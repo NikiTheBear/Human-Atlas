@@ -316,7 +316,7 @@ function render(route) {
   if (head === 'report') {
     setActiveNav('report');
     root.className = 'page';
-    renderReport(root, { App, DATA, volId: parts[1] || null, VOL_IDS, recompute, soulCode, go });
+    renderReport(root, { App, DATA, volId: parts[1] || null, VOL_IDS, recompute, soulCode, importSoulCode, go });
     return;
   }
 

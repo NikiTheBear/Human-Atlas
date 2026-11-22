@@ -19,7 +19,9 @@
     "test:monte:full": "node tests/monte-carlo-audit.js 10000",
     "test:all": "node tests/verify-scoring.js && node tests/verify-engine.js && node tests/monte-carlo-audit.js 2000",
     "audit": "node tests/audit.mjs 10000",
-    "audit:quick": "node tests/audit.mjs 1000"
+    "audit:quick": "node tests/audit.mjs 1000",
+    "build:pages": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node scripts/build-single.js && node scripts/build.js",
+    "test:v52": "node tests/audit-v52.mjs"
   },
   "engines": {
     "node": ">=18"

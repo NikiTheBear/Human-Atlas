@@ -13,7 +13,7 @@ import {
   sandboxSection, parliamentSection, timelineSection,
 } from './LabView.js';
 import { tierOf, maskTierOf, layeredScores } from '../core/scoring.js';
-import { butterflySvg } from '../viz/butterflySvg.js';
+import { butterflySvg, BUTTERFLY_PAIRS } from '../viz/butterflySvg.js';
 import { radarSvg, maskRadar } from '../viz/radarSvg.js';
 import { spectrumSvg } from '../viz/spectrumSvg.js';
 import { quadrantSvg, attachmentStyle } from '../viz/quadrantSvg.js';
@@ -25,10 +25,9 @@ import {
   downloadPoster, downloadMarkdown, copyMarkdown, copyAIPrompt, buildAIPrompt,
 } from './Exporter.js';
 import {
-  exportJSON, encodeSoulCode, initialSnapshotOf, retakeVolume, hasInitialSnapshot,
+  exportJSON, encodeSoulCode, initialSnapshotOf, retakeVolume, hasInitialSnapshot, importJSON,
 } from '../core/storage.js';
-import { confirmDialog } from './Dialogs.js';
-import { openSoulDialog } from './Dialogs.js';
+import { confirmDialog, openSoulDialog, openImportDialog } from './Dialogs.js';
 
 const meanOf = (ids, map) => {
   const vals = ids.map((i) => map[i]).filter((v) => Number.isFinite(v));
@@ -205,6 +204,162 @@ function reportNav(items) {
 }
 
 /* ------------------------------------------------------------
+   图表解锁占位条
+   ------------------------------------------------------------ */
+
+/**
+ * 某张图缺维度时的紧凑占位条。
+ *
+ * 为什么不用 `?? 50` 补点：补出来的点不是「中性」，是「假的」。
+ * 15 维里有 3 维没测，蝶形图会歪成另一只蝴蝶；
+ * 用户看到的形状是编的，但他不知道哪几行是编的。
+ * 占位条明确说清缺几个维度、要完成哪一卷，比假图诚实。
+ */
+function chartLockCard({ title, note, need, missing, total }) {
+  const box = el('div', { class: 'chart-lock' });
+  box.appendChild(el('div', { class: 'chart-lock__head' }, [
+    el('h3', { text: title }),
+    el('span', { class: 'chart-lock__note', text: note }),
+  ]));
+  box.appendChild(el('p', {
+    class: 'chart-lock__msg',
+    text: `${need} 后解锁 · 还缺 ${missing} / ${total} 个维度`,
+  }));
+  return box;
+}
+
+/* ------------------------------------------------------------
+   空态：档案尚未启封
+   ------------------------------------------------------------ */
+
+/**
+ * 没有任何已测维度时的空态卡。
+ *
+ * 为什么需要它：报告主体有 9 个板块、10 张图表、65 条跨卷规则。
+ * 在空状态下强行渲染，只会得到「全 50 的假图谱 + 0/65 的空壳表格」——
+ * 用户看到的第一屏是一份看起来有内容、其实全是占位数的假报告。
+ * 这里宁可什么都不画，只给三条明确的下一步。
+ */
+function renderEmptyDossier(root, ctx) {
+  const { App, DATA, importSoulCode } = ctx;
+
+  /* 28 题覆盖多少维度：从 DATA 现算，不写死。
+     算法与 core/express.js 的 buildExpressVolume() 一致（收集 options/effects/items）。 */
+  const expressIds = new Set(DATA.express?.questions || []);
+  const expressDimSet = new Set();
+  for (const vol of Object.values(DATA.volumes || {})) {
+    for (const q of vol.questions || []) {
+      if (!expressIds.has(q.id)) continue;
+      for (const o of q.options || []) Object.keys(o.effects || {}).forEach((d) => expressDimSet.add(d));
+      Object.keys(q.effects || {}).forEach((d) => expressDimSet.add(d));
+      for (const it of q.items || []) if (it.dim) expressDimSet.add(it.dim);
+      for (const v of q.values || []) Object.keys(v.effects || {}).forEach((d) => expressDimSet.add(d));
+    }
+  }
+  const EXPRESS_DIM_COUNT = expressDimSet.size;
+
+  root.classList.add('view');
+  const wrap = el('div', { class: 'report report--empty' });
+  root.appendChild(wrap);
+
+  const card = el('div', { class: 'empty-dossier' });
+
+  /* 印章式标记 */
+  const seal = el('div', { class: 'empty-dossier__seal' });
+  seal.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true">'
+    + '<circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="0.8"/>'
+    + '<circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 3"/>'
+    + '<path d="M24 10v28M13 24h22" stroke="currentColor" stroke-width="0.7"/>'
+    + '<circle cx="24" cy="24" r="4" fill="none" stroke="currentColor" stroke-width="0.8"/>'
+    + '</svg>';
+  card.appendChild(seal);
+
+  card.appendChild(el('div', { class: 'empty-dossier__kicker', text: 'DOSSIER · UNSEALED' }));
+  card.appendChild(el('h1', { class: 'empty-dossier__title', text: '档案尚未启封' }));
+  card.appendChild(el('p', {
+    class: 'empty-dossier__lead',
+    text: '这份报告由你的作答推导，不是通用模板。还没有任何维度被测量，所以现在画出来的每一条曲线都会是编的。',
+  }));
+
+  /* 三条出路 */
+  const paths = el('div', { class: 'empty-dossier__paths' });
+
+  paths.appendChild(el('a', { class: 'empty-path', href: '#/express' }, [
+    el('span', { class: 'empty-path__no', text: '01' }),
+    el('span', { class: 'empty-path__body' }, [
+      el('b', { text: '4 分钟极速初见' }),
+      el('span', { text: `${DATA.express?.questions?.length || 28} 题，覆盖 ${EXPRESS_DIM_COUNT} 个维度，立刻拿到一份简报` }),
+    ]),
+    el('span', { class: 'empty-path__arrow', text: '→' }),
+  ]));
+
+  paths.appendChild(el('a', { class: 'empty-path', href: '#/' }, [
+    el('span', { class: 'empty-path__no', text: '02' }),
+    el('span', { class: 'empty-path__body' }, [
+      el('b', { text: '前往十六卷宗大厅' }),
+      el('span', { text: '按自己的顺序启封，完成任意一卷就有完整报告' }),
+    ]),
+    el('span', { class: 'empty-path__arrow', text: '→' }),
+  ]));
+
+  /* 第三个是按钮而不是链接：它要开对话框，并且要能立刻重渲染 */
+  const importBtn = el('button', {
+    class: 'empty-path empty-path--btn',
+    type: 'button',
+  }, [
+    el('span', { class: 'empty-path__no', text: '03' }),
+    el('span', { class: 'empty-path__body' }, [
+      el('b', { text: '导入已有存档码' }),
+      el('span', { text: '粘贴 HA4- 短码，把别的设备上的进度搬过来' }),
+    ]),
+    el('span', { class: 'empty-path__arrow', text: '↑' }),
+  ]);
+
+  importBtn.addEventListener('click', () => {
+    openImportDialog({
+      importSoulCode,
+      importJSONText: (text) => {
+        const r = importJSON(text);
+        if (r.ok) {
+          const merged = { ...App.state };
+          merged.completedVolumes = Array.from(new Set([
+            ...(App.state.completedVolumes || []),
+            ...(r.state.completedVolumes || []),
+          ]));
+          merged.answersByVolume = { ...(r.state.answersByVolume || {}), ...(App.state.answersByVolume || {}) };
+          merged.inProgress = { ...(r.state.inProgress || {}), ...(App.state.inProgress || {}) };
+          merged.nickname = App.state.nickname || r.state.nickname || '';
+          App.state = merged;
+          window.HumanAtlas?.recompute?.();
+        }
+        return r;
+      },
+      onDone: () => {
+        window.HumanAtlas?.recompute?.();
+        /* hash 没变时浏览器不会自己触发 hashchange，这里手动补一次重渲染 */
+        window.dispatchEvent(new Event('hashchange'));
+      },
+    });
+  });
+
+  paths.appendChild(importBtn);
+  card.appendChild(paths);
+
+  /* 底部一句：说清这份系统的边界 */
+  card.appendChild(el('p', {
+    class: 'empty-dossier__foot',
+    text: `共 ${VOL_IDS_LABEL(DATA)} 卷 · ${Object.keys(DATA.dimMap).length} 个维度 · 全部数据只存在这台设备上`,
+  }));
+
+  wrap.appendChild(card);
+}
+
+/** 卷数：从 DATA 里数，不写死 */
+function VOL_IDS_LABEL(DATA) {
+  return Object.keys(DATA.volumes || {}).length;
+}
+
+/* ------------------------------------------------------------
    主渲染
    ------------------------------------------------------------ */
 
@@ -219,15 +374,19 @@ export function renderReport(root, ctx) {
     return;
   }
 
-  // 完成度不足
+  /* ---------- 空态门禁 ----------
+     只要测出的维度为 0，就绝不进入报告主体。
+     之前这里只判 completedVolumes.length，但当用户从存档码导入
+     「有维度分、completedVolumes 为空」的档案，或者在中途重置过进度时，
+     会出现「有分数但没完成卷」的半空状态 —— 报告照样往下渲染，
+     于是所有图表用 ?? 50 补出全 50 的假点、跨卷规则输出 0/65 的空壳。
+     现在改成以「已测维度数」为唯一门禁。 */
+  const measuredDims = Object.keys(state.computedScores || {})
+    .filter((d) => Number.isFinite(state.computedScores[d]));
   const completed = state.completedVolumes || [];
-  if (!completed.length) {
-    root.classList.add('view');
-    root.appendChild(el('div', { class: 'empty', style: { marginTop: '70px' } }, [
-      el('h3', { text: '还没有可以查看的档案' }),
-      el('p', { text: '完成任意一卷，即可获得该卷的独立深度报告；完成三卷以上，跨卷读心引擎会自动激活。' }),
-      el('a', { class: 'btn btn--solid', href: '#/', text: '前往卷宗大厅' }),
-    ]));
+
+  if (!measuredDims.length) {
+    renderEmptyDossier(root, ctx);
     return;
   }
 
@@ -363,9 +522,20 @@ export function renderReport(root, ctx) {
   const dash = el('section', { class: 'rsec', id: 'r-dash' });
   dash.appendChild(sec('01', '多维可视化', '所有图表均由原生 SVG 绘制，无第三方图表库'));
 
-  // 蝶形图
-  const vol1 = DATA.volumes.vol1;
-  if (vol1 && completed.includes('vol1')) {
+  /* 蝶形图门禁：14 个维度（7 美德 + 7 原罪）必须全部测出。
+     少一个就用 ?? 50 补点的话，那一行会变成一条贴中轴的假直线，
+     整个蝶翼形状因此失真。宁可不画，给一条解锁提示。 */
+  const butterflyDims = BUTTERFLY_PAIRS.flatMap((p) => [p.virtue, p.sin]);
+  const missingButterfly = butterflyDims.filter((d) => !Number.isFinite(report.scores[d]));
+  if (missingButterfly.length) {
+    dash.appendChild(chartLockCard({
+      title: '七美德 × 七原罪 · 双翼蝶形',
+      note: 'Vol.1',
+      need: '完成 Vol.1 光影圣殿',
+      missing: missingButterfly.length,
+      total: butterflyDims.length,
+    }));
+  } else {
     const bcard = el('div', { class: 'chart-card' });
     bcard.appendChild(el('div', { class: 'chart-card__head' }, [
       el('h3', { text: '七美德 × 七原罪 · 双翼蝶形' }),
@@ -474,10 +644,19 @@ export function renderReport(root, ctx) {
     grid2.appendChild(scard);
   }
 
-  // 面具虚实叠层雷达（需已完成 Vol.8）
-  if (completed.includes('vol8')) {
+  // 面具虚实叠层雷达：要 Vol.8 的高压题把暗线维度测出来
+  {
     const layers = layeredScores(state, DATA);
-    if (layers.keys.length >= 4) {
+    const hasLayer = layers.keys.length >= 4;
+    if (!hasLayer) {
+      grid2.appendChild(chartLockCard({
+        title: '面具虚实叠层',
+        note: 'Vol.8',
+        need: '完成 Vol.8 高压剧场',
+        missing: Math.max(0, 4 - layers.keys.length),
+        total: 4,
+      }));
+    } else {
       const picks = layers.keys
         .slice()
         .sort((a, b) => Math.abs(layers.surface[a] - layers.depth[a]) - Math.abs(layers.surface[b] - layers.depth[b]))
@@ -521,32 +700,43 @@ export function renderReport(root, ctx) {
     }
   }
 
-  // 依恋四象限
-  if (completed.includes('vol7')) {
+  // 依恋四象限：两个轴都测出来才画
+  {
     const an = report.scores.att_anxiety;
     const av = report.scores.att_avoidance;
-    const style = attachmentStyle(an, av);
-    const qcard = el('div', { class: 'chart-card' });
-    qcard.appendChild(el('div', { class: 'chart-card__head' }, [
-      el('h3', { text: `依恋坐标 · ${style.name}` }),
-      el('span', { class: 'chart-card__note', text: 'Vol.7' }),
-    ]));
-    const qb = el('div', { class: 'chart-card__body' });
-    qb.appendChild(quadrantSvg({ anxiety: an, avoidance: av }, {
-      width: 460,
-      color: C.vol7,
-      colorText: C.text,
-      colorMuted: C.faint,
-      colorBorder: C.border,
-      bg: C.card,
-      safeColor: C.vol2,
-    }));
-    qb.appendChild(el('p', {
-      style: { fontSize: '12.5px', lineHeight: '1.95', color: 'var(--text-secondary)', marginTop: '14px' },
-      text: style.desc,
-    }));
-    qcard.appendChild(qb);
-    grid2.appendChild(qcard);
+    const ok = Number.isFinite(an) && Number.isFinite(av);
+    if (!ok) {
+      grid2.appendChild(chartLockCard({
+        title: '依恋坐标 · 四象限',
+        note: 'Vol.7',
+        need: '完成 Vol.7 亲密防线',
+        missing: [an, av].filter((v) => !Number.isFinite(v)).length,
+        total: 2,
+      }));
+    } else {
+      const style = attachmentStyle(an, av);
+      const qcard = el('div', { class: 'chart-card' });
+      qcard.appendChild(el('div', { class: 'chart-card__head' }, [
+        el('h3', { text: `依恋坐标 · ${style.name}` }),
+        el('span', { class: 'chart-card__note', text: 'Vol.7' }),
+      ]));
+      const qb = el('div', { class: 'chart-card__body' });
+      qb.appendChild(quadrantSvg({ anxiety: an, avoidance: av }, {
+        width: 460,
+        color: C.vol7,
+        colorText: C.text,
+        colorMuted: C.faint,
+        colorBorder: C.border,
+        bg: C.card,
+        safeColor: C.vol2,
+      }));
+      qb.appendChild(el('p', {
+        style: { fontSize: '12.5px', lineHeight: '1.95', color: 'var(--text-secondary)', marginTop: '14px' },
+        text: style.desc,
+      }));
+      qcard.appendChild(qb);
+      grid2.appendChild(qcard);
+    }
   }
 
   // 思维棱镜光谱
@@ -649,16 +839,23 @@ export function renderReport(root, ctx) {
   const crossSec = el('section', { class: 'rsec', id: 'r-cross' });
   crossSec.appendChild(sec('03', '跨卷化学反应', `已触发 ${report.cross.length} / ${DATA.crossRules.length} 条黄金规则`));
 
+  /* 章节头部的计数也要按门禁改写：0 卷时显示「已触发 0 / 65」
+     会让用户以为系统跑过一遍并且没命中，其实根本没开始算。 */
   if (completed.length < 3) {
+    crossSec.replaceChild(
+      sec('03', '跨卷化学反应', '完成至少 3 卷后解锁跨卷化学反应'),
+      crossSec.firstElementChild,
+    );
     crossSec.appendChild(el('div', { class: 'empty' }, [
       el('h3', { text: '还差一点' }),
       el('p', { text: `跨卷读心需要至少完成 3 卷。你目前完成 ${completed.length} 卷，再完成 ${3 - completed.length} 卷即可激活。` }),
       el('a', { class: 'btn', href: '#/', text: '继续启封' }),
     ]));
   } else if (!report.cross.length) {
+    /* 走到这里说明真的算过了、且一条没命中 —— 这时候「分布均衡」才是可信结论 */
     crossSec.appendChild(el('div', { class: 'empty' }, [
-      el('h3', { text: '这一组组合很罕见' }),
-      el('p', { text: '你目前的维度组合没有命中任何预设的跨卷规则。这通常意味着你的各项特质分布相对均衡，没有形成极端拉扯的结构。' }),
+      el('h3', { text: `已完成 ${completed.length} 卷，${DATA.crossRules.length} 条规则都没有交汇` }),
+      el('p', { text: `跨卷引擎完整跑过 ${DATA.crossRules.length} 条规则，你的维度组合一条都没有命中。这通常意味着各项特质分布比较均衡，没有形成极端拉扯的结构。` }),
     ]));
   } else {
     report.cross.forEach((c) => {
@@ -750,7 +947,28 @@ export function renderReport(root, ctx) {
   const archSec = el('section', { class: 'rsec', id: 'r-archives' });
   archSec.appendChild(sec('05', '分卷深度档案', `${completed.length} / ${VOL_IDS.length} 卷已归档 · 共 ${DATA.dimOrder.length} 个维度`));
 
-  completed.forEach((vid) => {
+  /* 只渲染「这一卷真的测出了维度」的卷宗。
+     之前是遍历 completedVolumes，遇到「卷被标记完成但分数里没有它的维度」
+     （导入存档码、或中途清过 computedScores）就会输出一张只有表头、
+     0 行数据的空表格。 */
+  const archivable = completed.filter((vid) => {
+    const vol = DATA.volumes[vid];
+    if (!vol) return false;
+    return (vol.dimensions || []).some((d) => Number.isFinite(report.scores[d]));
+  });
+
+  if (!archivable.length) {
+    archSec.replaceChild(
+      sec('05', '分卷深度档案', '还没有任何一卷测出维度'),
+      archSec.firstElementChild,
+    );
+    archSec.appendChild(el('div', { class: 'empty' }, [
+      el('h3', { text: '还没有可归档的卷宗' }),
+      el('p', { text: '完成任意一卷后，这里会按卷列出该卷测出的全部维度与分数。' }),
+    ]));
+  }
+
+  archivable.forEach((vid) => {
     const vol = DATA.volumes[vid];
     if (!vol) return;
     const dims = (vol.dimensions || [])

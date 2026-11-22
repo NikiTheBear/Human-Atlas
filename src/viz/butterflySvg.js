@@ -173,29 +173,32 @@ export function butterflySvg(dims, opts = {}) {
     g.appendChild(rt);
 
     // 中轴：7 组维度名称（左美德 / 右原罪，用斜杠分开）
-    const midLabel = svgText(`${r.v}/${r.s}`, {
+    const midText = `${r.v}/${r.s}`;
+    const midSize = W > 560 ? 9 : 8;
+    const midLabel = svgText(midText, {
       x: cx,
       y: r.y + 3.4,
       'text-anchor': 'middle',
-      'font-size': W > 560 ? 9 : 8,
+      'font-size': midSize,
       'font-family': "'Noto Sans SC','PingFang SC',sans-serif",
       fill: cMuted,
       'letter-spacing': '0.02em',
     });
-    // 白底托片，压住中轴虚线，保证可读
-    const pillW = (W > 560 ? 9 : 8) * 4.2;
+    /* 白底托片按实际字数估算宽度：中文按 1em、斜杠按 0.45em。
+       原来是固定 4.2 倍字号，遇到「代偿·放纵/克制」这种 7 字行会露馅。 */
+    const emUnits = [...midText].reduce((a, ch) => a + (ch === '/' ? 0.45 : 1), 0);
+    const pillW = Math.max(midSize * 4.2, emUnits * midSize + midSize * 1.2);
     g.appendChild(svg('rect', {
-      x: cx - pillW / 2, y: r.y - 6, width: pillW, height: 12,
-      fill: opts.bg || '#FCFBF8', opacity: 0.92, rx: 2,
+      x: cx - pillW / 2, y: r.y - midSize * 0.72, width: pillW, height: midSize * 1.44,
+      fill: opts.bg || '#FCFBF8', opacity: 0.94, rx: 2,
     }));
     g.appendChild(midLabel);
   });
 
-  // ---- 中心徽记 ----
-  g.appendChild(svg('circle', { cx, cy, r: 15, fill: opts.bg || '#FCFBF8', stroke: cBorder, 'stroke-width': 1 }));
-  g.appendChild(svg('circle', { cx, cy, r: 4.5, fill: 'none', stroke: cText, 'stroke-width': 1 }));
-  g.appendChild(svg('line', { x1: cx, y1: cy - 15, x2: cx, y2: cy - 8, stroke: cBorder, 'stroke-width': 1 }));
-  g.appendChild(svg('line', { x1: cx, y1: cy + 8, x2: cx, y2: cy + 15, stroke: cBorder, 'stroke-width': 1 }));
+  /* 中轴中心不再放徽记。
+     原来这里有一个 r=15 的圆 + 内圈 + 上下短线，正好压在第 4 行
+     「比较·嫉妒/欣赏」的中轴文字上 —— 白底圆形把字盖掉了一半。
+     去掉之后中轴只剩一条虚线，7 行文字各自由白底托片护住，互不干扰。 */
 
   // ---- 标题 ----
   const tv = svgText('美德 · 秩序', {

@@ -1968,9 +1968,18 @@ html[data-theme='dark'] .report-cover {
 .gauge__note { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; letter-spacing: 0.04em; }
 
 /* ---------- report nav ---------- */
+/* 吸顶二级导航。top 必须精确等于全局顶栏高度：
+   masthead__inner 是 padding 14px 上下 + 内容 26px（brand__mark 高 26）
+   + border-bottom 1px = 55px，取整 56px。
+   之前写 62px，会露出 6px 缝隙 —— 正文从缝里透上来，看起来像层级错乱。 */
+:root {
+  --masthead-h: 56px;
+  --report-nav-h: 47px;   /* 14px 上 + 14px 下 + 12px 行高 + 1.5px 下边框，取整 */
+}
+
 .report-nav {
   position: sticky;
-  top: 62px;
+  top: var(--masthead-h);
   z-index: 30;
   background: var(--bg-page);
   backdrop-filter: blur(12px);
@@ -2000,7 +2009,8 @@ html[data-theme='dark'] .report-cover {
 /* ---------- report section ---------- */
 .rsec {
   margin-bottom: 58px;
-  scroll-margin-top: 142px;
+  /* 顶栏 56 + 二级导航 47 + 呼吸 16 + 余量 9 = 128 */
+  scroll-margin-top: calc(var(--masthead-h) + var(--report-nav-h) + 25px);
   /* 长报告有十几个大区块，视口外的部分跳过布局与绘制。
      用 contain-intrinsic-size 占位，避免滚动条跳动。 */
   content-visibility: auto;
@@ -2914,8 +2924,10 @@ html[data-theme='dark'] .mirror-face--back {
   .gauges { grid-template-columns: repeat(2, 1fr); }
   .cmp-verdict { grid-template-columns: 1fr; gap: 22px; padding: 26px; }
   .cmp-verdict__score { padding-right: 0; padding-bottom: 20px; border-right: 0; border-bottom: 1px solid var(--border); }
-  .report-nav { top: 56px; }
-  .rsec { scroll-margin-top: 116px; }
+  /* 移动端 masthead__inner padding 11px，内容 26px，边框 1px → 49px */
+  :root { --masthead-h: 49px; --report-nav-h: 45px; }
+  .report-nav { top: var(--masthead-h); }
+  .rsec { scroll-margin-top: calc(var(--masthead-h) + var(--report-nav-h) + 18px); }
   .mirror-face { min-height: 300px; }
 
   .interlude { margin: 32px auto; padding: 24px 0; }
@@ -5042,4 +5054,222 @@ body.is-immersive .quiz__back {
   .guide-vol__meta { display: none; }
   .guide-vol__body { padding-left: 18px; }
   .guide-train__car { min-width: 62px; flex: 1 1 30%; }
+}
+
+/* ============================================================
+   空态：档案尚未启封
+   ============================================================ */
+.report--empty {
+  min-height: 62vh;
+  display: grid;
+  place-items: center;
+  padding: 48px 0 64px;
+}
+
+.empty-dossier {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 52px 44px 44px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 极轻的斜纹底，避免大块纯色显得空旷（暗色下几乎不可见） */
+.empty-dossier::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--border-hair) 0 1px,
+    transparent 1px 14px
+  );
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.empty-dossier > * { position: relative; }
+
+.empty-dossier__seal {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 22px;
+  color: var(--gold);
+  opacity: 0.7;
+}
+.empty-dossier__seal svg { width: 100%; height: 100%; display: block; }
+
+.empty-dossier__kicker {
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.empty-dossier__title {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.empty-dossier__lead {
+  font-size: 13px;
+  line-height: 2;
+  color: var(--text-secondary);
+  max-width: 40ch;
+  margin: 0 auto 34px;
+}
+
+.empty-dossier__paths {
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+
+.empty-path {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 17px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  transition: border-color 200ms var(--ease), background 200ms var(--ease), transform 200ms var(--ease);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.empty-path:hover {
+  border-color: var(--gold);
+  background: var(--bg-card);
+}
+
+.empty-path__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  flex: none;
+  min-width: 22px;
+}
+
+.empty-path__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.empty-path__body b {
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+.empty-path__body span {
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--text-tertiary);
+}
+
+.empty-path__arrow {
+  margin-left: auto;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  flex: none;
+  transition: color 200ms var(--ease), transform 200ms var(--ease);
+}
+.empty-path:hover .empty-path__arrow {
+  color: var(--gold);
+  transform: translateX(3px);
+}
+
+.empty-dossier__foot {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-hair);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 640px) {
+  .empty-dossier { padding: 40px 22px 32px; }
+  .empty-dossier__title { font-size: 24px; }
+  .empty-path { padding: 15px 16px; gap: 12px; }
+}
+
+/* ---------- 图表尺寸收敛 ---------- */
+/* 图表本体在超宽屏上会被拉到 900px 以上，行距与字号比例失衡，
+   用户在 100% 缩放下必须缩到 67% 才能看全。给出上限并居中。 */
+.chart-card__body > svg,
+.chart-card__body > div > svg,
+.spec-svg > svg {
+  max-width: 560px;
+  max-height: 460px;
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+/* 蝶形图信息密度高（7 行双翼 + 28 个端点数字），允许更宽一档 */
+.chart-card__body > svg[aria-label*="蝶形"] {
+  max-width: 680px;
+  max-height: 470px;
+}
+
+@media (max-width: 760px) {
+  .chart-card__body > svg,
+  .chart-card__body > div > svg,
+  .spec-svg > svg {
+    max-width: 100%;
+    max-height: none;
+  }
+}
+
+/* ---------- 图表解锁占位条 ---------- */
+.chart-lock {
+  padding: 20px 22px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-page);
+  margin-bottom: 18px;
+}
+
+.chart-lock__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.chart-lock__head h3 {
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.chart-lock__note {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+
+.chart-lock__msg {
+  font-size: 11.5px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
 }

@@ -73,16 +73,36 @@ export function quadrantSvg(o = {}, opt = {}) {
   const px = (v) => padL + (iw * v) / 100;
   const py = (v) => padT + ih - (ih * v) / 100;
 
-  // 安全缓冲区光晕（左下，低焦虑低回避）
-  const safe = svg('circle', {
-    cx: px(22), cy: py(22), r: Math.min(iw, ih) * 0.24,
-    fill: opt.safeColor || '#4A6B5D', opacity: 0.07,
-  });
-  g.appendChild(safe);
-  g.appendChild(svg('circle', {
-    cx: px(22), cy: py(22), r: Math.min(iw, ih) * 0.24,
-    fill: 'none', stroke: opt.safeColor || '#4A6B5D', 'stroke-width': 0.8,
-    'stroke-dasharray': '3 4', opacity: 0.5,
+  /* 安全缓冲区（左下象限，低焦虑 + 低回避）。
+     原来用 r = min(iw,ih) × 0.24 的圆，圆心放在 (22,22)，
+     半径会越过中轴、压住左侧刻度 25 与「安全型」标签。
+     改成严格内切在 [padL, padL+iw/2] × [padT+ih/2, padT+ih] 这块区域里的圆角矩形：
+     四周各留 6px 呼吸，既不碰轴线也不碰刻度。 */
+  const safeCx = padL + iw / 4;
+  const safeCy = padT + ih * 0.75;
+  const safeW = iw / 2 - 12;
+  const safeH = ih / 2 - 12;
+  const safeColor = opt.safeColor || '#4A6B5D';
+  g.appendChild(svg('rect', {
+    x: safeCx - safeW / 2,
+    y: safeCy - safeH / 2,
+    width: safeW,
+    height: safeH,
+    rx: Math.min(safeW, safeH) * 0.34,
+    fill: safeColor,
+    opacity: 0.07,
+  }));
+  g.appendChild(svg('rect', {
+    x: safeCx - safeW / 2,
+    y: safeCy - safeH / 2,
+    width: safeW,
+    height: safeH,
+    rx: Math.min(safeW, safeH) * 0.34,
+    fill: 'none',
+    stroke: safeColor,
+    'stroke-width': 0.8,
+    'stroke-dasharray': '3 4',
+    opacity: 0.45,
   }));
 
   // 象限背景格
@@ -123,7 +143,8 @@ export function quadrantSvg(o = {}, opt = {}) {
   const ql = [
     { t: '焦虑纠缠', x: padL + 10, y: padT + 16, a: 'start' },
     { t: '恐惧矛盾', x: padL + iw - 10, y: padT + 16, a: 'end' },
-    { t: '安全型', x: padL + 10, y: padT + ih - 10, a: 'start' },
+    /* 标签贴左下角内侧，比安全区下沿再收 8px，不会与虚线框叠字 */
+    { t: '安全型', x: padL + 9, y: padT + ih - 7, a: 'start' },
     { t: '回避疏离', x: padL + iw - 10, y: padT + ih - 10, a: 'end' },
   ];
   ql.forEach((q) => {
