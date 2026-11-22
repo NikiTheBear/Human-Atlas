@@ -4,6 +4,7 @@
    模拟 5 类极端画像，跑通全链路，验证无 NaN / undefined
    ============================================================ */
 
+import fs from 'node:fs';
 import { DIMENSIONS, VOLUMES, MIRRORS, ARCHETYPES, CROSS_RULES, PAIR_RULES, DIM_ORDER } from '../src/data/bundle.js';
 import { computeAll, maskIndex, maskTierOf, tierOf } from '../src/core/scoring.js';
 import { encodeSoulCode, decodeSoulCode, SCHEMA_VERSION } from '../src/core/storage.js';
@@ -422,6 +423,56 @@ function tc6() {
 }
 
 /* ------------------------------------------------------------
+   TC6b · 量表档位与语义文案必须严格一一对应
+   ------------------------------------------------------------ */
+
+function tc6b() {
+  console.log('\n[TC6b] 量表档位 ↔ 语义文案一致性');
+
+  // 与 QuizRunner 中 SCALE_WORDS 保持一致（此处独立抄写，防止被同时改错）
+  const EXPECT = [
+    '强烈偏向左侧',
+    '明显偏向左侧',
+    '略偏左侧',
+    '居中平衡',
+    '略偏右侧',
+    '明显偏向右侧',
+    '强烈偏向右侧',
+  ];
+
+  const src = fs.readFileSync(new URL('../src/components/QuizRunner.js', import.meta.url), 'utf8');
+
+  // 1) 词表本身
+  const m = src.match(/const SCALE_WORDS = \[([\s\S]*?)\];/);
+  check('QuizRunner 中存在 SCALE_WORDS 常量', !!m);
+  if (m) {
+    const words = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]);
+    check('SCALE_WORDS 恰好 7 档', words.length === 7, `${words.length}`);
+    check('七档语义与预期逐字一致', JSON.stringify(words) === JSON.stringify(EXPECT),
+      words.join('/'));
+  }
+
+  // 2) 提示文字只能由「悬停预览」或「已选档位」推导，不能有第三个来源
+  check('提示由 hovering ?? selected 推导', /hovering\s*!==\s*null\s*\?\s*hovering\s*:\s*selected/.test(src));
+  check('存在 setScale 供外部同步', /wrap\.setScale\s*=/.test(src));
+  check('onPick 内会调用 setScale', /scaleWidget\.setScale\(value\)/.test(src));
+
+  // 3) 键盘路径不得绕过 onPick（否则提示会停留在悬停态）
+  const keyStart = src.indexOf('const onKey');
+  const keyEnd = src.indexOf("window.addEventListener('keydown', onKey)");
+  const keyBlock = keyStart >= 0 && keyEnd > keyStart ? src.slice(keyStart, keyEnd) : '';
+  check('键盘数字键量表分支走 pickHandler', /stealth_scale[\s\S]{0,220}pickHandler\(n\)/.test(keyBlock));
+  check('键盘选择题分支也走 pickHandler', /forced_choice[\s\S]{0,200}pickHandler\(opt\.key\)/.test(keyBlock));
+  check('键盘分支不再直接写 scale-dot 类名', !/\.scale-dot'[\s\S]{0,120}dataset\.k === String\(n\)/.test(keyBlock));
+
+  // 4) 数值一致性：第 i 档 → 第 i 条文案
+  EXPECT.forEach((w, i) => {
+    const expectLabel = `第 ${i + 1} 档：${w}`;
+    check(`aria-label 与档位对齐（${expectLabel}）`, src.includes(`第 \${i} 档：\${SCALE_WORDS[i - 1]}`) || src.includes(expectLabel));
+  });
+}
+
+/* ------------------------------------------------------------
    TC7 · 边界鲁棒性
    ------------------------------------------------------------ */
 
@@ -486,6 +537,7 @@ function main() {
   tc4();
   tc5();
   tc6();
+  tc6b();
   tc7();
 
   console.log('\n' + '─'.repeat(64));

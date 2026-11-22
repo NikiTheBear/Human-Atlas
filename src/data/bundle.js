@@ -20597,5 +20597,44 @@ export const PAIR_RULES = {
   ]
 };
 
+export const EXPRESS = {
+  "id": "express",
+  "title": "初见微光",
+  "subtitle": "28 题 · 约 4 分钟 · 关系核心轴速写",
+  "intro": "这不是完整档案，只是一次快照。二十八道题，覆盖关系里最要紧的那几条轴：你怎么看世界、怎么靠人、怎么冲突、怎么花钱、被压力压到时会变成什么形状。做完你会立刻拿到一份简报和一个可以发给别人的存档码；之后想继续做完整十六卷，这二十八题不会让你重复作答。",
+  "estimated_minutes": 4,
+  "questions": [
+    "v1_q02",
+    "v2_q04",
+    "v2_q18",
+    "v3_q05",
+    "v3_q15",
+    "v4_q04",
+    "v4_q12",
+    "v5_q04",
+    "v5_q16",
+    "v6_q06",
+    "v6_q11",
+    "v7_q09",
+    "v7_q16",
+    "v8_q01",
+    "v9_q13",
+    "v10_q01",
+    "v10_q08",
+    "v11_q01",
+    "v11_q14",
+    "v12_q01",
+    "v13_q04",
+    "v13_q13",
+    "v14_q01",
+    "v14_q05",
+    "v15_q04",
+    "v15_q10",
+    "v16_q01",
+    "v16_q08"
+  ],
+  "note": "键为原卷题目 id 的直接引用，不复制题干、不改权重。scorePool() 会按原卷归属把作答写进 answersByVolume，因此与十六卷完整模式完全互通。"
+};
+
 export const DIM_ORDER = DIMENSIONS.dims.map((d) => d.id);
 export const DIM_MAP = Object.fromEntries(DIMENSIONS.dims.map((d) => [d.id, d]));

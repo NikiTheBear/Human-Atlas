@@ -33,10 +33,26 @@ const TYPE_LABEL = {
 const TYPE_HINT = {
   impulse_3s: '凭第一直觉作答，不必权衡',
   stealth_scale: '',
-  forced_choice: '两项都可以是体面的，选更贴近你的那个',
+  forced_choice: '',          // 按选项数量动态生成，见 hintOf()
   budget_100: '总分必须恰好为 100',
   pyramid_top3: '顺序本身就是答案',
 };
+
+/**
+ * 题目提示语。
+ * 选择题的「两项 / 每项」必须跟着选项数量走 —— 四个选项下面写「两项都可以是体面的」
+ * 会立刻露怯，是很容易被一眼识破的穿帮。
+ */
+function hintOf(q) {
+  if (q.type === 'forced_choice' || q.type === 'impulse_3s') {
+    const n = (q.options || []).length;
+    if (q.type === 'impulse_3s') return '凭第一直觉作答，不必权衡';
+    if (n === 2) return '两点都可以是体面的，选更贴近你的那个';
+    if (n === 3) return '三种都说得通，选更像你的那个';
+    return '每个选项都是体面的，选更贴近你的那个';
+  }
+  return TYPE_HINT[q.type] || '';
+}
 
 /* ------------------------------------------------------------
    卷首
@@ -135,7 +151,8 @@ const SCALE_WORDS = [
 ];
 
 function renderStealthScale(q, value, onPick) {
-  const v = Number.isFinite(Number(value)) ? Number(value) : null;
+  // 当前已选档位：唯一事实来源。悬停只做「预览」，不改这个值。
+  let selected = Number.isFinite(Number(value)) ? Number(value) : null;
   let hovering = null;
 
   const wrap = el('div', { class: 'scale-wrap' });
@@ -149,8 +166,11 @@ function renderStealthScale(q, value, onPick) {
   const dots = el('div', { class: 'scale-dots' });
   const caption = el('div', { class: 'scale-caption' });
 
+  /* 提示文字只能由「悬停预览」或「已选档位」推导，不允许留任何残留状态。
+     早期版本只监听 pointerenter，键盘按 6 时 caption 会停在之前悬停的第 3 档，
+     出现「选中第 6 个点却写略偏左侧」的错位。 */
   const syncCaption = () => {
-    const shown = hovering ?? v;
+    const shown = hovering !== null ? hovering : selected;
     if (shown === null) {
       caption.textContent = '在两端之间，点选更贴近你的位置';
       caption.classList.remove('is-live');
@@ -160,9 +180,15 @@ function renderStealthScale(q, value, onPick) {
     }
   };
 
+  const syncDots = () => {
+    dots.querySelectorAll('.scale-dot').forEach((d) => {
+      d.classList.toggle('is-sel', Number(d.dataset.k) === selected);
+    });
+  };
+
   for (let i = 1; i <= 7; i += 1) {
     const dot = el('button', {
-      class: `scale-dot${v === i ? ' is-sel' : ''}`,
+      class: `scale-dot${selected === i ? ' is-sel' : ''}`,
       type: 'button',
       'aria-label': `第 ${i} 档：${SCALE_WORDS[i - 1]}`,
       onclick: () => onPick(i),
@@ -175,6 +201,19 @@ function renderStealthScale(q, value, onPick) {
     dots.appendChild(dot);
   }
   wrap.appendChild(dots);
+
+  /* 对外暴露：鼠标点击、键盘数字键、回退修改都走这条路，
+     保证「选中态」与「提示文字」永远同步。 */
+  wrap.setScale = (next) => {
+    const n = Number(next);
+    selected = Number.isFinite(n) && n >= 1 && n <= 7 ? n : null;
+    hovering = null;
+    syncDots();
+    syncCaption();
+  };
+
+  // 容器整体离开时兜底清空悬停预览，避免极端情况下残留
+  wrap.addEventListener('pointerleave', () => { hovering = null; syncCaption(); });
 
   syncCaption();
   wrap.appendChild(caption);
@@ -437,6 +476,10 @@ export function renderQuiz(root, ctx) {
   let focus = createFocusTimer();   // 自动扣除切屏 / 失焦时长
   let changesInQuestion = 0;
   let lastInterlude = -1;
+  /* 当前题的作答入口。鼠标点击 / 键盘数字键 / 回退修改共用同一条路径，
+     保证「选中态」与「下方语义提示」永远同步。
+     不能直接在 onKey 里引用 renderQuestion 内的 onPick —— 那会越出作用域。 */
+  let pickHandler = null;
 
   // 自动切题：默认开启，可随时切换；回退修改时不触发
   const AUTO_KEY = 'human-atlas::autoAdvance';
@@ -482,10 +525,15 @@ export function renderQuiz(root, ctx) {
     stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M15 5l-7 7 7 7"/></svg><span>大厅</span>`;
 
-  const volLabel = el('div', { class: 'quiz__vol' }, [
-    el('b', { text: vol.title }),
-    el('span', { text: `VOL.${String(vol.index).padStart(2, '0')}` }),
-  ]);
+  const volLabel = el('div', { class: 'quiz__vol' }, vol.isExpress
+    ? [
+      el('b', { text: vol.title }),
+      el('span', { text: 'EXPRESS · 28' }),
+    ]
+    : [
+      el('b', { text: vol.title }),
+      el('span', { text: `VOL.${String(vol.index).padStart(2, '0')}` }),
+    ]);
   const countLabel = el('div', { class: 'quiz__count' });
 
   barTop.appendChild(backToHub);
@@ -643,6 +691,16 @@ export function renderQuiz(root, ctx) {
       toast(`还有 ${qs.length - answeredNow} 题未作答，先把它们完成`);
       return;
     }
+
+    // 极速模式：把虚拟桶的答案写回原卷，然后进简报页。
+    // 不写 completedVolumes —— 28 题不等于完成了任何一整卷。
+    if (vol.isExpress) {
+      delete state.inProgress[volId];
+      persist();
+      nav('#/express/result');
+      return;
+    }
+
     const firstTime = !state.completedVolumes.includes(volId);
     if (firstTime) {
       state.completedVolumes.push(volId);
@@ -696,6 +754,10 @@ export function renderQuiz(root, ctx) {
       el('span', { class: 'q-meta__no', text: `Q ${String(current + 1).padStart(2, '0')}` }),
       el('span', { class: 'q-meta__sep' }),
       el('span', { class: 'q-meta__type', text: TYPE_LABEL[q.type] || q.type }),
+      // 极速模式标注题目出处，让人知道这是从哪一卷抽出来的
+      vol.isExpress && q._srcTitle
+        ? el('span', { class: 'q-meta__src', text: `摘自 ${q._srcTitle}` })
+        : null,
     ]);
     card.appendChild(meta);
 
@@ -707,8 +769,9 @@ export function renderQuiz(root, ctx) {
 
     card.appendChild(el('h2', { class: 'q-prompt', text: q.prompt }));
 
-    if (TYPE_HINT[q.type]) {
-      card.appendChild(el('div', { class: 'q-hint' }, [el('span', { text: TYPE_HINT[q.type] })]));
+    const hint = hintOf(q);
+    if (hint) {
+      card.appendChild(el('div', { class: 'q-hint' }, [el('span', { text: hint })]));
     }
 
     // 快捷键提示与当前题型对齐
@@ -723,6 +786,8 @@ export function renderQuiz(root, ctx) {
       keyPick.innerHTML = '点选顺序即排名';
     }
 
+    let scaleWidget = null;
+
     const onPick = (value) => {
       setValue(q, value);
       // 立即反映选中态
@@ -732,10 +797,17 @@ export function renderQuiz(root, ctx) {
       cardHolder.querySelectorAll('.scale-dot').forEach((d) => {
         d.classList.toggle('is-sel', d.dataset.k === String(value));
       });
+      // 量表还要同步下方语义提示（点击 / 键盘 / 回退三条路径共用）
+      if (scaleWidget && typeof scaleWidget.setScale === 'function') {
+        scaleWidget.setScale(value);
+      }
 
       // 240ms 柔和高亮后自动切题（可在底部开关关闭）
       if (autoAdvance) scheduleAdvance();
     };
+
+    // 交给键盘分支复用
+    pickHandler = onPick;
 
     if (q.type === 'forced_choice') {
       card.appendChild(renderForcedChoice(q, savedValue, onPick));
@@ -753,6 +825,7 @@ export function renderQuiz(root, ctx) {
       const wrap = renderStealthScale(q, savedValue, (v) => {
         onPick(v);
       });
+      scaleWidget = wrap;
       card.appendChild(wrap);
     } else if (q.type === 'budget_100') {
       card.appendChild(renderBudget(q, savedValue, (map) => {
@@ -808,17 +881,12 @@ export function renderQuiz(root, ctx) {
       const opt = q.options?.[n - 1];
       if (!opt) return;
       e.preventDefault();
-      setValue(q, opt.key);
-      cardHolder.querySelectorAll('.opt').forEach((o) => {
-        o.classList.toggle('is-sel', o.dataset.k === String(opt.key));
-      });
+      if (pickHandler) pickHandler(opt.key);
     } else if (q.type === 'stealth_scale') {
       if (n > 7) return;
       e.preventDefault();
-      setValue(q, n);
-      cardHolder.querySelectorAll('.scale-dot').forEach((d) => {
-        d.classList.toggle('is-sel', d.dataset.k === String(n));
-      });
+      // 走统一入口：选中态 + 语义提示 + 自动切题全部对齐
+      if (pickHandler) pickHandler(n);
     } else if (q.type === 'pyramid_top3') {
       const item = q.values?.[n - 1];
       if (!item) return;

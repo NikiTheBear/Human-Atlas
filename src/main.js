@@ -3,7 +3,8 @@
    ============================================================ */
 
 import {
-  DIMENSIONS, VOLUMES, MIRRORS, ARCHETYPES, CROSS_RULES, PAIR_RULES, DIM_ORDER, DIM_MAP,
+  DIMENSIONS, VOLUMES, MIRRORS, ARCHETYPES, CROSS_RULES, PAIR_RULES,
+  DIM_ORDER, DIM_MAP, EXPRESS,
 } from './data/bundle.js';
 
 import {
@@ -17,6 +18,8 @@ import { renderHub } from './components/VolumeHub.js';
 import { renderQuiz } from './components/QuizRunner.js';
 import { renderReport } from './components/ReportView.js';
 import { renderCompare } from './components/CompareView.js';
+import { renderExpressIntro, renderExpressResult } from './components/ExpressView.js';
+import { buildExpressVolume, seedFromVolumes } from './core/express.js';
 
 /* ------------------------------------------------------------
    数据装配
@@ -33,6 +36,7 @@ export const DATA = {
   dimMap: DIM_MAP,
   values: DIMENSIONS.values || [],
   pressureStyles: DIMENSIONS.pressureStyles || [],
+  express: EXPRESS,
 };
 
 export const VOL_IDS = Object.keys(VOLUMES).sort((a, b) => VOLUMES[a].index - VOLUMES[b].index);
@@ -211,6 +215,7 @@ export function setActiveNav(key) {
 function render(route) {
   const root = qs('#view-root');
   if (!root) return;
+  document.body.classList.remove('is-immersive');
   root.innerHTML = '';
   root.className = 'page';
 
@@ -230,12 +235,46 @@ function render(route) {
     return;
   }
 
+  // 极速模式：入口 / 答题 / 简报
+  if (head === 'express') {
+    document.body.classList.remove('is-immersive');
+    if (parts[1] === 'quiz') {
+      root.className = 'page page--narrow page--immersive';
+      document.body.classList.add('is-immersive');
+      const vol = buildExpressVolume(DATA, DATA.express);
+      // 只把虚拟卷挂进 DATA，App.state 保持同一个引用 ——
+      // 否则 renderQuiz 里的 save() 会写入一份副本，进度就存不回来了。
+      const dataWithExpress = { ...DATA, volumes: { ...DATA.volumes, [vol.volume_id]: vol } };
+      seedFromVolumes(App.state, vol);
+      renderQuiz(root, {
+        App,
+        DATA: dataWithExpress,
+        volId: vol.volume_id,
+        mode: 'run',
+        recompute,
+        go,
+      });
+      return;
+    }
+    if (parts[1] === 'result') {
+      root.className = 'page';
+      renderExpressResult(root, { App, DATA, recompute, soulCode, go });
+      return;
+    }
+    root.className = 'page';
+    renderExpressIntro(root, { App, DATA, go });
+    return;
+  }
+
   if (head === 'quiz' && parts[1]) {
     setActiveNav('hub');
-    root.className = 'page page--narrow';
+    root.className = 'page page--narrow page--immersive';
+    // 沉浸模式：收起顶栏冗余入口，答题区独占整屏
+    document.body.classList.add('is-immersive');
     renderQuiz(root, { App, DATA, volId: parts[1], mode: 'run', recompute, go });
     return;
   }
+  document.body.classList.remove('is-immersive');
 
   if (head === 'report') {
     setActiveNav('report');

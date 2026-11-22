@@ -299,6 +299,7 @@ export function renderHub(root, ctx) {
     doneCount > 0
       ? el('a', { class: 'btn', href: '#/report', text: '查看已有的报告' })
       : el('a', { class: 'btn btn--ghost', href: '#/quiz/vol1', text: '直接开始答题' }),
+    el('a', { class: 'btn btn--ghost', href: '#/express', text: '28 题极速版' }),
   ]));
 
   hero.appendChild(left);

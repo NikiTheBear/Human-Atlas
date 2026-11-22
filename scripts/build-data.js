@@ -48,6 +48,10 @@ fs.writeFileSync(
   'utf8',
 );
 
+/* ---------- express: 28 题极速精选（只存 id 引用，不复制题干） ---------- */
+const expressPath = path.join(DATA_DIR, 'express.json');
+const express = fs.existsSync(expressPath) ? read(expressPath) : { questions: [] };
+
 /* ---------- archetypes / cross rules ---------- */
 const archetypes = read(path.join(DATA_DIR, 'archetypes.json'));
 const crossRules = read(path.join(DATA_DIR, 'cross_rules.json'));
@@ -72,6 +76,8 @@ export const CROSS_RULES = ${JSON.stringify(crossRules, null, 2)};
 
 export const PAIR_RULES = ${JSON.stringify(pairRules, null, 2)};
 
+export const EXPRESS = ${JSON.stringify(express, null, 2)};
+
 export const DIM_ORDER = DIMENSIONS.dims.map((d) => d.id);
 export const DIM_MAP = Object.fromEntries(DIMENSIONS.dims.map((d) => [d.id, d]));
 `;
@@ -91,6 +97,8 @@ export const ARCHETYPES = ${JSON.stringify(archetypes)};
 export const CROSS_RULES = ${JSON.stringify(crossRules)};
 
 export const PAIR_RULES = ${JSON.stringify(pairRules)};
+
+export const EXPRESS = ${JSON.stringify(express)};
 
 export const DIM_ORDER = DIMENSIONS.dims.map((d) => d.id);
 export const DIM_MAP = Object.fromEntries(DIMENSIONS.dims.map((d) => [d.id, d]));
@@ -115,6 +123,37 @@ if (banned.length) {
   process.exitCode = 1;
 } else {
   console.log('[data] ✓ 无黑名单词汇');
+}
+
+/* ---------- express 清单校验：id 必须存在、无重复 ---------- */
+{
+  const allIds = new Map();
+  for (const [vid, vol] of Object.entries(volumes)) {
+    for (const q of vol.questions || []) allIds.set(q.id, vid);
+  }
+  const list = express.questions || [];
+  const missing = list.filter((id) => !allIds.has(id));
+  const dupes = list.filter((id, i) => list.indexOf(id) !== i);
+  const slow = [];
+  for (const id of list) {
+    const vid = allIds.get(id);
+    if (!vid) continue;
+    const q = (volumes[vid].questions || []).find((x) => x.id === id);
+    if (!q) continue;
+    if (q.type !== 'forced_choice' && q.type !== 'impulse_3s') slow.push(id);
+  }
+  const problems = [];
+  if (missing.length) problems.push(`不存在的 id：${missing.join(', ')}`);
+  if (dupes.length) problems.push(`重复 id：${dupes.join(', ')}`);
+  if (slow.length) problems.push(`极速模式只允许快答题型，这些是慢题：${slow.join(', ')}`);
+  if (list.length !== 28) problems.push(`题量应为 28，实际 ${list.length}`);
+  if (problems.length) {
+    console.error('[data] ✗ express 清单有问题：');
+    problems.forEach((p) => console.error('   ' + p));
+    process.exitCode = 1;
+  } else {
+    console.log(`[data] ✓ express 清单 ${list.length} 题，全部为快答题型`);
+  }
 }
 
 /* ---------- 筹码题配置校验：禁止负 gain / base 混用 ---------- */
@@ -206,7 +245,7 @@ const dimTotal = Object.keys(mirrors).length;
 const missMirror = dimensions.dims.filter((d) => !mirrors[d.id]).map((d) => d.id);
 
 console.log(
-  `[data] volumes=${volFiles.length} questions=${qTotal} mirrors=${dimTotal}/${dimensions.dims.length} archetypes=${archetypes.archetypes?.length ?? 0} crossRules=${crossRules.length}`,
+  `[data] volumes=${volFiles.length} questions=${qTotal} mirrors=${dimTotal}/${dimensions.dims.length} archetypes=${archetypes.archetypes?.length ?? 0} crossRules=${crossRules.length} express=${(express.questions || []).length}`,
 );
 console.log(
   `[data] bundle.js ${(out.length / 1024).toFixed(0)}K · bundle.compact.js ${(compact.length / 1024).toFixed(0)}K`,
