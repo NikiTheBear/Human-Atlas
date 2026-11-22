@@ -21,6 +21,7 @@ import { renderCompare } from './components/CompareView.js';
 import { renderExpressIntro, renderExpressResult } from './components/ExpressView.js';
 import { renderJohari, renderSquad } from './components/SocialView.js';
 import { buildExpressVolume, seedFromVolumes } from './core/express.js';
+import { getAdapter, LocalOnlyAdapter, CONSENT_COPY } from './core/cloudAdapter.js';
 
 /* ------------------------------------------------------------
    数据装配
@@ -337,6 +338,8 @@ export function boot() {
   window.HumanAtlas = {
     App, DATA, recompute, soulCode, importSoulCode,
     reset: () => { App.state = reset(); recompute(); go('#/'); },
+    /* 云端适配层：默认本地静默实现，暴露出来便于将来切换与调试 */
+    cloud: { adapter: getAdapter(), local: LocalOnlyAdapter, consentCopy: CONSENT_COPY },
   };
 }
 
