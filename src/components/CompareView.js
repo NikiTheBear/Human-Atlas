@@ -175,7 +175,21 @@ export function renderCompare(root, ctx) {
       resultBox.innerHTML = '';
       return;
     }
-    renderResult(resultBox, stateA, stateB, { DATA, col });
+    // 任何一层渲染出错都不能让页面变成一片空白 —— 显示原因，方便定位。
+    try {
+      renderResult(resultBox, stateA, stateB, { DATA, col });
+    } catch (err) {
+      console.error('[compare] 渲染失败', err);
+      resultBox.innerHTML = '';
+      resultBox.appendChild(el('div', { class: 'empty', style: { marginTop: '26px' } }, [
+        el('h3', { text: '这次计算没能完成' }),
+        el('p', { text: `${err?.name || 'Error'}：${err?.message || '未知原因'}` }),
+        el('p', { text: '两份存档码本身是有效的，问题出在渲染阶段。把这段文字发给我就能定位。' }),
+      ]));
+    }
+    // 结果在按钮下方，滚过去，否则看起来像"点了没反应"
+    const top = resultBox.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top, behavior: 'smooth' });
   }
 }
 

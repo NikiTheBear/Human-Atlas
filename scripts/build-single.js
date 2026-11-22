@@ -73,6 +73,15 @@ for (const file of order) {
   const { code: raw } = readModule(file);
   const rel = path.relative(ROOT, file).split(path.sep).join('/');
 
+  /* 内联是把所有模块拼进同一个 IIFE 作用域，import 整行被删掉。
+     如果某个 import 带别名（`import { A as B }`），B 在单文件里就无从定义，
+     运行时直接 ReferenceError —— 而开发态（ES module）完全正常，
+     所以这类 bug 只在双击 html 时暴露。这里在构建期就拦下来。 */
+  const aliasImport = raw.match(/import\s*\{[^}]*\bas\s+[A-Za-z_$][\w$]*[^}]*\}/);
+  if (aliasImport) {
+    throw new Error(`[single] ${rel} 使用了带别名的 import，内联后会丢失：${aliasImport[0]}`);
+  }
+
   let code = raw
     .replace(IMPORT_RE, '')                                   // 去掉 import
     // 去掉 export 关键字。不能用 ^ 锚定行首：源码里存在

@@ -46,7 +46,31 @@ const DARKWARD = new Set([
   'phil_cynic', 'phil_nihilism',
 ]);
 
+/* 正向调控维度：越耗竭越低、越充沛越高。 */
+const LIGHTWARD = new Set([
+  'virtue_humility', 'virtue_charity', 'virtue_chastity', 'virtue_kindness',
+  'virtue_temperance', 'virtue_patience', 'virtue_diligence',
+  'light_humanism', 'light_kant', 'light_faith',
+  'big5_order', 'big5_industry', 'big5_compliance',
+  'cog_logic', 'mot_mastery', 'mot_purpose', 'mot_security',
+  'pac_adult', 'def_sublimate',
+  'tki_collaborating', 'tki_compromising',
+  'time_future', 'val_boundary',
+]);
+
+/* 中性层：结构性的认知/风格维度，不该随电量整体上下漂。
+   荣格八维、双极三观、认知风格都归这里 —— 一个人「累到极点」时
+   会变得更防御、更暴躁，但不会突然从内倾直觉变成外倾感觉。 */
+const NEUTRAL_DIMS = new Set([
+  'jung_si', 'jung_se', 'jung_ni', 'jung_ne', 'jung_ti', 'jung_te', 'jung_fi', 'jung_fe',
+  'wv_causal', 'wv_nature', 'wv_social',
+  'cog_global', 'cog_diverge', 'cog_ambiguity', 'cog_independent', 'cog_speed',
+  'big5_open', 'big5_aesthetic',
+  'phil_stoic', 'phil_existential', 'phil_humanist', 'phil_cynic', 'phil_nihilism',
+]);
+
 const AMPLITUDE = 16;   // 满偏移时每个维度最多移动 16 分
+const NEUTRAL_AMPLITUDE = 3;  // 中性层：最多只动 ±3 分
 
 /**
  * @param {Object} scores  当前得分
@@ -63,10 +87,22 @@ export function pressureSandbox(scores, energy = 50) {
 
   for (const [dim, raw] of Object.entries(scores || {})) {
     if (!Number.isFinite(raw)) continue;
-    const darkward = DARKWARD.has(dim);
-    // 充沛时明面维度上行、暗面维度下行；耗竭时反过来
-    const dir = darkward ? -1 : 1;
-    const shift = t * AMPLITUDE * dir;
+
+    let shift;
+    if (NEUTRAL_DIMS.has(dim)) {
+      /* 中性层：认知风格与三观是结构性的，压力不会把人变成另一个人。
+         只给一点微小漂移，让曲线不至于完全僵直。 */
+      shift = t * NEUTRAL_AMPLITUDE * (dim.endsWith('_te') || dim === 'cog_speed' ? 1 : 0.6);
+    } else if (DARKWARD.has(dim)) {
+      shift = t * AMPLITUDE * -1;          // 越充沛越低
+    } else if (LIGHTWARD.has(dim)) {
+      shift = t * AMPLITUDE * 1;           // 越充沛越高
+    } else {
+      /* 既不在暗面也不在明面的其余维度（如金钱脚本、职业锚）：
+         幅度减半，避免凭空造出「耗竭时更贪财」这种没依据的结论。 */
+      shift = t * AMPLITUDE * 0.5;
+    }
+
     const next = clamp(raw + shift, 0, 100);
     out[dim] = round(next, 1);
     delta[dim] = round(next - raw, 1);

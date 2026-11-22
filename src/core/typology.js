@@ -47,11 +47,33 @@ const BUILDERS = {
     };
   },
 
-  /* Vol.2 · 大五高显特质双核型（取 Z 最高的正负两极） */
+  /* Vol.2 · 大五高显特质双核型（取 Z 最高的正负两极）
+     Z 分来自本地计算；导入的存档码只带绝对分，没有 Z。
+     所以这里必须有降级路径：无 Z 时退回「绝对分最高两项」。 */
   vol2(S, Z, L) {
     const ids = ['big5_open', 'big5_aesthetic', 'big5_order', 'big5_industry', 'big5_social', 'big5_assert', 'big5_compassion', 'big5_compliance', 'big5_alert', 'big5_rumination'];
+
+    const hasZ = ids.some((d) => Number.isFinite(Z?.[d]));
+
+    if (!hasZ) {
+      // 降级：用绝对分排序，高于 50 的当作「高显」，低于 50 的当作「低显」
+      const ranked = top(S, ids);
+      if (!ranked.length) return null;
+      const hi = ranked[0];
+      const lo = ranked[ranked.length - 1];
+      const hiLabel = (hi.v ?? 50) >= 50 ? '高显' : '相对显';
+      const loLabel = (lo.v ?? 50) < 50 ? '低显' : '相对弱';
+      return {
+        title: lo && lo.id !== hi.id
+          ? `${L[hi.id]}${hiLabel} × ${L[lo.id]}${loLabel}双核型`
+          : `${L[hi.id]}单极${hiLabel}型`,
+        tag: '本卷以绝对分排序（导入存档不含个人尖峰数据），高分项与最低项构成本卷双核',
+        anchors: [hi, lo && lo.id !== hi.id ? lo : null].filter(Boolean),
+      };
+    }
+
     const hi = zTop(Z, ids, 1)[0];
-    const lo = zTop(Z, ids.map((d) => d), ids.length)
+    const lo = zTop(Z, ids, ids.length)
       .filter((x) => x.id !== hi?.id)
       .sort((a, b) => a.z - b.z)[0];
     if (!hi) return null;

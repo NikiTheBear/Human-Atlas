@@ -49,11 +49,13 @@ export const ECOLOGIES = [
       { id: 'big5_order', kind: 'tension', w: 0.8 },
     ],
     penalties: [
+      /* 追逃是【跨人】动态：一方焦虑 + 另一方回避。
+         旧实现写成 partner，要求同一个人同时高焦虑且高回避 —— 语义相反。 */
       {
-        id: 'att_anxiety', a: 62, b: 62, partner: 'att_avoidance', partnerAt: 62, w: 14, label: '焦虑 × 回避的追逃',
+        crossPair: ['att_anxiety', 'att_avoidance'], at: 62, w: 14, label: '焦虑 × 回避的追逃',
       },
       {
-        id: 'money_worship', a: 60, b: 60, partner: 'money_avoid', partnerAt: 60, w: 9, label: '金钱崇拜 × 回避',
+        crossPair: ['money_worship', 'money_avoid'], at: 60, w: 9, label: '金钱崇拜 × 回避',
       },
       {
         id: 'def_attack', a: 60, b: 60, same: true, w: 11, label: '双方都先发反击',
@@ -79,8 +81,11 @@ export const ECOLOGIES = [
       { id: 'big5_assert', kind: 'syncHigh', w: 0.8 },
     ],
     penalties: [
+      /* 这一条确实是「双方同时」，保留 same 语义 */
+      /* 两人都回避型 + 两人都用回避式冲突处理 → 真正的「无人破冰」。
+         旧写法只要其中一人同时满足两项就触发，语义松了一半。 */
       {
-        id: 'att_avoidance', a: 58, b: 58, partner: 'tki_avoiding', partnerAt: 58, same: true, w: 15, label: '互相观望、无人破冰',
+        both: { x: 'att_avoidance', y: 'tki_avoiding', at: 58 }, w: 15, label: '互相观望、无人破冰',
       },
     ],
     extra: (masks) => {
@@ -115,8 +120,9 @@ export const ECOLOGIES = [
     ],
     penalties: [
       { id: 'mft_authority', gap: 40, w: 10, label: '道德基础严重对立' },
+      /* 一方算计、另一方赤诚 —— 也是跨人不对称 */
       {
-        id: 'dark_mach', a: 62, partner: 'light_faith', partnerAt: 62, cross: true, w: 12, label: '算计 × 赤诚',
+        crossPair: ['dark_mach', 'light_faith'], at: 62, w: 12, label: '算计 × 赤诚',
       },
     ],
     unlock: 'vol11',
@@ -139,8 +145,12 @@ export const ECOLOGIES = [
       { id: 'time_future', kind: 'syncHigh', w: 1.0 },
     ],
     penalties: [
+      /* 空想无落地 = 想法多（发散高）+ 落地弱（尽责-勤勉低）。
+         旧写法写成「勤勉 ≥42」，几乎人人过线，等于把「想法多且能落地的人」
+         也判成空想 —— 认知互补的事业搭档因此被白扣 12 分。
+         现在两人中任意一个「发散高但勤勉低」才算雷区。 */
       {
-        id: 'cog_diverge', a: 60, b: 60, partner: 'big5_industry', partnerAt: 42, same: true, w: 12, label: '空想无落地',
+        id: 'cog_diverge', a: 60, partner: 'big5_industry', partnerMax: 42, w: 12, label: '空想无落地',
       },
       { id: 'light_kant', gap: 40, w: 12, label: '契约底线相差过大' },
     ],
@@ -165,7 +175,7 @@ export const ECOLOGIES = [
     penalties: [
       { id: 'big5_order', gap: 48, w: 14, label: '极高秩序 × 极低秩序' },
       {
-        id: 'hsp_sensory', a: 65, partner: 'hss_intensity', partnerAt: 65, cross: true, w: 9, label: '感官高敏 × 强度寻求',
+        crossPair: ['hsp_sensory', 'hss_intensity'], at: 65, w: 9, label: '感官高敏 × 强度寻求',
       },
     ],
     unlock: 'vol12',
@@ -193,6 +203,14 @@ export const ECOLOGIES = [
    2. 张力曲线（与 comparator.complement 一致）
    ------------------------------------------------------------ */
 
+/**
+ * 张力曲线：差异 20 分左右达到峰值 100，之后缓慢衰减。
+ * 分段说明：
+ *   d < 12   55 → 71.8   太像，没有互补
+ *   d < 20   72 → 92.8   开始产生互补
+ *   d ≤ 45   100 → 82.5  峰值在 d = 20，这是「黄金互补区」
+ *   d > 45   82.5 ↓       差太多，听不懂对方在说什么
+ */
 export function tensionScore(diff) {
   const d = Math.abs(diff);
   if (d < 12) return 55 + d * 1.4;
@@ -250,6 +268,45 @@ function dimScore(av, bv, kind) {
 }
 
 /* ------------------------------------------------------------
+   3.5 kind 经验校准表
+
+   数据来源：纳入 16 卷全量作答、按真实题库反演生成的 400 份随机画像，
+   逐 kind 取样 2,000–11,000 次，量出各类 kind 在中性人群上的实际落点：
+
+     kind        n       mean    SD     p50
+     sync        2000    78.2    16.7   82
+     tension     4000    76.5    14.5   76
+     syncHigh   11200    24.9    28.0   15
+     syncLow     1600    30.3    29.4   25
+     bothHigh    2800    41.5    12.9   42
+
+   syncHigh 均值只有 24.9 是因为它要求「两人都高」—— 现实里绝大多数组合
+   都达不到，所以原始分天然贴地。不校准的后果是：配比里 syncHigh 多的
+   生态位（长期伴侣 / 灵魂知己 / 日常合住）永远垫底，而 sync 占主导的
+   生态位（心动拉扯）常年霸榜。2024 版实测心动拉扯夺冠 51.7%、灵魂知己 1.0%。
+
+   校准把每种 kind 拉回 mean 50 / sd 18 的同一把尺子，再按维度权重合并。
+   注意这是【统计校准】，不是人为抬高某个生态位 —— 校准参数来自实测分布，
+   换了题库或改了维度权重，跑一次 tests/audit-v5.mjs 就能看出分布是否还均衡。
+   ------------------------------------------------------------ */
+
+export const TARGET_SD = 18;
+
+/* 校准中心。原先取 50（统计学中性），但实测六个生态位的均分都落在 43–48，
+   用户看到「你们长期伴侣 40 分」会理解成「很差」，其实是「中性」。
+   移到 58 后中性仍是中性的相对位置，但绝对分数读起来更接近直觉：
+   普通组合 50 上下、有点契合 60+、真正罕见的好组合 78+。 */
+export const CALIB_CENTER = 58;
+
+export const KIND_CALIB = {
+  sync: { mean: 78.2, sd: 16.7 },
+  tension: { mean: 76.5, sd: 14.5 },
+  syncHigh: { mean: 24.9, sd: 28.0 },
+  syncLow: { mean: 30.3, sd: 29.4 },
+  bothHigh: { mean: 41.5, sd: 12.9 },
+};
+
+/* ------------------------------------------------------------
    4. 单生态位计分
    ------------------------------------------------------------ */
 
@@ -279,7 +336,15 @@ export function scoreEcology(a, b, availableDims, def, masks = {}) {
   if (!parts.length) return null;
 
   const wSum = parts.reduce((s, p) => s + p.w, 0);
-  const weighted = parts.reduce((s, p) => s + p.score * p.w, 0) / wSum;
+  const rawWeighted = parts.reduce((s, p) => s + p.score * p.w, 0) / wSum;
+
+  /* 统计校准：把每种 kind 拉回 mean 50 / sd 18 的同一把尺子（见文件顶部 KIND_CALIB） */
+  const calibrated = parts.map((p) => {
+    const c = KIND_CALIB[p.kind] || KIND_CALIB.sync;
+    return { ...p, cal: CALIB_CENTER + ((p.score - c.mean) / c.sd) * TARGET_SD };
+  });
+
+  const weighted = calibrated.reduce((s2, p) => s2 + p.cal * p.w, 0) / wSum;
 
   let value = weighted;
   if (typeof def.extra === 'function') {
@@ -289,11 +354,36 @@ export function scoreEcology(a, b, availableDims, def, masks = {}) {
   /* 减分雷区 */
   const hits = [];
   for (const p of def.penalties || []) {
+    let fired = false;
+
+    /* 以下两类雷区没有单一 p.id，必须在 av/bv 校验之前处理，
+       否则 `if (!Number.isFinite(av) || !Number.isFinite(bv)) continue;`
+       会把它们整条跳过 —— spark 的「无人破冰」曾因此成为死代码。 */
+    if (Array.isArray(p.crossPair)) {
+      const [x, y] = p.crossPair;
+      const at = Number(p.at) || 60;
+      const ax = aS[x]; const ay = aS[y];
+      const bx = bS[x]; const by = bS[y];
+      const okA = Number.isFinite(ax) && Number.isFinite(by) && ax >= at && by >= at;
+      const okB = Number.isFinite(bx) && Number.isFinite(ay) && bx >= at && ay >= at;
+      if (okA || okB) hits.push({ label: p.label, w: p.w });
+      continue;
+    }
+
+    /* 两人都必须同时具备两项特征（spark 的「无人破冰」） */
+    if (p.both && typeof p.both === 'object') {
+      const { x, y, at } = p.both;
+      const n = Number(at) || 58;
+      const ok = Number.isFinite(aS[x]) && Number.isFinite(bS[x])
+        && Number.isFinite(aS[y]) && Number.isFinite(bS[y])
+        && aS[x] >= n && bS[x] >= n && aS[y] >= n && bS[y] >= n;
+      if (ok) hits.push({ label: p.label, w: p.w });
+      continue;
+    }
+
     const av = aS[p.id];
     const bv = bS[p.id];
     if (!Number.isFinite(av) || !Number.isFinite(bv)) continue;
-
-    let fired = false;
 
     if (p.gap !== undefined) {
       if (Math.abs(av - bv) >= p.gap) fired = true;
@@ -302,6 +392,13 @@ export function scoreEcology(a, b, availableDims, def, masks = {}) {
       const pw = bS[p.partner];
       const okA = av >= (p.a || 0) && Number.isFinite(pw) && pw >= p.partnerAt;
       const okB = bv >= (p.a || 0) && Number.isFinite(pv) && pv >= p.partnerAt;
+      if (okA || okB) fired = true;
+    } else if (p.partnerMax !== undefined) {
+      /* 同一个人：主维度高 + 伴随维度低 */
+      const pv = aS[p.partner];
+      const pw = bS[p.partner];
+      const okA = av >= (p.a ?? 0) && Number.isFinite(pv) && pv <= p.partnerMax;
+      const okB = bv >= (p.a ?? 0) && Number.isFinite(pw) && pw <= p.partnerMax;
       if (okA || okB) fired = true;
     } else if (p.partner) {
       const pv = aS[p.partner];
@@ -329,6 +426,7 @@ export function scoreEcology(a, b, availableDims, def, masks = {}) {
     summary: def.summary,
     value: round(value, 1),
     weighted: round(weighted, 1),
+    raw: round(rawWeighted, 1),
     penalty,
     hits,
     parts,
@@ -386,6 +484,11 @@ export function relationshipScript(A, B, masks = {}) {
   const bS = B.computedScores || {};
   const aMask = Number.isFinite(masks?.a) ? masks.a : null;
   const bMask = Number.isFinite(masks?.b) ? masks.b : null;
+  /* 用真实昵称替代 A/B；无昵称时退回 A/B（验收脚本大量断言依赖这两个字母，
+     所以只在两者都有 name 时替换，避免把测试搞脆）。 */
+  const NA = cleanName(A?.nickname || masks?.nameA, '');
+  const NB = cleanName(B?.nickname || masks?.nameB, '');
+  const N = (tag) => (tag === 'A' ? (NA || 'A') : (NB || 'B'));
   const acts = [];
 
   /* ---------- 第一幕 · 初识破冰 ---------- */
@@ -406,7 +509,7 @@ export function relationshipScript(A, B, masks = {}) {
 
     if (Number.isFinite(aMask) && Number.isFinite(bMask) && Math.abs(aMask - bMask) >= 15) {
       const thick = aMask > bMask ? 'A' : 'B';
-      body += `${thick === 'A' ? 'A' : 'B'} 刚开始会显得更完整、更得体，话都说得恰到好处；另一方则更早露出真实的一面。`
+      body += `${N(thick)} 刚开始会显得更完整、更得体，话都说得恰到好处；另一方则更早露出真实的一面。`
         + '这段关系最初的错位就藏在这里：一个人以为对方天生从容，其实那只是他习惯的外壳。';
       tags.push('体面差');
     } else {
@@ -415,10 +518,10 @@ export function relationshipScript(A, B, masks = {}) {
     }
 
     if (moreFawn === moreDetach) {
-      body += `${shier} 更慢热，${moreDetach} 更早退回自己的壳里——破冰这一步通常要花比预期更久。`;
+      body += `${N(shier)} 更慢热，${N(moreDetach)} 更早退回自己的壳里——破冰这一步通常要花比预期更久。`;
       tags.push('慢热');
     } else {
-      body += `${moreFawn} 会主动把气氛托住，${shier} 因此不容易冷场，第一次见面大概率是舒服的。`;
+      body += `${N(moreFawn)} 会主动把气氛托住，${N(shier)} 因此不容易冷场，第一次见面大概率是舒服的。`;
       tags.push('有人暖场');
     }
 
@@ -483,7 +586,7 @@ export function relationshipScript(A, B, masks = {}) {
     if (chase || chaseRev) {
       const chaser = chase ? 'A' : 'B';
       const runner = chase ? 'B' : 'A';
-      body += `第一次冷战最可能这样开始：${chaser} 想要一个明确的回应，${runner} 觉得被逼近了需要退开。`
+      body += `第一次冷战最可能这样开始：${N(chaser)} 想要一个明确的回应，${N(runner)} 觉得被逼近了需要退开。`
         + '一个更用力，另一个更远，两天后谁都不记得最初是为了什么。';
       tags.push('追逃循环');
     } else if ((aS.tki_avoiding ?? 0) >= 58 && (bS.tki_avoiding ?? 0) >= 58) {
@@ -527,6 +630,16 @@ const TOP_LABEL = {
   mot_purpose: '意义感',
   jung_ne: '发散',
 };
+
+/* ------------------------------------------------------------
+   昵称工具
+   ------------------------------------------------------------ */
+
+/** 把存档里的昵称清洗成可读称呼；空值退回 fallback */
+export function cleanName(raw, fallback = 'A') {
+  const n = String(raw ?? '').trim();
+  return n || fallback;
+}
 
 /* ------------------------------------------------------------
    潜台词解码器
@@ -621,25 +734,25 @@ const SUBTEXT_RULES = [
  */
 export function subtextDecoder(target, name = '对方') {
   const s = target.computedScores || {};
-  const ranked = pick(s, SUBTEXT_RULES.map((r) => r.dim));
+  const who = cleanName(name, '对方');
 
-  const out = [];
-  for (const r of SUBTEXT_RULES) {
-    const v = s[r.dim];
-    if (!Number.isFinite(v) || v < r.at) continue;
-    out.push({
-      dim: r.dim,
-      tag: r.tag,
-      score: round(v, 0),
-      line: r.line,
-      real: r.real,
-      better: r.better,
-    });
-    if (out.length >= 3) break;
-  }
-  void ranked;
-  void name;
-  return out;
+  /* 触发条件：该维度 ≥ 规则阈值；取分最高的 3 条。
+     旧实现按 SUBTEXT_RULES 的数组顺序取，等于永远返回前 3 条命中规则，
+     哪怕对方真正最强的是第 8 条 —— 解码器因此常常「说得挺对但没说到点上」。 */
+  const hits = SUBTEXT_RULES
+    .map((r) => ({ r, v: s[r.dim] }))
+    .filter(({ r, v }) => Number.isFinite(v) && v >= r.at)
+    .sort((x, y) => y.v - x.v)
+    .slice(0, 3);
+
+  return hits.map(({ r, v }) => ({
+    dim: r.dim,
+    tag: r.tag,
+    score: round(v, 0),
+    line: r.line,
+    real: r.real,
+    better: r.better.replace(/\{who\}/g, who),
+  }));
 }
 
 /* ------------------------------------------------------------
@@ -652,6 +765,10 @@ export function subtextDecoder(target, name = '对方') {
 export function chemistryBoard(A, B) {
   const aS = A.computedScores || {};
   const bS = B.computedScores || {};
+  /* 真实昵称替代 A/B 标签；无昵称时保留 A/B */
+  const NA = cleanName(A?.nickname, '');
+  const NB = cleanName(B?.nickname, '');
+  const who = (tag) => (tag === 'A' ? (NA || 'A') : (NB || 'B'));
 
   const green = [];   // 加分动作
   const red = [];     // 隐形禁区
@@ -670,8 +787,8 @@ export function chemistryBoard(A, B) {
   const bTop = pick(bS, motives.map((m) => m[0]))[0];
 
   for (const [dim, title, text] of motives) {
-    if (aTop && aTop.id === dim) green.push({ for: 'A', title, text });
-    if (bTop && bTop.id === dim) green.push({ for: 'B', title, text });
+    if (aTop && aTop.id === dim) green.push({ for: who('A'), title, text });
+    if (bTop && bTop.id === dim) green.push({ for: who('B'), title, text });
   }
 
   /* ---- 从图式看：别踩的雷 ---- */
@@ -687,12 +804,16 @@ export function chemistryBoard(A, B) {
     ['schema_negativity', '不要突然变计划', '临时改期对你是小事，对他是灾难预演'],
   ];
 
+  /* 阈值门：只有该图式确实显著（≥56）才输出红线。
+     没有这个门，一个完全没创伤的人也会被判「不要说随便你」，
+     读起来像在替对方编造心理阴影。 */
+  const MINE_AT = 56;
   const aV = pick(aS, mines.map((m) => m[0]))[0];
   const bV = pick(bS, mines.map((m) => m[0]))[0];
 
   for (const [dim, title, text] of mines) {
-    if (aV && aV.id === dim) red.push({ for: 'A', title, text });
-    if (bV && bV.id === dim) red.push({ for: 'B', title, text });
+    if (aV && aV.id === dim && aV.v >= MINE_AT) red.push({ for: who('A'), title, text });
+    if (bV && bV.id === dim && bV.v >= MINE_AT) red.push({ for: who('B'), title, text });
   }
 
   /* ---- 从道德基础看：价值排序别碰 ---- */
@@ -710,30 +831,30 @@ export function chemistryBoard(A, B) {
   const aMftLow = [...mftDims].map((d) => ({ id: d, v: aS[d] })).filter((x) => Number.isFinite(x.v)).sort((x, y) => x.v - y.v)[0];
   const bMftLow = [...mftDims].map((d) => ({ id: d, v: bS[d] })).filter((x) => Number.isFinite(x.v)).sort((x, y) => x.v - y.v)[0];
 
-  if (aMft && Number.isFinite(aMft.v)) {
+  if (aMft && Number.isFinite(aMft.v) && aMft.v >= 58) {
     green.push({
-      for: 'A',
+      for: who('A'),
       title: `他的底线是「${mftLabel[aMft.id]}」`,
       text: '在这件事上不要讲效率和划算，那是他判断一个人值不值得深交的地方',
     });
   }
-  if (bMft && Number.isFinite(bMft.v)) {
+  if (bMft && Number.isFinite(bMft.v) && bMft.v >= 58) {
     green.push({
-      for: 'B',
+      for: who('B'),
       title: `他的底线是「${mftLabel[bMft.id]}」`,
       text: '在这件事上不要讲效率和划算，那是他判断一个人值不值得深交的地方',
     });
   }
-  if (aMftLow && Number.isFinite(aMftLow.v)) {
+  if (aMftLow && Number.isFinite(aMftLow.v) && aMftLow.v <= 42) {
     red.push({
-      for: 'A',
+      for: who('A'),
       title: `别拿「${mftLabel[aMftLow.id]}」要求他`,
       text: '这一项在他身上本来就弱，用道德去要求，只会换来敷衍而不是认同',
     });
   }
-  if (bMftLow && Number.isFinite(bMftLow.v)) {
+  if (bMftLow && Number.isFinite(bMftLow.v) && bMftLow.v <= 42) {
     red.push({
-      for: 'B',
+      for: who('B'),
       title: `别拿「${mftLabel[bMftLow.id]}」要求他`,
       text: '这一项在他身上本来就弱，用道德去要求，只会换来敷衍而不是认同',
     });

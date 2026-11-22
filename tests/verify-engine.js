@@ -21,6 +21,7 @@ import {
   JOHARI_DIMS, JOHARI_QUESTIONS, encodeJohari, decodeJohari, johariResult,
 } from '../src/core/johari.js';
 import { assignRoles, affinityMatrix, coverage, squadCharter } from '../src/core/squad.js';
+import { ALIGNMENTS, alignmentFrom } from '../src/viz/alignmentSvg.js';
 import {
   scoreAllEcologies, relationshipScript, subtextDecoder, chemistryBoard,
 } from '../src/core/ecology.js';
@@ -435,6 +436,168 @@ function tc6() {
 }
 
 /* ------------------------------------------------------------
+   TC6i · 导览页与首屏分流
+   ------------------------------------------------------------ */
+
+function tc6i() {
+  console.log('\n[TC6i] 导览页与首屏分流');
+
+  const mainSrc = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  const guideSrc = fs.readFileSync(new URL('../src/components/GuideView.js', import.meta.url), 'utf8');
+
+  /* ---- 路由与导航 ---- */
+  check('注册了 #/guide 路由', /head === 'guide'/.test(mainSrc));
+  check('顶部导航含「导览」', /href: '#\/guide', label: '导览'/.test(mainSrc));
+
+  /* ---- 首屏分流：必须只作用于根路由 ---- */
+  check('首屏分流在根路由分支内',
+    /if \(head === '' \|\| head === 'hub'\)[\s\S]{0,400}guideSeen\(\)/.test(mainSrc));
+  check('有进度时跳过大堂不被拦',
+    /hasProgress[\s\S]{0,200}!hasProgress && !guideSeen\(\)/.test(mainSrc));
+
+  // 关键：功能深链绝不能被导览拦截 —— 它们各自有独立分支，且分支顺序在 hub 之前或之后都不影响
+  const deepLinks = ['quiz', 'report', 'compare', 'express', 'johari', 'squad'];
+  deepLinks.forEach((k) => {
+    check(`深链 #/${k} 有独立分支`, new RegExp(`head === '${k}'`).test(mainSrc));
+  });
+  check('深链分支里不出现 guideSeen 重定向',
+    !/head === 'join'[\s\S]{0,200}guideSeen/.test(mainSrc));
+
+  /* ---- 零硬编码：导览页数字必须动态读 DATA ---- */
+  const hardcoded = [];
+  if (/"298"/.test(guideSrc) || /'298'/.test(guideSrc)) hardcoded.push('298');
+  if (/"127"/.test(guideSrc) || /'127'/.test(guideSrc)) hardcoded.push('127');
+  if (/"65"/.test(guideSrc) || /'65'/.test(guideSrc)) hardcoded.push('65');
+  if (/"296"/.test(guideSrc)) hardcoded.push('296');
+  check('导览页无写死的卷/题/维/规则数', hardcoded.length === 0, hardcoded.join(','));
+
+  check('题数从 DATA 累加', /reduce\(\(a, v\) => a \+ DATA\.volumes\[v\]\.questions\.length/.test(guideSrc));
+  check('维度数读 dimOrder', /DATA\.dimOrder\.length/.test(guideSrc));
+  check('规则数读 crossRules', /DATA\.crossRules/.test(guideSrc));
+
+  /* ---- 可访问性：aria-expanded ---- */
+  check('模块按钮带 aria-expanded', /'aria-expanded': 'false'/.test(guideSrc));
+  check('展开时更新 aria-expanded', /setAttribute\('aria-expanded', 'true'\)/.test(guideSrc));
+  check('再次点击会收起', /if \(isOpen\) \{[\s\S]{0,260}setAttribute\('aria-expanded', 'false'\)/.test(guideSrc));
+
+  /* ---- 六模块齐全 ---- */
+  const nos = ['01', '02', '03', '04', '05', '06'];
+  check('六个模块编号齐全', nos.every((n) => guideSrc.includes(`no: '${n}'`)));
+}
+
+/* ------------------------------------------------------------
+   TC6h · 九宫格 / 四象限 / 沙盒刻度
+   ------------------------------------------------------------ */
+
+function tc6h() {
+  console.log('\n[TC6h] 九宫格 / 四象限 / 沙盒刻度');
+
+  /* ---- 九宫格：九格齐全 ---- */
+  check('九宫格恰好 9 格', ALIGNMENTS.length === 9, `${ALIGNMENTS.length}`);
+  check('九格 key 唯一', new Set(ALIGNMENTS.map((a) => a.key)).size === 9);
+
+  const EXPECT_KEYS = ['lg', 'ng', 'cg', 'ln', 'tn', 'cn', 'le', 'ne', 'ce'];
+  const keys = new Set(ALIGNMENTS.map((a) => a.key));
+  check('九格覆盖 lg/ng/cg/ln/tn/cn/le/ne/ce',
+    EXPECT_KEYS.every((k) => keys.has(k)) && keys.size === 9,
+    [...keys].join(','));
+
+  /* ---- 九宫格：分档与落点必须一致 ---- */
+  // 分档用精确三等分（与 alignmentSvg.BAND_EDGE 一致）
+  const E = 100 / 3;
+  const bandOfLocal = (v) => (v >= E * 2 ? 0 : v <= E ? 2 : 1);
+  let mismatch = 0;
+  const bad = [];
+  for (let o = 0; o <= 100; o += 1) {
+    const hit = alignmentFrom(o, 50);
+    if (bandOfLocal(o) !== hit.col) { mismatch += 1; bad.push(o); }
+  }
+  check('101 个分数点的档位与落点一致', mismatch === 0,
+    mismatch ? `不一致：${bad.slice(0, 5).join(',')}` : '');
+
+  /* ---- 九宫格：方向（守序=第 0 列，混乱=第 2 列） ---- */
+  check('高秩序落在守序列（col 0）', alignmentFrom(80, 50).col === 0,
+    alignmentFrom(80, 50).alignment.name);
+  check('低秩序落在混乱列（col 2）', alignmentFrom(20, 50).col === 2,
+    alignmentFrom(20, 50).alignment.name);
+  check('中秩序落在中立列（col 1）', alignmentFrom(50, 50).col === 1,
+    alignmentFrom(50, 50).alignment.name);
+
+  /* ---- 四象限轴标签必须在格子外 ---- */
+  const src = fs.readFileSync(new URL('../src/viz/matrixSvg.js', import.meta.url), 'utf8');
+  check('xLo/xHi 画在格子下方',
+    /x: padL \+ 2, y: padT \+ ih \+ 18/.test(src)
+    && /x: padL \+ iw - 2, y: padT \+ ih \+ 18/.test(src));
+  check('yHi/yLo 画在格子左侧',
+    /x: padL - 10, y: padT \+ 12/.test(src)
+    && /x: padL - 10, y: padT \+ ih - 4/.test(src));
+  check('格子内不再画 yHi/yLo',
+    !/x: padL \+ 6, y: padT \+ 12/.test(src)
+    && !/x: padL \+ 6, y: padT \+ ih - 6/.test(src));
+
+  /* ---- 沙盒刻度牌必须与滑杆同向 ---- */
+  const lab = fs.readFileSync(new URL('../src/components/LabView.js', import.meta.url), 'utf8');
+  check('刻度牌不再 reverse', !/ENERGY_STAGES\.slice\(\)\.reverse\(\)/.test(lab));
+  check('刻度牌按 ENERGY_STAGES 原序', /ENERGY_STAGES\.forEach/.test(lab));
+  check('ENERGY_STAGES 从低到高',
+    ENERGY_STAGES[0].key === 'depleted' && ENERGY_STAGES[3].key === 'zone',
+    `${ENERGY_STAGES[0].key} → ${ENERGY_STAGES[3].key}`);
+}
+
+/* ------------------------------------------------------------
+   TC6g · 单卷报告渲染回归（防 TDZ / 象限镜像）
+   ------------------------------------------------------------ */
+
+function tc6g() {
+  console.log('\n[TC6g] 单卷报告渲染回归');
+
+  /* --- 1. TDZ 守卫：typoScoreMap 必须在首次使用之前声明 --- */
+  const src = fs.readFileSync(new URL('../src/components/ReportView.js', import.meta.url), 'utf8');
+  const lines = src.split('\n');
+  const decl = lines.findIndex((l) => /const\s+typoScoreMap\s*=/.test(l));
+  // 「首次使用」= 第一处不包含声明的引用
+  const firstUse = lines.findIndex((l, i) => i !== decl && /typoScoreMap/.test(l));
+  check('typoScoreMap 有且仅有一处声明',
+    lines.filter((l) => /const\s+typoScoreMap\s*=/.test(l)).length === 1,
+    `${lines.filter((l) => /const\s+typoScoreMap\s*=/.test(l)).length} 处`);
+  check('typoScoreMap 先声明后使用', decl !== -1 && decl < firstUse,
+    `声明@${decl + 1} 首次使用@${firstUse + 1}`);
+
+  /* --- 2. 九宫格象限必须与轴方向一致 --- */
+  check('高秩序高良善 → 守序善良', alignmentFrom(72, 74).alignment.key === 'lg',
+    alignmentFrom(72, 74).alignment.name);
+  check('低秩序高良善 → 混乱善良', alignmentFrom(30, 72).alignment.key === 'cg',
+    alignmentFrom(30, 72).alignment.name);
+  check('高秩序低良善 → 守序冷硬', alignmentFrom(72, 32).alignment.key === 'le',
+    alignmentFrom(72, 32).alignment.name);
+  check('低秩序低良善 → 混乱冷硬', alignmentFrom(28, 26).alignment.key === 'ce',
+    alignmentFrom(28, 26).alignment.name);
+
+  /* --- 3. 每卷分型都能算出（含无数据时不崩） --- */
+  let okCount = 0;
+  for (const vid of VOL_IDS) {
+    const vol = VOLUMES[vid];
+    const sc = {};
+    (vol.dimensions || []).forEach((d, i) => { sc[d] = 58 + (i % 6) * 5; });
+    try {
+      const t = buildVolumeTypology(vid, sc, {}, DATA.dimMap, { pressure: { key: 'cold', share: 40 }, mask: 55 });
+      if (t && t.title) okCount += 1;
+    } catch (e) {
+      check(`${vid} 分型不抛异常`, false, e.message);
+    }
+  }
+  check('16 卷分型全部可算无异常', okCount === VOL_IDS.length, `${okCount}`);
+
+  /* --- 4. 空分数不该崩 --- */
+  try {
+    const t = buildVolumeTypology('vol1', {}, {}, DATA.dimMap, {});
+    check('空分数返回 null 而非抛错', t === null || typeof t === 'object');
+  } catch (e) {
+    check('空分数返回 null 而非抛错', false, e.message);
+  }
+}
+
+/* ------------------------------------------------------------
    TC6f · 社交实验室（乔哈里窗 / 群像星图）
    ------------------------------------------------------------ */
 
@@ -443,6 +606,36 @@ function tc6f() {
 
   /* ---- 乔哈里 ---- */
   check('乔哈里 12 题', JOHARI_QUESTIONS.length === 12, `${JOHARI_QUESTIONS.length}`);
+
+  /* 极性：每题必须有 scale 两端说明，且选项数恒为 4 —— 倒序会让象限判反 */
+  check('每题都声明了 polarity scale',
+    JOHARI_QUESTIONS.every((q) => Array.isArray(q.scale) && q.scale.length === 2),
+    JOHARI_QUESTIONS.filter((q) => !q.scale).map((q) => q.dim).join(','));
+
+  check('题干与选项统一用中性人称 TA',
+    JOHARI_QUESTIONS.every((q) => !/\b他\b/.test(q.prom)
+      && !(q.opts || []).some((o) => /\b他\b/.test(o))),
+    JOHARI_QUESTIONS.filter((q) => /他/.test(q.prom)).map((q) => q.dim).join(','));
+
+  /* 6 道曾被审计指出倒序的题：确认首项描述低端、末项描述高端 */
+  const POLAR = {
+    big5_order: [/没有秩序/, /连角度都对/],
+    virtue_humility: [/坦率承认/, /功劳分给别人/],
+    light_kant: [/会做/, /规则就是规则/],
+    big5_compassion: [/解决方案|建议/, /跟着一起难受/],
+    dark_mach: [/道理/, /不表态|摸清/],
+    mot_belonging: [/自在/, /觉得空/],
+  };
+  for (const [dim, [lo, hi]] of Object.entries(POLAR)) {
+    const q = JOHARI_QUESTIONS.find((x) => x.dim === dim);
+    check(`${dim} 选项是由低到高`,
+      Boolean(q) && lo.test(q.opts[0]) && hi.test(q.opts[3]),
+      q ? `${q.opts[0].slice(0, 12)} … ${q.opts[3].slice(0, 12)}` : 'missing');
+  }
+
+  check('mot_belonging 是单维 4 档而非 4 个动机',
+    /连续两周/.test(JOHARI_QUESTIONS.find((q) => q.dim === 'mot_belonging')?.prom || ''),
+    JOHARI_QUESTIONS.find((q) => q.dim === 'mot_belonging')?.prom);
   check('乔哈里 12 维', JOHARI_DIMS.length === 12, `${JOHARI_DIMS.length}`);
   check('每题都对应一个合法维度',
     JOHARI_QUESTIONS.every((q) => DIM_ORDER.includes(q.dim)));
@@ -697,8 +890,10 @@ function tc6c() {
     few.list.map((r) => r.confidence).join(','));
 
   // 三幕剧
-  const A = mk({ def_detach: 72, att_avoidance: 70, big5_social: 38 });
-  const B = mk({ att_anxiety: 70, def_fawn: 64, big5_social: 66 });
+  /* 红黑榜现在带阈值门（图式 ≥56、道德底线 ≥58/≤42），
+     所以夹具里必须真的存在一条显著图式，否则禁区为空是正确行为。 */
+  const A = mk({ def_detach: 72, att_avoidance: 70, big5_social: 38, schema_abandonment: 74 });
+  const B = mk({ att_anxiety: 70, def_fawn: 64, big5_social: 66, schema_std: 70, mft_authority: 66, mft_care: 36 });
   const script = relationshipScript(A, B, { a: 62, b: 38 });
   check('三幕剧恰好三幕', script.acts.length === 3, `${script.acts.length}`);
   check('三幕剧每幕都有正文', script.acts.every((x) => x.body && x.body.length > 20));
@@ -838,6 +1033,9 @@ function main() {
   tc6d();
   tc6e();
   tc6f();
+  tc6g();
+  tc6h();
+  tc6i();
   tc7();
 
   console.log('\n' + '─'.repeat(64));

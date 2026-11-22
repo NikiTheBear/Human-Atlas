@@ -17,10 +17,10 @@ import { svg, svgText, clamp, round } from '../core/utils.js';
 export function matrixSvg(o = {}, opt = {}) {
   const W = opt.width || 480;
   const H = opt.height || Math.round(W * 0.94);
-  const padL = 54;
+  const padL = 68;
   const padR = 26;
   const padT = 30;
-  const padB = 54;
+  const padB = 64;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
 
@@ -105,34 +105,51 @@ export function matrixSvg(o = {}, opt = {}) {
     }
   });
 
-  // 轴标签
-  root.appendChild(svgText(o.xLabel || 'X', {
-    x: padL + iw / 2, y: H - 16,
-    'text-anchor': 'middle', fill: cMuted, 'font-size': 9.5, 'letter-spacing': 2.4,
-  }));
-  const yl = svgText(o.yLabel || 'Y', {
-    x: 16, y: padT + ih / 2,
-    'text-anchor': 'middle', fill: cMuted, 'font-size': 9.5, 'letter-spacing': 2.4,
-  });
-  yl.setAttribute('transform', `rotate(-90 16 ${padT + ih / 2})`);
-  root.appendChild(yl);
-
-  // 轴两端极名
+  /* 轴文字统一挪到画布外侧：
+       横轴两端名放格子正下方（与列标题同向），轴名再往下一行；
+       纵轴两端名放格子左侧（格子外），轴名竖排在更外侧。
+     旧版把 yHi/yLo 画在格子内部左上/左下角，会和象限名撞在一起，
+     同时横轴名和两端名共用 y 区间，出现重叠。 */
   if (o.xLo || o.xHi) {
     root.appendChild(svgText(o.xLo || '', {
-      x: padL + 4, y: H - 32, 'text-anchor': 'start', fill: cMuted, 'font-size': 9, opacity: 0.8,
+      x: padL + 2, y: padT + ih + 18,
+      'text-anchor': 'start', fill: cMuted, 'font-size': 9, opacity: 0.7,
+      'letter-spacing': 0.8,
     }));
     root.appendChild(svgText(o.xHi || '', {
-      x: padL + iw - 4, y: H - 32, 'text-anchor': 'end', fill: cMuted, 'font-size': 9, opacity: 0.8,
+      x: padL + iw - 2, y: padT + ih + 18,
+      'text-anchor': 'end', fill: cMuted, 'font-size': 9, opacity: 0.7,
+      'letter-spacing': 0.8,
     }));
   }
-  if (o.yLo || o.yHi) {
+
+  if (o.xLabel) {
+    root.appendChild(svgText(o.xLabel, {
+      x: padL + iw / 2, y: padT + ih + 34,
+      'text-anchor': 'middle', fill: cMuted, 'font-size': 9, opacity: 0.5,
+      'letter-spacing': 1.2,
+    }));
+  }
+
+  if (o.yHi || o.yLo) {
     root.appendChild(svgText(o.yHi || '', {
-      x: padL + 6, y: padT + 12, 'text-anchor': 'start', fill: cMuted, 'font-size': 9, opacity: 0.8,
+      x: padL - 10, y: padT + 12,
+      'text-anchor': 'end', fill: cMuted, 'font-size': 9, opacity: 0.7,
     }));
     root.appendChild(svgText(o.yLo || '', {
-      x: padL + 6, y: padT + ih - 6, 'text-anchor': 'start', fill: cMuted, 'font-size': 9, opacity: 0.8,
+      x: padL - 10, y: padT + ih - 4,
+      'text-anchor': 'end', fill: cMuted, 'font-size': 9, opacity: 0.7,
     }));
+  }
+
+  if (o.yLabel) {
+    const yl = svgText(o.yLabel, {
+      x: 12, y: padT + ih / 2,
+      'text-anchor': 'middle', fill: cMuted, 'font-size': 9, opacity: 0.5,
+      'letter-spacing': 1.2,
+    });
+    yl.setAttribute('transform', `rotate(-90 12 ${padT + ih / 2})`);
+    root.appendChild(yl);
   }
 
   // 落点
@@ -161,11 +178,16 @@ export function matrixSvg(o = {}, opt = {}) {
    预设：阵营九宫格 & 神经边缘四象限
    ------------------------------------------------------------ */
 
+/* 象限摆放必须与坐标轴方向一致：
+     x 高 = 秩序（右），x 低 = 混沌（左）
+     y 高 = 善良（上），y 低 = 冷硬（下）
+   旧版把守序放在 x:'lo'，与 xLo='混沌' 正好相反，
+   导致「落点在左半边却点亮右半边的名字」。 */
 export const ALIGNMENT_QUADRANTS = [
-  { key: 'lg', x: 'lo', y: 'hi', name: '守序善良', desc: '规则即承诺' },
-  { key: 'cg', x: 'hi', y: 'hi', name: '混乱善良', desc: '良心高于条文' },
-  { key: 'le', x: 'lo', y: 'lo', name: '守序冷硬', desc: '契约就是全部' },
-  { key: 'ce', x: 'hi', y: 'lo', name: '混乱冷硬', desc: '只看结果' },
+  { key: 'lg', x: 'hi', y: 'hi', name: '守序善良', desc: '规则即承诺' },
+  { key: 'cg', x: 'lo', y: 'hi', name: '混乱善良', desc: '良心高于条文' },
+  { key: 'le', x: 'hi', y: 'lo', name: '守序冷硬', desc: '契约就是全部' },
+  { key: 'ce', x: 'lo', y: 'lo', name: '混乱冷硬', desc: '只看结果' },
 ];
 
 export function alignmentOf(order, good) {

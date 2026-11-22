@@ -8,7 +8,7 @@ import { el, round, toast, copyText, downloadText } from '../core/utils.js';
 import { radarSvg } from '../viz/radarSvg.js';
 import { decodeSoulCode } from '../core/storage.js';
 import {
-  JOHARI_DIMS, JOHARI_QUESTIONS, encodeJohari, decodeJohari, johariResult,
+  JOHARI_DIMS, JOHARI_QUESTIONS, encodeJohari, decodeJohari, johariResult, fillName,
 } from '../core/johari.js';
 import {
   assignRoles, roleMeta, affinityMatrix, coverage, squadCharter, SQUAD_ROLES,
@@ -58,8 +58,8 @@ export function renderJohari(root, ctx) {
   hero.appendChild(el('h1', { text: '别人眼中的你' }));
   hero.appendChild(el('p', {
     text: '生成一条邀请链接，让朋友凭直觉回答 12 道关于你的短题。'
-      + '他不需要自己测，90 秒就能答完。提交后会立刻画出一张「乔哈里窗」：'
-      + '你和好友都看见的、只有他看见的、只有你知道的，以及谁都没触及的。',
+      + '对方不需要自己测，90 秒就能答完。提交后会立刻画出一张「乔哈里窗」：'
+      + '你们都知道的、只有你看见的、只有对方知道的，以及谁都没触及的。',
   }));
   wrap.appendChild(hero);
 
@@ -132,10 +132,11 @@ function renderJohariGuest(wrap, dec, DATA) {
 
   const hero = el('div', { class: 'express-hero' });
   hero.appendChild(el('div', { class: 'express-hero__kicker', text: 'Johari · 印象盲盒' }));
-  hero.appendChild(el('h1', { text: `${name} 想看看你眼中的他` }));
+  const known = Boolean(dec.nickname);
+  hero.appendChild(el('h1', { text: `${name} 想看看你眼中的${known ? 'TA' : '这位朋友'}` }));
   hero.appendChild(el('p', {
-    text: '下面 12 道题都不需要你想太多，凭第一印象选一个最像他的即可。'
-      + '你答的不是自己，是他。全部答完后会立刻画出一张四象限图。',
+    text: '下面 12 道题都不需要你想太多，凭第一印象选一个最像的即可。'
+      + '你答的不是自己，是对方。全部答完后会立刻画出一张四象限图。',
   }));
   wrap.appendChild(hero);
 
@@ -148,14 +149,14 @@ function renderJohariGuest(wrap, dec, DATA) {
   JOHARI_QUESTIONS.forEach((q, qi) => {
     const card = el('div', { class: 'johari-q', dataset: { dim: q.dim } });
     card.appendChild(el('div', { class: 'johari-q__no', text: `Q ${String(qi + 1).padStart(2, '0')}` }));
-    card.appendChild(el('p', { class: 'johari-q__prom', text: q.prom }));
+    card.appendChild(el('p', { class: 'johari-q__prom', text: fillName(q.prom, dec.nickname) }));
 
     const opts = el('div', { class: 'johari-q__opts' });
     q.opts.forEach((text, oi) => {
       const btn = el('button', {
         class: 'johari-opt',
         type: 'button',
-        text,
+        text: fillName(text, dec.nickname),
         onclick: () => {
           picks[q.dim] = oi;
           opts.querySelectorAll('.johari-opt').forEach((b) => b.classList.remove('is-sel'));
@@ -211,7 +212,7 @@ function showQuadrants(box, dec, guesses, DATA, name) {
     el('h2', { text: '乔哈里窗' }),
     el('div', {
       class: 'section-head__hint',
-      text: Number.isFinite(res.agreement) ? `你眼中的他 vs 他眼中的自己，一致度 ${res.agreement}%` : '',
+      text: Number.isFinite(res.agreement) ? `你眼中的TA vs TA眼中的自己，一致度 ${res.agreement}%` : '',
     }),
   ]);
   box.appendChild(head1);
@@ -238,15 +239,15 @@ function showQuadrants(box, dec, guesses, DATA, name) {
       c.appendChild(el('p', {
         class: 'sandbox__hint',
         style: { marginTop: '8px' },
-        text: '格式为：他自己的分 / 你猜的分',
+        text: '格式为：TA自己的分 / 你猜的分',
       }));
     }
     return c;
   };
 
   grid.appendChild(cell('open', '公开区', '你们看法一致的地方', res.open, '01'));
-  grid.appendChild(cell('blind', '盲区', '你一眼看见、他自己没注意到的', res.blind, '02'));
-  grid.appendChild(cell('facade', '隐藏区', '他心里很强、藏得滴水不漏的', res.facade, '03'));
+  grid.appendChild(cell('blind', '盲区', '你一眼看见、TA自己没注意到的', res.blind, '02'));
+  grid.appendChild(cell('facade', '隐藏区', 'TA心里很强、藏得滴水不漏的', res.facade, '03'));
   grid.appendChild(cell('unknown', '未知潜能区', '谁都没触及的留白', res.unknown, '04'));
   box.appendChild(grid);
 
@@ -291,13 +292,13 @@ function labelOfLocal(dim, DATA) {
 function summaryOf(res, name) {
   const parts = [];
   if (res.blind.length) {
-    parts.push(`你看见了 ${res.blind.length} 处他自己没注意的地方——这通常是他在别人面前比在自己心里更清楚的部分。`);
+    parts.push(`你看见了 ${res.blind.length} 处TA自己没注意的地方——这通常是TA在别人面前比在自己心里更清楚的部分。`);
   }
   if (res.facade.length) {
-    parts.push(`另有 ${res.facade.length} 处他很强，但藏得比较好，你这次没接住。`);
+    parts.push(`另有 ${res.facade.length} 处TA很强，但藏得比较好，你这次没接住。`);
   }
   if (res.unknown.length > 4) {
-    parts.push('还有不少留白，说明这些题不足以覆盖他的全部。');
+    parts.push('还有不少留白，说明这些题不足以覆盖TA的全部。');
   }
   parts.unshift(`这是 ${name} 在一个人眼里的一个切面，不是结论。`);
   return parts.join('');

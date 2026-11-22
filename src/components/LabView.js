@@ -88,9 +88,14 @@ export function sandboxSection({ scores, colors }) {
   });
   sliderWrap.appendChild(input);
 
+  /* 刻度牌必须与滑杆同向：0 在左 = 极度耗竭，100 在右 = 充沛顺境。
+     ENERGY_STAGES 本身已按 电量从低到高 排列，直接用即可，不要再 reverse。 */
   const ticks = el('div', { class: 'sandbox__ticks' });
-  ENERGY_STAGES.slice().reverse().forEach((st) => {
-    ticks.appendChild(el('span', { text: st.name }));
+  ENERGY_STAGES.forEach((st) => {
+    ticks.appendChild(el('span', {
+      class: 'sandbox__tick',
+      text: st.name,
+    }));
   });
   sliderWrap.appendChild(ticks);
 

@@ -6,10 +6,29 @@
    ============================================================ */
 
 import { clamp, round, mean, sortBy } from './utils.js';
-import { ALL_VOLUMES as VOLS } from './storage.js';
+import { ALL_VOLUMES } from './storage.js';
+
+/**
+ * 「有效参与」的卷：已标记完成，或该卷里至少有一道题被答过。
+ *
+ * 第二类是为 28 题极速模式准备的 —— 极速模式**不写 completedVolumes**
+ * （避免误触发跨卷解锁门槛），但它确实把 28 题按来源卷写回了 answersByVolume。
+ * 如果只看 completedVolumes，极速用户与完整用户的交集恒为空，
+ * 合盘会直接返回「你们还没有共同完成任何一卷」，等于把极速模式排除在合盘之外。
+ */
+export function activeVolumes(state) {
+  const done = new Set(state?.completedVolumes || []);
+  for (const [v, bucket] of Object.entries(state?.answersByVolume || {})) {
+    if (v === '__express') continue;
+    if (bucket && Object.keys(bucket).length) done.add(v);
+  }
+  return done;
+}
 
 export function commonVolumes(a, b) {
-  return VOLS.filter((v) => (a.completedVolumes || []).includes(v) && (b.completedVolumes || []).includes(v));
+  const A = activeVolumes(a);
+  const B = activeVolumes(b);
+  return ALL_VOLUMES.filter((v) => A.has(v) && B.has(v));
 }
 
 export function commonDims(a, b, DATA) {

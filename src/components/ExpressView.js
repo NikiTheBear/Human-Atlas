@@ -260,8 +260,8 @@ export function renderExpressResult(root, ctx) {
     }),
     el('a', {
       class: 'btn btn--sm',
-      href: '#/join',
-      text: '发起合盘邀请',
+      href: '#/compare',
+      text: '去合盘对比',
     }),
   ]);
   codeBody.appendChild(btnRow);

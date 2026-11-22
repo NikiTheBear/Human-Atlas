@@ -18035,7 +18035,7 @@ export const ARCHETYPES = {
         "big5_open": 1.1,
         "cog_diverge": 0.8
       },
-      "psych_tag": "高全局抽象 × 低勤勉投入型"
+      "psych_tag": "全局抽象 × 极简省力型"
     },
     {
       "id": "AR11",
@@ -18053,7 +18053,7 @@ export const ARCHETYPES = {
         "cog_logic": 1.2,
         "def_detach": 0.8
       },
-      "psych_tag": "低共情 × 高人性信念的矛盾型"
+      "psych_tag": "人性信念 × 抽离共情的冷静型"
     },
     {
       "id": "AR12",
@@ -18071,7 +18071,7 @@ export const ARCHETYPES = {
         "mot_mastery": 0.9,
         "big5_aesthetic": 0.8
       },
-      "psych_tag": "高贪婪驱力 × 低幸福取向型"
+      "psych_tag": "贪婪驱力 × 体验优先型"
     },
     {
       "id": "AR13",
@@ -18143,7 +18143,7 @@ export const ARCHETYPES = {
         "big5_alert": -0.9,
         "mot_security": 0.8
       },
-      "psych_tag": "低反刍 × 高情感隔离的稳态型"
+      "psych_tag": "情绪稳定 × 情感隔离的稳态型"
     },
     {
       "id": "AR17",
@@ -18161,7 +18161,7 @@ export const ARCHETYPES = {
         "cog_speed": 1.1,
         "val_standard": -1
       },
-      "psych_tag": "低社会契约 × 低道德绝对型"
+      "psych_tag": "现实博弈 × 结果优先型"
     },
     {
       "id": "AR18",
@@ -18233,7 +18233,7 @@ export const ARCHETYPES = {
         "virtue_temperance": 1.1,
         "lv_suffering": 0.9
       },
-      "psych_tag": "高勤勉 × 低享乐的自律型"
+      "psych_tag": "长程勤勉 × 克制享乐型"
     },
     {
       "id": "AR22",
@@ -18251,7 +18251,7 @@ export const ARCHETYPES = {
         "mot_purpose": 1.1,
         "big5_rumination": 0.7
       },
-      "psych_tag": "高升华转化 × 低逃避倾向型"
+      "psych_tag": "升华转化 × 直面创伤型"
     },
     {
       "id": "AR23",
@@ -18269,7 +18269,7 @@ export const ARCHETYPES = {
         "virtue_diligence": 1.1,
         "big5_social": -0.7
       },
-      "psych_tag": "低表达 × 高勤勉的内驱型"
+      "psych_tag": "静默内驱 × 高勤勉型"
     },
     {
       "id": "AR24",
@@ -18454,7 +18454,7 @@ export const ARCHETYPES = {
       "negWeights": {
         "dark_mach": -1
       },
-      "psych_tag": "低制度信任 × 高道德严格型"
+      "psych_tag": "制度存疑 × 道德严格型"
     },
     {
       "id": "AR33",
@@ -20661,10 +20661,10 @@ export const EXPRESS = {
     "v11_q14",
     "v12_q01",
     "v13_q04",
-    "v13_q13",
+    "v12_q22",
     "v14_q01",
     "v14_q05",
-    "v15_q04",
+    "v2_q02",
     "v15_q10",
     "v16_q01",
     "v16_q08"

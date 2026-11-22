@@ -19,9 +19,10 @@ import { spectrumSvg } from '../viz/spectrumSvg.js';
 import { quadrantSvg, attachmentStyle } from '../viz/quadrantSvg.js';
 import { triadSvg } from '../viz/triadSvg.js';
 import { jungStackSvg, jungTypeHint } from '../viz/jungStackSvg.js';
-import { matrixSvg, alignmentOf, neuroOf, ALIGNMENT_QUADRANTS, NEURO_QUADRANTS } from '../viz/matrixSvg.js';
+import { matrixSvg, neuroOf, NEURO_QUADRANTS } from '../viz/matrixSvg.js';
+import { alignmentSvg, alignmentFrom, ALIGNMENTS } from '../viz/alignmentSvg.js';
 import {
-  downloadPoster, downloadMarkdown, copyMarkdown, copyAIPrompt, buildAIPrompt as buildAIPromptLocal,
+  downloadPoster, downloadMarkdown, copyMarkdown, copyAIPrompt, buildAIPrompt,
 } from './Exporter.js';
 import {
   exportJSON, encodeSoulCode, initialSnapshotOf, retakeVolume, hasInitialSnapshot,
@@ -326,7 +327,7 @@ export function renderReport(root, ctx) {
   const maskTier = Number.isFinite(state.maskIndex) ? maskTierOf(state.maskIndex) : null;
 
   cover.appendChild(el('div', { class: 'gauges' }, [
-    gauge('光暗能量比', lightDark),
+    gauge('光暗能量比', lightDark.text, lightDark.note),
     gauge('社会面具厚度', maskV, maskTier ? ` · ${maskTier.name}` : ''),
     gauge('测评完成度', `${completed.length}`, ` / ${VOL_IDS.length} 卷`),
     gauge('跨卷规则命中', `${report.cross.length}`, ` / ${DATA.crossRules.length}`),
@@ -1009,7 +1010,7 @@ export function renderReport(root, ctx) {
         type: 'button',
         text: '下载 .md',
         onclick: () => {
-          const text = buildAIPromptLocal(reportForExport, {
+          const text = buildAIPrompt(reportForExport, {
             nickname,
             answersByVolume: state.answersByVolume || {},
             telemetry: state.telemetry || {},
@@ -1104,6 +1105,8 @@ function renderVolumeReport(root, ctx, volId) {
   /* 主标题：本卷专属分型（不是 36 个跨卷原型）
      卷名降为上方的小字副标，分型成为封面主角。 */
   const scoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
+  // 分型引擎用的是同一份分数；这里给个别名，避免后面重复声明造成 TDZ
+  const typoScoreMap = scoreMap;
   const zMap = {};
   for (const d of Object.keys(typoScoreMap)) {
     const z = state.zScores?.[d];
@@ -1181,7 +1184,6 @@ function renderVolumeReport(root, ctx, volId) {
     return body;
   };
 
-  const typoScoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
 
   if (volId === 'vol1') {
     const body = chartCard('七美德 × 七原罪 · 双翼蝶形', '左翼为秩序，右翼为驱力');
@@ -1506,36 +1508,37 @@ function renderVolumeReport(root, ctx, volId) {
   if (volId === 'vol10') {
     const order = scoreMap.dd_order;
     const good = scoreMap.dd_good;
-    const q = alignmentOf(order, good);
-    const body = chartCard('阵营坐标 · 秩序 × 良善', q ? `落点：${q.name}` : '二维坐标');
-    let quadrants = ALIGNMENT_QUADRANTS;
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      quadrants = ALIGNMENT_QUADRANTS.map((x) => ({ ...x }));
-    }
-    body.appendChild(matrixSvg({
-      x: order,
-      y: good,
-      xLabel: '秩序 ← → 混沌',
-      yLabel: '冷硬 ← → 善良',
-      xLo: '混沌',
-      xHi: '秩序',
-      yLo: '冷硬',
-      yHi: '善良',
-      quadrants,
-      active: q?.key,
-      pointLabel: q?.name,
-    }, {
+    const hit = alignmentFrom(order, good);
+    const body = chartCard(
+      '阵营九宫格 · 秩序 × 良善',
+      hit ? `落点：${hit.alignment.name}` : '九宫格坐标',
+    );
+
+    body.appendChild(alignmentSvg({ order, good }, {
       ...chartOpt,
-      width: 480,
+      width: 560,
       color: P.vol10 || P.gold,
-      ariaLabel: '秩序与良善二维坐标',
+      showDesc: true,
     }));
-    if (q) {
+
+    if (hit) {
       const cap = el('div', { class: 'matrix-caption' });
-      cap.appendChild(el('h4', { text: q.name }));
-      cap.appendChild(el('p', { text: `${q.desc}。坐标只是语言，不是判决书——同一套原则，在顺境里是风骨，在耗竭时可能变成硬壳。` }));
+      cap.appendChild(el('h4', { text: `${hit.alignment.name} · ${hit.alignment.latin}` }));
+      cap.appendChild(el('p', {
+        text: `${hit.alignment.desc}。落在「${hit.orderBand.name} / ${hit.goodBand.name}」这一格。`
+          + '坐标只是语言，不是判决书——同一套原则，在顺境里是风骨，在耗竭时可能变成硬壳。',
+      }));
       body.appendChild(cap);
+
+      /* 九格全览：把自己那一格标出来，其余八格作为参照 */
+      const grid = el('div', { class: 'align-chips' });
+      ALIGNMENTS.forEach((a) => {
+        grid.appendChild(el('span', {
+          class: `align-chip${a.key === hit.alignment.key ? ' is-on' : ''}`,
+          text: a.name,
+        }));
+      });
+      body.appendChild(grid);
     }
   }
 
@@ -1838,15 +1841,28 @@ function formatAnswer(q, value) {
   return String(value);
 }
 
+/**
+ * 光暗能量比。
+ *
+ * 旧实现输出 `49 : 100` —— 看起来像两个独立分数，也很像算错了，
+ * 因为一般的 `A : B` 会被默认理解为占比（相加 100）。
+ * 现在改成「光 49% / 暗 51%」：两数相加恒为 100，一眼能读，
+ * 同时给出「接近均衡 / 明显偏光 / 明显偏暗」的档位词。
+ */
 function computeLightDark(scores) {
   const lightKeys = ['light_humanism', 'light_kant', 'light_faith', 'virtue_humility', 'virtue_charity', 'virtue_kindness', 'virtue_patience', 'virtue_temperance', 'virtue_diligence', 'virtue_chastity'];
   const darkKeys = ['dark_mach', 'dark_narc', 'dark_psycho', 'sin_pride', 'sin_greed', 'sin_envy', 'sin_wrath', 'sin_sloth', 'sin_lust', 'sin_gluttony'];
   const l = lightKeys.map((k) => scores[k]).filter(Number.isFinite);
   const d = darkKeys.map((k) => scores[k]).filter(Number.isFinite);
-  if (!l.length || !d.length) return '—';
+  if (!l.length || !d.length) return { text: '—', note: '' };
+
   const lm = l.reduce((a, b) => a + b, 0) / l.length;
   const dm = d.reduce((a, b) => a + b, 0) / d.length;
-  if (dm <= 0.5) return '100 : 1';
-  const ratio = Math.max(1, Math.round((lm / dm) * 100));
-  return `${ratio} : 100`;
+  const sum = lm + dm;
+  if (sum <= 0.5) return { text: '光 50% / 暗 50%', note: ' · 无数据' };
+
+  const lp = Math.round((lm / sum) * 100);
+  const dp = 100 - lp;
+  const note = lp >= 58 ? ' · 偏光' : dp >= 58 ? ' · 偏暗' : ' · 接近均衡';
+  return { text: `光 ${lp}% / 暗 ${dp}%`, note };
 }

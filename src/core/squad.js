@@ -71,16 +71,36 @@ export function assignRoles(members, DATA) {
     const s = members[i].state.computedScores || {};
     for (const role of SQUAD_ROLES) {
       let acc = 0;
-      let wSum = 0;
+      let wSum = 0;      // 覆盖到的权重（用于算覆盖率）
+      let totalW = 0;    // 该角色的全部权重
+
       for (const [dim, w] of Object.entries(role.weights)) {
-        const v = s[dim];
-        if (!Number.isFinite(v)) continue;
         const mag = Math.abs(w);
+        totalW += mag;
+        const v = s[dim];
+        /* 缺测维度按中性 50 计入，而不是直接跳过。
+           跳过会让「只测了一维但那一维极高」的人拿到接近 100 的分母归一化，
+           于是 1 卷用户能靠单维劫持 16 卷用户的团队角色。 */
+        if (!Number.isFinite(v)) {
+          acc += 50 * mag;
+          wSum += mag;
+          continue;
+        }
         acc += (w < 0 ? 100 - v : v) * mag;
         wSum += mag;
       }
-      if (wSum <= 0) continue;
-      scored.push({ idx: i, role: role.id, fit: round(acc / wSum, 1) });
+
+      if (totalW <= 0) continue;
+
+      /* 覆盖率置信系数（与 matchArchetype() 同一判别力）：
+         真正覆盖到的权重占比越低，分数越往 50 收缩。
+         全覆盖 → 1.0；只覆盖 25% → 0.75。 */
+      let coveredW = 0;
+      for (const [dim, w] of Object.entries(role.weights)) {
+        if (Number.isFinite(s[dim])) coveredW += Math.abs(w);
+      }
+      const conf = 0.75 + 0.25 * Math.min(1, coveredW / totalW);
+      scored.push({ idx: i, role: role.id, fit: round((acc / totalW) * conf, 1) });
     }
   }
 
@@ -171,7 +191,7 @@ export const COVER_DIMS = [
   'big5_order', 'big5_open', 'big5_assert', 'big5_compassion',
   'cog_global', 'cog_logic', 'mot_autonomy', 'mot_belonging',
   'mot_mastery', 'mot_purpose', 'light_kant', 'dark_mach',
-  'tki_collaborating', 'time_future', 'hsp_sensory', 'att_advance_placeholder',
+  'tki_collaborating', 'time_future', 'hsp_sensory',
 ];
 
 /**
@@ -179,7 +199,7 @@ export const COVER_DIMS = [
  * 「共同短板」= 所有人在这条轴上都低于 55。
  */
 export function coverage(members, DATA) {
-  const dims = COVER_DIMS.filter((d) => d !== 'att_advance_placeholder');
+  const dims = COVER_DIMS.slice();
   const rows = [];
 
   for (const d of dims) {

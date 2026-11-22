@@ -20,6 +20,7 @@ import { renderReport } from './components/ReportView.js';
 import { renderCompare } from './components/CompareView.js';
 import { renderExpressIntro, renderExpressResult } from './components/ExpressView.js';
 import { renderJohari, renderSquad } from './components/SocialView.js';
+import { renderGuide, guideSeen } from './components/GuideView.js';
 import { buildExpressVolume, seedFromVolumes } from './core/express.js';
 import { getAdapter, LocalOnlyAdapter, CONSENT_COPY } from './core/cloudAdapter.js';
 
@@ -162,6 +163,7 @@ function mountShell() {
   const nav = el('nav', { class: 'masthead__nav', 'aria-label': '主导航' });
 
   const navItems = [
+    { href: '#/guide', label: '导览', key: 'guide' },
     { href: '#/', label: '卷宗大厅', key: 'hub' },
     { href: '#/report', label: '全息报告', key: 'report' },
     { href: '#/compare', label: '双人对比', key: 'compare' },
@@ -224,7 +226,27 @@ function render(route) {
   const { parts } = route;
   const head = parts[0] || '';
 
+  if (head === 'guide') {
+    setActiveNav('guide');
+    root.className = 'page page--guide';
+    renderGuide(root, { App, DATA, VOL_IDS, go });
+    return;
+  }
+
   if (head === '' || head === 'hub') {
+    /* 首屏分流：新访客第一次进根路由先看导览。
+       老用户（已有任何作答进度）与 guideSeen 已标记的访客直接进大厅。 */
+    const hasProgress = (App.state.completedVolumes || []).length > 0
+      || Object.keys(App.state.inProgress || {}).length > 0
+      || Object.keys(App.state.answersByVolume || {}).length > 0;
+
+    if (!hasProgress && !guideSeen()) {
+      setActiveNav('guide');
+      root.className = 'page page--guide';
+      renderGuide(root, { App, DATA, VOL_IDS, go });
+      return;
+    }
+
     setActiveNav('hub');
     renderHub(root, { App, DATA, VOL_IDS, recompute, soulCode, importSoulCode, go });
     return;
