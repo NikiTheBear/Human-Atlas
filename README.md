@@ -97,9 +97,6 @@ human-atlas/
 │       └── bundle.js              # 编译产物（build-data 自动生成）
 ├── tests/
 │   └── verify-engine.js           # 5 类极端画像 + 边界鲁棒性校验
-├── docs/
-│   ├── AGENT_SPEC.md              # 原始开发规范
-│   └── BLUEPRINT.md               # 原始产品蓝图
 └── scripts/
     ├── build-data.js              # JSON → bundle.js
     ├── build.js                   # 静态产物构建

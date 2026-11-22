@@ -19,8 +19,7 @@
     "test:monte:full": "node tests/monte-carlo-audit.js 10000",
     "test:all": "node tests/verify-scoring.js && node tests/verify-engine.js && node tests/monte-carlo-audit.js 2000",
     "audit": "node tests/audit.mjs 10000",
-    "audit:quick": "node tests/audit.mjs 1000",
-    "pack": "node scripts/build-audit-pack.mjs"
+    "audit:quick": "node tests/audit.mjs 1000"
   },
   "engines": {
     "node": ">=18"
