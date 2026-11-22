@@ -23,3 +23,9 @@ styles_backup_*/
 
 # 审计包的中间产物（由 npm run pack 重新生成）
 audit-parts/
+
+# 内部验收包 / AI 审稿产物（永不入库）
+AUDIT_*.md
+HOW_TO_SEND_TO_GEMINI.md
+audit-v5-parts/
+scripts/build-audit-pack.mjs
