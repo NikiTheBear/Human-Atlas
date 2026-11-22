@@ -8,7 +8,145 @@
    ============================================================ */
 
 import { clamp, round, mean, sortBy } from './utils.js';
-import { tierOf, maskTierOf } from './scoring.js';
+import { tierOf, maskTierOf, computeAll } from './scoring.js';
+
+/* ------------------------------------------------------------
+   双源无损融合：live 现算 ∪ 存档分数
+   ------------------------------------------------------------ */
+
+/**
+ * 个人内部相对尖峰 Z。
+ * 与 scoring.js 的 scorePool() 尾部保持同一把尺子：σ 下限 6.0。
+ */
+function zFromScores(scores, dims) {
+  const vals = dims.map((d) => scores[d]).filter(Number.isFinite);
+  const mu = vals.length ? mean(vals) : 50;
+  const variance = vals.length
+    ? vals.reduce((a, v) => a + (v - mu) ** 2, 0) / vals.length
+    : 0;
+  const sigma = Math.max(6, Math.sqrt(variance));
+  const out = {};
+  for (const d of dims) {
+    if (!Number.isFinite(scores[d])) continue;
+    out[d] = round((scores[d] - mu) / sigma, 2);
+  }
+  return out;
+}
+
+/**
+ * 有效分数（v5.2.2）。
+ *
+ * 背景：HA4- 存档码只编码「完成卷位掩码 + 127 个维度分 + 面具 + 价值 + 昵称」，
+ * 不含 answersByVolume。导入后 computeAll() 只能看到空作答池，于是 live 里全是 null。
+ * 旧实现直接 `state.computedScores = {}` 再从 live 填回去 —— 导入的 60–99 个维度
+ * 被整对象覆盖洗白，报告页便被空态门禁拦成「档案尚未启封」。
+ *
+ * 现在的规则：
+ *   1. 底盘 = state.computedScores（内存/导入/本地存档里已有的分）
+ *   2. 只用 live 里【有限】的值覆盖，null 绝不参与覆盖
+ *   3. mask / topValues / pressure 同理：live 没有就回落到存档值
+ *   4. Z 分：live 覆盖不到合并后的全部维度时，按合并后的分布重算（σ 下限 6.0）
+ *
+ * @param {Object} state 任意 HA 状态（可只带 computedScores，无 answersByVolume）
+ * @param {Object} DATA  { volumes, dimensions, dimOrder, ... }
+ * @returns {{ scores, zScores, mask, maskDetail, topValues, pressure, live, completedVolumes }}
+ */
+export function resolveEffectiveComputed(state, DATA) {
+  const live = computeAll(state, DATA);
+
+  const dimOrder = (DATA.dimOrder && DATA.dimOrder.length)
+    ? DATA.dimOrder
+    : (DATA.dimensions?.dims || []).map((d) => d.id);
+  const valid = new Set(dimOrder);
+
+  /* ---- 1. 底盘：存档里已有的分 ---- */
+  const scores = {};
+  for (const [d, v] of Object.entries(state?.computedScores || {})) {
+    if (!valid.has(d)) continue;
+    if (Number.isFinite(v)) scores[d] = v;
+  }
+
+  /* ---- 2. live 覆盖（仅有限值，且仅在「本地真的答过这一卷」时） ----
+     单纯「live 是有限值就覆盖」还不够。反例：
+       导入 vol1–8（只带 computedScores，无作答原文）→ 接着答 vol9
+       vol9 的选项会顺带在 big5_open 之类的维度上产生交叉载荷，
+       于是 live.big5_open 是个有限值（58.6），它会把导入的 8 卷聚合值覆盖掉。
+       一次单卷作答就打穿了八卷的证据量 —— 这正是「洗白」的另一种形式，
+       只是从「变成 null」变成了「变成另一个数」。
+     所以再加一道：只有该维度属于【本地确有作答】的卷，live 才有权覆盖。
+     本地没答过的卷，它的分来自存档码，没有新证据，一律保留存档值。 */
+  const localVols = new Set();
+  for (const [v, bucket] of Object.entries(state?.answersByVolume || {})) {
+    /* 虚拟桶不算「答过某卷」：它的分归属到真实卷，由 commitExpress 负责写回。
+       若留在桶里，DATA.volumes['__express'] 是 undefined，不会产生任何归属，
+       所以这里直接跳过即可。 */
+    if (v === '__express') continue;
+    if (bucket && Object.keys(bucket).length) localVols.add(v);
+  }
+  const liveOwnedDims = new Set();
+  for (const v of localVols) {
+    const vol = DATA?.volumes?.[v];
+    for (const d of vol?.dimensions || []) liveOwnedDims.add(d);
+  }
+
+  for (const d of dimOrder) {
+    const v = live?.scores?.[d];
+    if (!Number.isFinite(v)) continue;
+    /* 本地零作答（纯导入态）：live 完全无权覆盖，全部保留存档值。
+       否则 live 会把「没有任何证据的空计算」写进底盘。 */
+    if (!liveOwnedDims.size) continue;
+    if (!liveOwnedDims.has(d)) continue;
+    scores[d] = v;
+  }
+
+  /* ---- 3. Z 分 ---- */
+  const finiteDims = dimOrder.filter((d) => Number.isFinite(scores[d]));
+  const liveZ = live?.zScores || {};
+  const liveZCovers = finiteDims.every((d) => Number.isFinite(liveZ[d]));
+  const zScores = liveZCovers
+    ? Object.fromEntries(finiteDims.map((d) => [d, liveZ[d]]))
+    : zFromScores(scores, finiteDims);
+
+  /* ---- 4. 面具：live 为 null 时回落存档值 ---- */
+  const liveMask = live?.mask && typeof live.mask === 'object' ? live.mask : null;
+  let maskValue = Number.isFinite(liveMask?.value) ? liveMask.value : null;
+  if (maskValue === null && Number.isFinite(state?.maskIndex)) maskValue = state.maskIndex;
+  const maskTier = maskValue === null ? null : maskTierOf(maskValue);
+  const mask = {
+    ...(liveMask || {}),
+    value: maskValue,
+    tier: maskTier,
+  };
+
+  const baseDetail = state?.maskDetail && typeof state.maskDetail === 'object'
+    ? { ...state.maskDetail }
+    : {};
+  const liveParts = Array.isArray(liveMask?.parts) ? liveMask.parts : [];
+  const maskDetail = {
+    ...baseDetail,
+    ...(liveMask || {}),
+    parts: liveParts.length ? liveParts : (Array.isArray(baseDetail.parts) ? baseDetail.parts : []),
+    value: maskValue,
+    tier: maskTier,
+  };
+
+  /* ---- 5. 价值金字塔 / 压力退行态 ---- */
+  const topValues = (Array.isArray(live?.topValues) && live.topValues.length)
+    ? live.topValues
+    : [...(state?.topValues || [])];
+  const pressure = live?.pressure || state?.pressureStyle || null;
+
+  return {
+    scores,
+    zScores,
+    mask,
+    maskDetail,
+    topValues,
+    pressure,
+    live,
+    completedVolumes: [...(state?.completedVolumes || [])],
+  };
+}
 
 /* ------------------------------------------------------------
    维度解读：一维四面镜 → 当前档位应取的那一面
@@ -440,16 +578,26 @@ export function buildVolumeReport(state, DATA, volId) {
   const ans = state.answersByVolume?.[volId] || {};
   const answered = qs.filter((q) => ans[q.id]?.value !== undefined);
 
+  /* 分数底盘：state.computedScores。只有当它完全为空（例如只拿到 answersByVolume
+     的原始态）时才现场融合一次，不重复计算。 */
+  const hasStored = Object.values(state?.computedScores || {}).some(Number.isFinite);
+  const eff = hasStored ? null : resolveEffectiveComputed(state, DATA);
+  const scoreMap = hasStored ? (state.computedScores || {}) : eff.scores;
+  const zMap = (hasStored && Object.keys(state?.zScores || {}).length)
+    ? state.zScores
+    : (eff ? eff.zScores : (state?.zScores || null));
+
   const dims = {};
   for (const d of vol.dimensions || []) {
-    const v = state.computedScores?.[d];
+    const v = scoreMap[d];
     if (Number.isFinite(v)) dims[d] = v;
   }
 
   const mirrors = mirrorAll(dims, DATA.mirrors);
-  const gifts = topGifts(dims, DATA.mirrors, 3, state.zScores || null);
-  const shadows = topShadows(dims, DATA.mirrors, 3, state.zScores || null);
-  const mask = state.maskIndex === null || state.maskIndex === undefined ? null : state.maskIndex;
+  const gifts = topGifts(dims, DATA.mirrors, 3, zMap);
+  const shadows = topShadows(dims, DATA.mirrors, 3, zMap);
+  const maskV = Number.isFinite(state.maskIndex) ? state.maskIndex : (eff?.mask?.value ?? null);
+  const mask = maskV === null || maskV === undefined ? null : maskV;
 
   return {
     volumeId: volId,
@@ -486,19 +634,28 @@ function buildVolumeVerdict(vol, gifts, shadows, answered, total) {
    ------------------------------------------------------------ */
 
 export function buildHolographicReport(state, DATA) {
-  const scores = state.computedScores || {};
+  /* 分数底盘：优先用 state.computedScores（renderReport 已先算好融合态传进来）；
+     只有当它完全为空时，才现场融合一次 —— 保证任何直接调用本函数的
+     地方（导出工作室 / 验收脚本 / 其他视图）不会拿到一份全空报告。 */
+  const hasStored = Object.values(state?.computedScores || {}).some(Number.isFinite);
+  const eff = hasStored ? null : resolveEffectiveComputed(state, DATA);
+  const scores = hasStored ? (state.computedScores || {}) : eff.scores;
+  const zScores = (hasStored && Object.keys(state?.zScores || {}).length)
+    ? state.zScores
+    : (eff ? eff.zScores : (state?.zScores || {}));
   const completed = state.completedVolumes || [];
+  const maskValue = Number.isFinite(state.maskIndex) ? state.maskIndex : (eff?.mask?.value ?? null);
   const mask = {
-    value: state.maskIndex,
-    tier: Number.isFinite(state.maskIndex) ? maskTierOf(state.maskIndex) : null,
+    value: maskValue,
+    tier: Number.isFinite(maskValue) ? maskTierOf(maskValue) : null,
   };
 
   const cross = matchCrossRules(scores, mask, DATA.crossRules, completed);
   const archetype = matchArchetype(scores, DATA.archetypes);
-  const dual = dualState(scores, DATA.mirrors, state.pressureStyle || null);
-  const manual = useManual(scores, state.pressureStyle || null);
+  const dual = dualState(scores, DATA.mirrors, state.pressureStyle || eff?.pressure || null);
+  const manual = useManual(scores, state.pressureStyle || eff?.pressure || null);
 
-  const values = (state.topValues || []).map((id) => {
+  const values = (state.topValues?.length ? state.topValues : (eff?.topValues || [])).map((id) => {
     const v = (DATA.dimensions.values || []).find((x) => x.id === id);
     return v ? { id: v.id, name: v.name, desc: v.desc } : { id, name: id, desc: '' };
   });
@@ -507,16 +664,16 @@ export function buildHolographicReport(state, DATA) {
     completed,
     totalVolumes: Object.keys(DATA.volumes || {}).length,
     scores,
-    zScores: state.zScores || {},
+    zScores,
     mask,
     cross,
     archetype,
     dual,
     manual,
     values,
-    pressure: state.pressureStyle || null,
-    gifts: topGifts(scores, DATA.mirrors, 4, state.zScores || null),
-    shadows: topShadows(scores, DATA.mirrors, 3, state.zScores || null),
+    pressure: state.pressureStyle || eff?.pressure || null,
+    gifts: topGifts(scores, DATA.mirrors, 4, zScores),
+    shadows: topShadows(scores, DATA.mirrors, 3, zScores),
   };
 }
 
@@ -532,7 +689,8 @@ export function reportDepth(completedCount) {
 
 /** 用于存档码 / 分享卡的简短判词 */
 export function soulVerdict(state, DATA) {
-  const scores = state.computedScores || {};
+  const hasStored = Object.values(state?.computedScores || {}).some(Number.isFinite);
+  const scores = hasStored ? (state.computedScores || {}) : resolveEffectiveComputed(state, DATA).scores;
   const arch = matchArchetype(scores, DATA.archetypes);
   if (!arch?.best) return null;
   return {

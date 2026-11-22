@@ -11,7 +11,7 @@ import {
   load, save, reset, loadTheme, saveTheme, encodeSoulCode, decodeSoulCode,
 } from './core/storage.js';
 
-import { computeAll, maskIndex } from './core/scoring.js';
+import { resolveEffectiveComputed } from './core/synthesizer.js';
 import { el, qs, go, parseHash } from './core/utils.js';
 
 import { renderHub } from './components/VolumeHub.js';
@@ -71,36 +71,36 @@ function applyTheme(theme) {
    计分刷新
    ------------------------------------------------------------ */
 
+/**
+ * 重算并落盘。
+ *
+ * v5.2.2 关键修复（P0 · 导入存档码后报告页空态）：
+ *   旧实现是 `s.computedScores = {}` 后再用 computeAll() 的结果回填。
+ *   但 HA4- 存档码只带分数不带 answersByVolume，导入后 computeAll()
+ *   对每个维度都返回 null，于是导入的 60–99 个维度被整对象洗白，
+ *   报告页门禁（已测维度数 = 0）直接把用户拦成「档案尚未启封」。
+ *   现在改用 resolveEffectiveComputed()：以已有分数为底盘，
+ *   只用 live 中【有限】的值覆盖，null 永远不参与写入。
+ */
 export function recompute({ silent = true } = {}) {
   const s = App.state;
 
-  // 逐卷算分并写回
-  const all = computeAll(s, DATA);
-  s.computedScores = {};
-  for (const d of DIM_ORDER) {
-    const v = all.scores[d];
-    if (Number.isFinite(v)) s.computedScores[d] = v;
-  }
+  const eff = resolveEffectiveComputed(s, DATA);
 
-  // 个人内部相对尖峰：报告的「王牌天赋 / 阴影预警」按 |Z| 排序时才用得到
-  s.zScores = {};
-  for (const d of DIM_ORDER) {
-    const z = all.zScores?.[d];
-    if (Number.isFinite(z)) s.zScores[d] = z;
-  }
+  s.computedScores = eff.scores;
+  s.zScores = eff.zScores;
 
-  const mask = maskIndex(s, DATA);
-  s.maskIndex = mask.value === null ? null : mask.value;
-  s.maskDetail = mask;
+  s.maskIndex = eff.mask?.value === null || eff.mask?.value === undefined ? null : eff.mask.value;
+  s.maskDetail = eff.maskDetail;
 
   // Top3 价值
-  s.topValues = all.topValues || [];
+  s.topValues = eff.topValues || [];
 
   // 压力退行态
-  s.pressureStyle = all.pressure || null;
+  s.pressureStyle = eff.pressure || null;
 
   save(s, { immediate: silent });
-  return all;
+  return eff.live;
 }
 
 /* ------------------------------------------------------------
@@ -127,6 +127,8 @@ export function importSoulCode(text, { merge = true } = {}) {
     if (!s.topValues?.length) s.topValues = incoming.topValues || [];
     save(s, { immediate: true });
   }
+  /* recompute() 现在走 resolveEffectiveComputed()，
+     刚合并进来的导入分数不会再被空作答池洗掉。 */
   recompute({ silent: true });
   return { ok: true, state: App.state };
 }

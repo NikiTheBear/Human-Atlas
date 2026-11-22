@@ -412,6 +412,37 @@ check(`跨模式合盘 ${CROSS} 对无 NaN`, crossNan === 0, crossNan);
 check(`真实 compareStates 全部 ok（${cmpOk}/${CROSS}）`, cmpFail === 0, `失败 ${cmpFail} 次`);
 check('不再出现「还没有共同完成任何一卷」', cmpNoCommon === 0, cmpNoCommon);
 
+/* 极速态标记：两份都没有共同卷的档位对，必须打上 isExpressPair。
+   同时验证「真卷交集为空」与「可比维度足够」这两个条件同时成立。 */
+{
+  const full = profile(VOL_IDS, null);
+  const exA = makeExpressState();
+  const exB = makeExpressState();
+
+  const pair = compareStates(exA, exB, DATA);
+  check('极速×极速：ok 且 isExpressPair', pair.ok === true && pair.isExpressPair === true,
+    `ok=${pair.ok} common=${pair.common?.length} dims=${pair.dims?.length}`);
+  check('极速×极速：可比维度 ≥ 10', (pair.dims?.length || 0) >= 10, pair.dims?.length);
+  check('极速×极速：契合度为有限值', Number.isFinite(pair.overall), pair.overall);
+
+  const cross = compareStates(full, exA, DATA);
+  check('完整×极速：ok 且 isExpressPair', cross.ok === true && cross.isExpressPair === true,
+    `ok=${cross.ok} common=${cross.common?.length} dims=${cross.dims?.length}`);
+
+  /* 反向：两份都有 16 卷完成 → 不得误标极速对 */
+  const two = profile(VOL_IDS, null);
+  const same = compareStates(full, two, DATA);
+  check('完整×完整：isExpressPair 为 false', same.ok === true && same.isExpressPair === false,
+    `common=${same.common?.length} isExpressPair=${same.isExpressPair}`);
+
+  /* 闸门：可比维度不足 10 时必须优雅降级 */
+  const thin = { computedScores: Object.fromEntries(DIM_ORDER.slice(0, 5).map((d) => [d, 50])), completedVolumes: [], maskIndex: 50, nickname: '' };
+  const bad = compareStates(full, thin, DATA);
+  check('可比维度 < 10 时降级且 isExpressPair 为 false',
+    bad.ok === false && bad.isExpressPair === false && typeof bad.reason === 'string',
+    `${bad.dims?.length} 维`);
+}
+
 /* 对称性 */
 {
   let asym = 0;

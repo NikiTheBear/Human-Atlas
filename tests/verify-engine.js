@@ -335,12 +335,25 @@ function tc5() {
   });
   check('对比结果无 NaN/undefined', issues.length === 0, issues.slice(0, 3).join('; '));
 
-  // 极端：无交集
+  /* 极端 A：卷交集为空，但可比维度足够（28 题极速档的真实形态）。
+     v5.2.2 起合盘闸门改为「可比维度 ≥ 10」，不再看共同卷宗。
+     A 做了 vol1–6，C 只做了 vol8 —— 一卷都不重合，但 sin/virtue/dark/light/big5
+     有 20 个共同维度，必须放行。 */
   const C = emptyState('C 君');
   answerVolume(C, 'vol8', 'random');
   applyScores(C);
   const res2 = compareStates(A, C, DATA);
-  check('无交集时优雅降级', res2.ok === false && typeof res2.reason === 'string');
+  check('卷交集为空但可比维度 ≥10 时放行', res2.ok === true && res2.common.length === 0,
+    `common=${res2.common.length} dims=${res2.dims.length}`);
+  check('卷交集为空时标记为极速对档', res2.isExpressPair === true);
+
+  /* 极端 B：可比维度不足 10 → 优雅降级 */
+  const D = emptyState('D 君');
+  D.computedScores = {};
+  DIM_ORDER.slice(0, 6).forEach((d) => { D.computedScores[d] = 55; });
+  const res4 = compareStates(A, D, DATA);
+  check('可比维度 <10 时优雅降级', res4.ok === false && typeof res4.reason === 'string',
+    `${res4.dims?.length} 维`);
 
   // 极端：完全相同的画像
   const res3 = compareStates(A, A, DATA);

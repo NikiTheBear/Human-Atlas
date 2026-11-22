@@ -9,6 +9,7 @@
 
 import { clamp, round, mean } from './utils.js';
 import { compareStates } from './comparator.js';
+import { resolveEffectiveComputed } from './synthesizer.js';
 
 /* ------------------------------------------------------------
    1. 生态位角色
@@ -145,25 +146,48 @@ export function roleMeta(id) {
    ------------------------------------------------------------ */
 
 /**
+ * 缘分热力矩阵。
+ *
+ * v5.3：小队里可能混进「只做过 28 题极速版」的成员 —— 他们的 state 里
+ * completedVolumes 为空，只有 computedScores。这里不再依赖任何卷交集，
+ * 直接按维度对齐；每个格子都用 Number.isFinite 兜底，矩阵里永不出现 NaN。
+ *
  * @returns {{ matrix: number[][], best: {i,j,score}, worst: {i,j,score} }}
  */
 export function affinityMatrix(members, DATA) {
   const n = members.length;
   const matrix = Array.from({ length: n }, () => Array(n).fill(null));
 
+  /* 每个成员先洗成「分数齐全再进合盘」的形态：
+     只有 answersByVolume 的成员靠融合补分，已带 computedScores 的成员原样保留。 */
+  const states = members.map((m) => {
+    const st = m?.state || {};
+    if (Object.values(st.computedScores || {}).some(Number.isFinite)) return st;
+    const eff = resolveEffectiveComputed(st, DATA);
+    return {
+      ...st,
+      computedScores: eff.scores,
+      zScores: eff.zScores,
+      maskIndex: eff.mask?.value ?? st.maskIndex ?? null,
+    };
+  });
+
   for (let i = 0; i < n; i += 1) {
     matrix[i][i] = 100;
     for (let j = i + 1; j < n; j += 1) {
       let score = null;
       try {
-        const res = compareStates(members[i].state, members[j].state, DATA);
-        if (res?.ok && Number.isFinite(res.overall)) score = round(res.overall, 1);
+        const res = compareStates(states[i], states[j], DATA);
+        const v = res?.overall;
+        if (res?.ok && Number.isFinite(v)) score = round(clamp(v, 0, 100), 1);
       } catch {
         score = null;
       }
-      matrix[i][j] = score;
-      matrix[j][i] = score;
+      /* 极端兜底：上面任何一步算出一个非有限值，都归为「不可比」，而不是 NaN。 */
+      matrix[i][j] = Number.isFinite(score) ? score : null;
+      matrix[j][i] = matrix[i][j];
     }
+    if (!Number.isFinite(matrix[i][i])) matrix[i][i] = 100;
   }
 
   const pairs = [];

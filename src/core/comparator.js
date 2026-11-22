@@ -32,16 +32,29 @@ export function commonVolumes(a, b) {
 }
 
 export function commonDims(a, b, DATA) {
-  const vols = commonVolumes(a, b);
-  const set = new Set();
-  for (const v of vols) {
-    const vol = DATA.volumes[v];
-    for (const d of vol?.dimensions || []) set.add(d);
-  }
-  return Array.from(set).filter(
-    (d) => Number.isFinite(a.computedScores?.[d]) && Number.isFinite(b.computedScores?.[d]),
-  );
+  /* v5.3：不再绕道 commonVolumes。
+     28 题极速档不写 completedVolumes，靠 activeVolumes 也只能找回“被答过的原卷”；
+     而两份极速档各自抽的 28 题很可能来自完全不同的卷，交集于是恒为空，
+     合盘直接返回「你们还没有共同完成任何一卷」。
+     可比性真正的判定标准只有一个：同一维度双方都有【有限】分数。 */
+  const order = (DATA?.dimOrder && DATA.dimOrder.length)
+    ? DATA.dimOrder
+    : Object.keys(DATA?.dimMap || {});
+  const aS = a?.computedScores || {};
+  const bS = b?.computedScores || {};
+  return order.filter((d) => Number.isFinite(aS[d]) && Number.isFinite(bS[d]));
 }
+
+/** 该档是否只有「28 题极速数据」：一卷都没标记完成，但确实有足够维度分 */
+export function isExpressOnly(state) {
+  const done = (state?.completedVolumes || []).length;
+  if (done > 0) return false;
+  const finite = Object.values(state?.computedScores || {}).filter(Number.isFinite).length;
+  return finite >= MIN_COMPARABLE_DIMS;
+}
+
+/** 合盘最少可比维度：低于此数任何结论都是噪声 */
+export const MIN_COMPARABLE_DIMS = 10;
 
 /** 底层共振度 R_sync = 100 − 平均绝对差 */
 export function resonance(a, b, dims, DATA) {
@@ -152,16 +165,29 @@ export function compareStates(a, b, DATA) {
   const common = commonVolumes(a, b);
   const dims = commonDims(a, b, DATA);
 
-  if (!common.length || !dims.length) {
+  /* 放行闸门：看可比维度数，不看是否同卷。
+     两份 28 题极速档往往一卷都不重合，但有 85–110 个共同维度，
+     完全足够算生态位与契合度。 */
+  if (dims.length < MIN_COMPARABLE_DIMS) {
     return {
       ok: false,
       common,
       dims,
-      reason: common.length
-        ? '双方共同完成的卷宗里，还没有可比较的维度。'
-        : '你们还没有共同完成任何一卷，暂时无法计算契合度。',
+      isExpressPair: false,
+      reason: dims.length
+        ? `双方只有 ${dims.length} 个可比较维度，不足 ${MIN_COMPARABLE_DIMS} 个，暂时算不出可信的契合度。`
+        : '双方还没有任何重叠的可测维度，暂时无法计算契合度。',
     };
   }
+
+  /* 极速对档：卷交集为空，但维度足够。
+     两点补充：
+       1. 解码后的存档码 answersByVolume 恒为空 → common 必为空，命中前半条；
+       2. 内存里刚做完 28 题的状态，commitExpress 会把答案写回原卷，
+          activeVolumes 于是能枚举出 16 卷，common 不再是空数组 ——
+          所以再用 isExpressOnly() 看「谁一卷都没标记完成」兜底。 */
+  const isExpressPair = (common.length === 0 || isExpressOnly(a) || isExpressOnly(b))
+    && dims.length >= MIN_COMPARABLE_DIMS;
 
   const res = resonance(a, b, dims, DATA);
   const comp = complement(a, b, dims, DATA);
@@ -201,6 +227,7 @@ export function compareStates(a, b, DATA) {
     ok: true,
     common,
     dims,
+    isExpressPair,
     sync: res,
     complement: comp,
     collisions: coll,

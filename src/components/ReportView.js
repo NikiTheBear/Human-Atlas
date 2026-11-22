@@ -7,6 +7,7 @@
 import { el, go, round, clamp, toast, downloadText, formatDate } from '../core/utils.js';
 import {
   mirrorFor, topGifts, topShadows, buildHolographicReport, reportDepth,
+  resolveEffectiveComputed,
 } from '../core/synthesizer.js';
 import { buildVolumeTypology } from '../core/typology.js';
 import {
@@ -328,7 +329,12 @@ function renderEmptyDossier(root, ctx) {
           ]));
           merged.answersByVolume = { ...(r.state.answersByVolume || {}), ...(App.state.answersByVolume || {}) };
           merged.inProgress = { ...(r.state.inProgress || {}), ...(App.state.inProgress || {}) };
+          /* 本地分优先于导入分（与 importSoulCode 的合并口径一致） */
+          merged.computedScores = { ...(r.state.computedScores || {}), ...(App.state.computedScores || {}) };
+          merged.zScores = { ...(r.state.zScores || {}), ...(App.state.zScores || {}) };
           merged.nickname = App.state.nickname || r.state.nickname || '';
+          merged.maskIndex = Number.isFinite(App.state.maskIndex) ? App.state.maskIndex : r.state.maskIndex;
+          if (!App.state.topValues?.length && r.state.topValues?.length) merged.topValues = r.state.topValues;
           App.state = merged;
           window.HumanAtlas?.recompute?.();
         }
@@ -336,8 +342,12 @@ function renderEmptyDossier(root, ctx) {
       },
       onDone: () => {
         window.HumanAtlas?.recompute?.();
-        /* hash 没变时浏览器不会自己触发 hashchange，这里手动补一次重渲染 */
+        /* hash 没变时浏览器不会自己触发 hashchange，这里手动补一次重渲染。
+           recompute 现在走双源融合，导入的分不会再被空作答池洗掉，
+           所以这次重渲染会直接进入报告主体，而不是继续停在空态。 */
         window.dispatchEvent(new Event('hashchange'));
+        const dims = Object.values(App.state.computedScores || {}).filter(Number.isFinite).length;
+        if (dims > 0) toast(`已载入 ${dims} 个维度`);
       },
     });
   });
@@ -368,9 +378,30 @@ export function renderReport(root, ctx) {
   const state = App.state;
   const C = themeColors();
 
+  /* ---------- 双源融合 ----------
+     HA4- 存档码只带分数、不带 answersByVolume。如果直接用 state.computedScores，
+     导入后只要 recompute 跑过一次就可能被空作答池洗成 0 维 —— 报告页就被
+     空态门禁拦成『档案尚未启封』。这里先算融合态，所有下游一律看 eff。 */
+  const eff = resolveEffectiveComputed(state, DATA);
+  const effectiveScores = eff.scores;
+  const hasEffective = Object.keys(effectiveScores).length > 0;
+
+  /* 丢掉旧 state 里已经失效的分，把融合后的分喂给下游（报告 / 单卷报告 / 导出）。 */
+  const effState = hasEffective
+    ? {
+      ...state,
+      computedScores: effectiveScores,
+      zScores: eff.zScores,
+      maskIndex: eff.mask?.value ?? state.maskIndex,
+      maskDetail: eff.maskDetail || state.maskDetail || null,
+      topValues: eff.topValues,
+      pressureStyle: eff.pressure || state.pressureStyle || null,
+    }
+    : state;
+
   // 单卷报告
   if (volId && DATA.volumes[volId]) {
-    renderVolumeReport(root, ctx, volId);
+    renderVolumeReport(root, { ...ctx, effectiveState: effState, effective: eff }, volId);
     return;
   }
 
@@ -380,9 +411,9 @@ export function renderReport(root, ctx) {
      「有维度分、completedVolumes 为空」的档案，或者在中途重置过进度时，
      会出现「有分数但没完成卷」的半空状态 —— 报告照样往下渲染，
      于是所有图表用 ?? 50 补出全 50 的假点、跨卷规则输出 0/65 的空壳。
-     现在改成以「已测维度数」为唯一门禁。 */
-  const measuredDims = Object.keys(state.computedScores || {})
-    .filter((d) => Number.isFinite(state.computedScores[d]));
+     现在以【双源融合后的已测维度数】为唯一门禁。 */
+  const measuredDims = Object.keys(effectiveScores)
+    .filter((d) => Number.isFinite(effectiveScores[d]));
   const completed = state.completedVolumes || [];
 
   if (!measuredDims.length) {
@@ -390,7 +421,7 @@ export function renderReport(root, ctx) {
     return;
   }
 
-  const report = buildHolographicReport(state, DATA);
+  const report = buildHolographicReport(effState, DATA);
   const depth = reportDepth(completed.length);
   const archPack = report.archetype || null;
   const arch = archPack?.eligible === false ? null : archPack?.best;
@@ -482,8 +513,11 @@ export function renderReport(root, ctx) {
   }
 
   const lightDark = computeLightDark(report.scores);
-  const maskV = Number.isFinite(state.maskIndex) ? Math.round(state.maskIndex) : '—';
-  const maskTier = Number.isFinite(state.maskIndex) ? maskTierOf(state.maskIndex) : null;
+  /* 面具读报告对象里的融合值（effState.maskIndex），不直接读 App.state ——
+     导入的档可能只有 maskIndex 没有作答，重算前后会短暂不一致。 */
+  const maskNum = report.mask?.value;
+  const maskV = Number.isFinite(maskNum) ? Math.round(maskNum) : '—';
+  const maskTier = Number.isFinite(maskNum) ? maskTierOf(maskNum) : null;
 
   cover.appendChild(el('div', { class: 'gauges' }, [
     gauge('光暗能量比', lightDark.text, lightDark.note),
@@ -1286,15 +1320,28 @@ export function renderReport(root, ctx) {
    ------------------------------------------------------------ */
 
 function renderVolumeReport(root, ctx, volId) {
-  const { App, DATA, VOL_IDS } = ctx;
-  const state = App.state;
+  const { App, DATA, VOL_IDS, effectiveState, effective } = ctx;
+  const state = effectiveState || App.state;
   const vol = DATA.volumes[volId];
   const P = themeColors();
   const ans = state.answersByVolume?.[volId] || {};
 
+  /* 分数底盘：融合后的 state.computedScores。
+     导入存档码后 answersByVolume 为空，靠右上角三个 gauge 与下方维度明细
+     必须能看到导入的分 —— 否则 `#/report/vol1` 会渲染成一张空壳。 */
+  const scoreSource = state.computedScores && Object.keys(state.computedScores).length
+    ? state.computedScores
+    : (effective?.scores || {});
+
   const dims = (vol.dimensions || [])
-    .map((d) => ({ id: d, score: state.computedScores?.[d] }))
+    .map((d) => ({ id: d, score: scoreSource?.[d] }))
     .filter((d) => Number.isFinite(d.score));
+
+  /* 该卷一个可渲染维度都没有时，同样走空态而不是空白页。 */
+  if (!dims.length) {
+    renderEmptyDossier(root, ctx);
+    return;
+  }
 
   const mirrors = {};
   dims.forEach((d) => {
@@ -1970,7 +2017,7 @@ function renderVolumeReport(root, ctx, volId) {
           confirmText: hasSnap ? '封存并重测' : '清空并重测',
           danger: !hasSnap,
           onConfirm: () => {
-            retakeVolume(state, volId);
+            retakeVolume(state, volId, vol.dimensions || []);
             recompute({ silent: true });
             toast('已清空本卷作答');
             go(`#/quiz/${volId}`);

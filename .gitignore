@@ -29,3 +29,6 @@ AUDIT_*.md
 HOW_TO_SEND_TO_GEMINI.md
 audit-v5-parts/
 scripts/build-audit-pack.mjs
+
+# 本地私有商业解读工作台（严禁推送公开仓库）
+local-studio/

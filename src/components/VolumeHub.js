@@ -427,14 +427,26 @@ export function renderHub(root, ctx) {
           ]));
           merged.answersByVolume = { ...(r.state.answersByVolume || {}), ...(App.state.answersByVolume || {}) };
           merged.inProgress = { ...(r.state.inProgress || {}), ...(App.state.inProgress || {}) };
+          /* 本地分优先于导入分（与 importSoulCode 的合并口径一致） */
+          merged.computedScores = { ...(r.state.computedScores || {}), ...(App.state.computedScores || {}) };
+          merged.zScores = { ...(r.state.zScores || {}), ...(App.state.zScores || {}) };
           merged.nickname = App.state.nickname || r.state.nickname || '';
+          merged.maskIndex = Number.isFinite(App.state.maskIndex) ? App.state.maskIndex : r.state.maskIndex;
+          if (!App.state.topValues?.length && r.state.topValues?.length) merged.topValues = r.state.topValues;
           App.state = merged;
           save(App.state, { immediate: true });
-          recompute();
+          recompute({ silent: true });
         }
         return r;
       },
-      onDone: () => go('#/'),
+      /* 导入成功后直接落盘并跳到全息报告：
+         HA4- 只带分数，若停在原地，用户会以为只有「卷已归档」却没有报告。
+         recompute() 现在走双源融合，导入分不会再被空作答池洗掉。 */
+      onDone: () => {
+        save(App.state, { immediate: true });
+        const dims = Object.values(App.state.computedScores || {}).filter(Number.isFinite).length;
+        go(dims > 0 ? '#/report' : '#/');
+      },
     }),
   ));
 

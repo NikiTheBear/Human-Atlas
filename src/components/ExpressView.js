@@ -4,8 +4,8 @@
 
 import { el, go, round, toast, copyText } from '../core/utils.js';
 import { save, encodeSoulCode } from '../core/storage.js';
-import { computeAll, tierOf } from '../core/scoring.js';
-import { mirrorFor, topGifts, topShadows } from '../core/synthesizer.js';
+import { tierOf } from '../core/scoring.js';
+import { mirrorFor, topGifts, topShadows, resolveEffectiveComputed } from '../core/synthesizer.js';
 import { emblemSvg } from '../viz/emblemsSvg.js';
 import {
   EXPRESS_BUCKET, buildExpressVolume, seedFromVolumes, commitExpress,
@@ -78,12 +78,20 @@ export function renderExpressResult(root, ctx) {
   const state = App.state;
   const vol = buildExpressVolume(DATA, DATA.express);
 
-  // 把虚拟桶的答案写回真实卷，然后重算
-  const moved = commitExpress(state, vol);
-  if (moved) {
-    save(state, { immediate: true });
-    recompute({ silent: true });
-  }
+  /* ---------- 出码时序（P0 · 28 题存档码） ----------
+     commitExpress（虚拟桶 → 原卷）
+       → recompute（内部走 resolveEffectiveComputed：computeAll + 双源融合）
+       → state.computedScores / zScores / maskIndex / topValues 落盘
+       → encodeSoulCode（下方用的就是这份 state）
+     以前只有 moved > 0 才 recompute：直接刷新 #/express/result、
+     或答案已在原卷里而虚拟桶为空时，computedScores 可能还是空的，
+     生成的存档码会只有 0 个维度分。现在无条件重算一次。 */
+  commitExpress(state, vol);
+  recompute({ silent: true });
+
+  /* 展示层一律看融合后的分：就算某次 recompute 被主线程挤掉，
+     也不会把一份有分的极速档渲染成「已测维度 0」。 */
+  const eff = resolveEffectiveComputed(state, DATA);
 
   const answers = state.answersByVolume || {};
   const answeredCount = vol.questions.filter((q) => {
@@ -107,7 +115,7 @@ export function renderExpressResult(root, ctx) {
 
   /* ---------- 得分 ---------- */
   const dims = (vol.dimensions || [])
-    .map((d) => ({ id: d, score: state.computedScores?.[d] }))
+    .map((d) => ({ id: d, score: eff.scores?.[d] ?? state.computedScores?.[d] }))
     .filter((d) => Number.isFinite(d.score));
 
   const gifts = topGifts(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
@@ -242,6 +250,9 @@ export function renderExpressResult(root, ctx) {
   ]));
   const codeBody = el('div', { class: 'chart-card__body' });
   try {
+    /* 出码前再落一次盘：确保 encodeSoulCode 读到的是刚写入的 computedScores，
+       而不是空闲帧里还没合并的旧对象。 */
+    save(state, { immediate: true });
     const code = encodeSoulCode(state, DATA.dimOrder);
     codeBox.textContent = code;
   } catch {

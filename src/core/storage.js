@@ -311,9 +311,14 @@ function decodeHA3(payload, dimOrder) {
     if (b !== 255 && dimOrder[i]) computedScores[dimOrder[i]] = b;
   }
 
+  /* HA3- 老码同样可能只带分数、不带卷位（极速版的祖先形态） */
+  const isExpressOnly = completedVolumes.length === 0
+    && Object.values(computedScores).filter(Number.isFinite).length >= 10;
+
   return {
     ok: true,
     legacy: true,
+    isExpressOnly,
     state: {
       version: SCHEMA_VERSION,
       nickname: dec(bytes.subarray(66, bytes.length - 1)).replace(/\u0000/g, '').trim(),
@@ -355,7 +360,6 @@ export function decodeSoulCode(code, dimOrder = []) {
   const dimCount = Math.max(0, Math.min(dimOrder.length, bytes.length - headerLen - 1));
 
   const doneMask = bytes[1] | (bytes[2] << 8);
-  const completedVolumes = ALL_VOLUMES.filter((_, i) => doneMask & (1 << i));
 
   const year = 2000 + bytes[3];
   const month = Math.max(1, Math.min(12, bytes[4] || 1));
@@ -368,10 +372,20 @@ export function decodeSoulCode(code, dimOrder = []) {
   }
 
   const tail = bytes.subarray(headerLen + dimCount, bytes.length - 1);
+  const completedVolumes = ALL_VOLUMES.filter((_, i) => doneMask & (1 << i));
+
+  /* 「只做了 28 题极速版」的合法档：一卷都没标记完成，但有≥10 个维度分。
+     极速版有意不写 completedVolumes（28 题≠完成一整卷），旧版合盘却拿
+     «有没有共同卷» 当门禁，于是极速用户永远被拦在外面。
+     这里不拒绝任何空卷存档码（字节布局与空态往返完全不变），
+     只额外打一个标记，让下游 UI 自己决定文案与放行。 */
+  const finiteCount = Object.values(computedScores).filter(Number.isFinite).length;
+  const isExpressOnly = completedVolumes.length === 0 && finiteCount >= 10;
 
   return {
     ok: true,
     legacy: false,
+    isExpressOnly,
     state: {
       version: SCHEMA_VERSION,
       nickname: dec(tail).replace(/\u0000/g, '').trim(),
@@ -474,11 +488,23 @@ export function initialSnapshotOf(state, volumeId) {
   return state.initialSnapshot?.[volumeId] || null;
 }
 
-/** 清空某卷作答（保留初印象快照），用于「封存初印象并重测」 */
-export function retakeVolume(state, volumeId) {
+/** 清空某卷作答（保留初印象快照），用于「封存初印象并重测」
+ *
+ * v5.2.2：recompute() 改为「已有分数为底盘」的双源融合后，
+ * 光删作答已经不能把该卷旧分洗掉（live 为空，底盘里仍然有它）。
+ * 这里同步删除该卷维度的 computedScores / zScores，保证重测语义不变。
+ * 字节布局与存档码编解码不受影响。
+ */
+export function retakeVolume(state, volumeId, dimIds = null) {
   state.completedVolumes = (state.completedVolumes || []).filter((v) => v !== volumeId);
   if (state.inProgress) delete state.inProgress[volumeId];
   if (state.answersByVolume) delete state.answersByVolume[volumeId];
+  if (Array.isArray(dimIds)) {
+    for (const d of dimIds) {
+      if (state.computedScores) delete state.computedScores[d];
+      if (state.zScores) delete state.zScores[d];
+    }
+  }
   return state;
 }
 

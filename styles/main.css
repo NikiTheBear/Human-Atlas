@@ -5273,3 +5273,688 @@ body.is-immersive .quiz__back {
   letter-spacing: 0.04em;
   color: var(--text-tertiary);
 }
+
+/* ============================================================
+   双人对比 · P0 升级（v5.3）
+   · 六大生态位卡片「点击展开逐维拆解」
+   · 全维度双人逐项显微镜 #cmp-micro
+   · 0–100 双人哑铃对照轨
+
+   颜色纪律：
+     A 点复用品牌金 var(--gold)，随昼夜双轨自动切换；
+     B 点 #8c4a32 是全文件唯一新增裸 hex —— 陶土赭与金形成冷暖对照，
+     已在下面注释标明归属；暗夜档用 color-mix 提亮，不另写 hex。
+   ============================================================ */
+:root {
+  /* A 点 = 品牌金，走既有 token；
+     B 点 = 陶土赭，全项目唯一新增裸 hex，仅此一处声明，其余全部走 var(--cmp-b)。 */
+  --cmp-a: var(--gold);
+  --cmp-b-base: #8c4a32;
+  --cmp-b: var(--cmp-b-base);
+}
+
+html[data-theme='dark'] {
+  /* 暗夜里陶土赭会沉进背景，按 58% 混入香槟金提亮，不另写新色相 */
+  --cmp-b: color-mix(in srgb, var(--cmp-b-base) 58%, var(--gold-soft));
+}
+
+/* ---------- 通用图例条 ---------- */
+.cmp-legend,
+.cmp-micro__legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.cmp-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cmp-legend__item i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cmp-legend__item i.is-a { background: var(--cmp-a); }
+.cmp-legend__item i.is-b { background: var(--cmp-b); }
+
+.cmp-legend__mid {
+  padding-left: 16px;
+  border-left: 1px solid var(--border-hair);
+  color: var(--text-tertiary);
+  opacity: 0.8;
+}
+
+/* ---------- 0–100 双人哑铃对照轨 ---------- */
+.dtrack {
+  position: relative;
+  display: block;
+  height: 38px;
+  min-width: 0;
+}
+
+.dtrack__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--border);
+  transform: translateY(-50%);
+}
+
+.dtrack__mid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 11px;
+  background: var(--border-strong);
+  opacity: 0.75;
+  transform: translate(-50%, -50%);
+}
+
+.dtrack__band {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cmp-a) 40%, transparent),
+    color-mix(in srgb, var(--cmp-b) 40%, transparent)
+  );
+  transition: left 320ms var(--ease), width 320ms var(--ease);
+}
+
+.dtrack__dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 320ms var(--ease);
+}
+
+.dtrack__dot--a {
+  background: var(--cmp-a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cmp-a) 15%, transparent);
+}
+
+.dtrack__dot--b {
+  background: var(--cmp-b);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cmp-b) 15%, transparent);
+}
+
+.dtrack__dot b {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dtrack__dot--a b { bottom: 13px; color: var(--cmp-a); }
+.dtrack__dot--b b { top: 13px; color: var(--cmp-b); }
+
+/* 极窄轨（生态位拆解里的小项）：不显示数值，不占高度 */
+.dtrack--sm { height: 16px; margin-top: 4px; }
+.dtrack--sm .dtrack__band { height: 4px; }
+.dtrack--sm .dtrack__dot { width: 7px; height: 7px; }
+
+/* ---------- 生态位卡片 · 逐维拆解抽屉 ---------- */
+.eco-break__foot-zone {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.eco-break__toggle {
+  width: 100%;
+  padding: 7px 10px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: 1px solid var(--border-hair);
+  border-radius: var(--radius-pill);
+  transition: color 220ms var(--ease), border-color 220ms var(--ease),
+    background 220ms var(--ease);
+}
+
+.eco-break__toggle:hover {
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 42%, transparent);
+  background: var(--gold-wash);
+}
+
+.eco-card.is-open .eco-break__toggle { color: var(--gold); }
+
+.eco-break__wrap,
+.cmp-mpanel__wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 420ms var(--ease);
+}
+
+.eco-card.is-open .eco-break__wrap,
+.cmp-mrow.is-open .cmp-mpanel__wrap {
+  grid-template-rows: 1fr;
+}
+
+.eco-break__inner,
+.cmp-mpanel__inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.eco-break__body {
+  padding: 14px 0 2px;
+}
+
+.eco-prow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-hair);
+}
+
+.eco-prow:last-of-type { border-bottom: none; }
+
+.eco-prow__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.eco-prow__name {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eco-prow__kind {
+  flex: none;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.eco-prow__scores {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.eco-prow__ab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.eco-prow__ab i {
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  max-width: 46px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
+.eco-prow__ab i.is-a { color: var(--cmp-a); }
+.eco-prow__ab i.is-b { color: var(--cmp-b); }
+
+.eco-prow__ab b {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.eco-prow__ab em {
+  font-style: normal;
+  font-size: 9.5px;
+  color: var(--text-tertiary);
+  padding: 0 2px;
+}
+
+.eco-prow__contrib {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.eco-prow .dtrack { grid-column: 1 / -1; }
+
+.eco-prow--hit { grid-template-columns: minmax(0, 1fr) auto; }
+
+.eco-prow--hit .eco-prow__name {
+  color: var(--vol1);
+  font-size: 11.5px;
+  white-space: normal;
+}
+
+.eco-break__hits {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--vol1) 26%, transparent);
+  background: color-mix(in srgb, var(--vol1) 5%, transparent);
+}
+
+.eco-break__hits-h {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--vol1);
+  margin-bottom: 4px;
+}
+
+.eco-break__foot {
+  margin-top: 10px;
+  font-size: 10.5px;
+  line-height: 1.85;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+/* ---------- 全维度双人逐项显微镜 ---------- */
+.cmp-micro { margin-top: 10px; }
+
+.cmp-micro__legend {
+  position: sticky;
+  top: var(--masthead-h);
+  z-index: 12;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-veil);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.cmp-micro__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.cmp-micro__pills {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+}
+
+.cmp-pill {
+  padding: 7px 15px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-pill);
+  transition: color 200ms var(--ease), background 200ms var(--ease);
+  white-space: nowrap;
+}
+
+.cmp-pill:hover { color: var(--text-primary); }
+
+.cmp-pill.is-on {
+  color: var(--text-inverse);
+  background: var(--gold);
+}
+
+.cmp-micro__select,
+.cmp-micro__search {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  transition: border-color 220ms var(--ease);
+}
+
+.cmp-micro__select { min-width: 150px; }
+.cmp-micro__search { flex: 1 1 200px; min-width: 0; }
+.cmp-micro__search::placeholder { color: var(--text-tertiary); }
+.cmp-micro__select:focus,
+.cmp-micro__search:focus { outline: none; border-color: var(--gold-soft); }
+
+.cmp-micro__list {
+  border-top: 1px solid var(--border);
+}
+
+.cmp-mrow {
+  display: grid;
+  grid-template-columns: minmax(0, 176px) minmax(140px, 1fr) auto;
+  gap: 4px 20px;
+  align-items: center;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--border-hair);
+  cursor: pointer;
+  transition: background 220ms var(--ease);
+}
+
+.cmp-mrow:hover { background: var(--bg-page-tint); }
+.cmp-mrow.is-open { background: var(--bg-page-tint); }
+
+.cmp-mrow__lead {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  min-width: 0;
+}
+
+.cmp-mrow__name {
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmp-mrow__vol {
+  flex: none;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  opacity: 0.75;
+}
+
+.cmp-mrow__tail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cmp-delta {
+  min-width: 52px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.cmp-band {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-hair);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* 状态标签配色：同频 / 互补 / 分叉，只用语义卷色与金，不引新色相 */
+.cmp-delta.is-resonance-high,
+.cmp-band.is-resonance-high {
+  color: var(--tier-4);
+  border-color: color-mix(in srgb, var(--tier-4) 34%, transparent);
+  background: color-mix(in srgb, var(--tier-4) 6%, transparent);
+}
+
+.cmp-delta.is-resonance-low,
+.cmp-band.is-resonance-low {
+  color: var(--tier-2);
+  border-color: color-mix(in srgb, var(--tier-2) 34%, transparent);
+  background: color-mix(in srgb, var(--tier-2) 6%, transparent);
+}
+
+.cmp-delta.is-sync,
+.cmp-band.is-sync {
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 32%, transparent);
+  background: var(--gold-wash);
+}
+
+.cmp-delta.is-tension,
+.cmp-band.is-tension {
+  color: var(--vol3);
+  border-color: color-mix(in srgb, var(--vol3) 32%, transparent);
+  background: color-mix(in srgb, var(--vol3) 7%, transparent);
+}
+
+.cmp-delta.is-fork,
+.cmp-band.is-fork {
+  color: var(--vol1);
+  border-color: color-mix(in srgb, var(--vol1) 32%, transparent);
+  background: color-mix(in srgb, var(--vol1) 6%, transparent);
+}
+
+.cmp-delta.is-mild,
+.cmp-band.is-mild {
+  color: var(--text-secondary);
+}
+
+.cmp-micro__count {
+  margin-top: 14px;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+}
+
+.cmp-micro__empty {
+  padding: 34px 20px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.95;
+  color: var(--text-tertiary);
+}
+
+/* ---------- 单维深度释义面板 ---------- */
+.cmp-mpanel__wrap { grid-column: 1 / -1; }
+
+.cmp-mpanel__body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  padding: 6px 0 18px;
+}
+
+.cmp-mface {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border-left: 2px solid var(--border-strong);
+}
+
+.cmp-mface.is-a { border-left-color: var(--cmp-a); }
+.cmp-mface.is-b { border-left-color: var(--cmp-b); }
+
+.cmp-mface__head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.cmp-mface__who {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+.cmp-mface.is-a .cmp-mface__who { color: var(--cmp-a); }
+.cmp-mface.is-b .cmp-mface__who { color: var(--cmp-b); }
+
+.cmp-mface__label {
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.cmp-mface__gift,
+.cmp-mface__shadow {
+  display: grid;
+  gap: 2px;
+  padding: 7px 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.cmp-mface__gift b,
+.cmp-mface__shadow b {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.cmp-mface__gift span,
+.cmp-mface__shadow span {
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.cmp-mface__shadow b { color: var(--vol1); }
+
+.cmp-mface__tip {
+  margin-top: 6px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.cmp-mpanel__hint {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  line-height: 1.95;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  border-left: 2px solid var(--gold);
+}
+
+/* ---------- 375px 竖屏 ---------- */
+@media (max-width: 760px) {
+  .cmp-micro__legend {
+    position: static;
+    padding: 9px 13px;
+    font-size: 10.5px;
+    gap: 12px;
+  }
+
+  .cmp-micro__legend .cmp-legend__mid {
+    padding-left: 0;
+    border-left: none;
+    flex-basis: 100%;
+  }
+
+  .cmp-micro__bar { gap: 9px; }
+
+  .cmp-micro__pills {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cmp-micro__pills::-webkit-scrollbar { display: none; }
+
+  .cmp-pill {
+    flex: 1 0 auto;
+    padding: 7px 11px;
+    font-size: 10.5px;
+  }
+
+  .cmp-micro__select { flex: 1 1 45%; min-width: 0; }
+  .cmp-micro__search { flex: 1 1 45%; }
+
+  .cmp-mrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    padding: 12px 2px;
+  }
+
+  .cmp-mrow .dtrack { grid-column: 1 / -1; grid-row: 2; }
+
+  .cmp-mrow__tail {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 6px;
+  }
+
+  .cmp-delta { min-width: 44px; font-size: 10.5px; padding: 2px 7px; }
+  .cmp-band { font-size: 9.5px; padding: 2px 8px; }
+
+  .cmp-mpanel__body {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 4px 0 14px;
+  }
+
+  .eco-break__body { padding: 10px 0 0; }
+  .eco-prow__name { font-size: 11.5px; }
+  .eco-prow__contrib { font-size: 9.5px; }
+}
+
+@media (max-width: 420px) {
+  .cmp-band { display: none; }
+  .cmp-mrow__name { font-size: 13px; }
+}
+
+.cmp-micro__title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cmp-micro__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  opacity: 0.8;
+}

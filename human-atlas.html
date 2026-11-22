@@ -5495,6 +5495,691 @@ body.is-immersive .quiz__back {
   color: var(--text-tertiary);
 }
 
+/* ============================================================
+   双人对比 · P0 升级（v5.3）
+   · 六大生态位卡片「点击展开逐维拆解」
+   · 全维度双人逐项显微镜 #cmp-micro
+   · 0–100 双人哑铃对照轨
+
+   颜色纪律：
+     A 点复用品牌金 var(--gold)，随昼夜双轨自动切换；
+     B 点 #8c4a32 是全文件唯一新增裸 hex —— 陶土赭与金形成冷暖对照，
+     已在下面注释标明归属；暗夜档用 color-mix 提亮，不另写 hex。
+   ============================================================ */
+:root {
+  /* A 点 = 品牌金，走既有 token；
+     B 点 = 陶土赭，全项目唯一新增裸 hex，仅此一处声明，其余全部走 var(--cmp-b)。 */
+  --cmp-a: var(--gold);
+  --cmp-b-base: #8c4a32;
+  --cmp-b: var(--cmp-b-base);
+}
+
+html[data-theme='dark'] {
+  /* 暗夜里陶土赭会沉进背景，按 58% 混入香槟金提亮，不另写新色相 */
+  --cmp-b: color-mix(in srgb, var(--cmp-b-base) 58%, var(--gold-soft));
+}
+
+/* ---------- 通用图例条 ---------- */
+.cmp-legend,
+.cmp-micro__legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.cmp-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cmp-legend__item i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cmp-legend__item i.is-a { background: var(--cmp-a); }
+.cmp-legend__item i.is-b { background: var(--cmp-b); }
+
+.cmp-legend__mid {
+  padding-left: 16px;
+  border-left: 1px solid var(--border-hair);
+  color: var(--text-tertiary);
+  opacity: 0.8;
+}
+
+/* ---------- 0–100 双人哑铃对照轨 ---------- */
+.dtrack {
+  position: relative;
+  display: block;
+  height: 38px;
+  min-width: 0;
+}
+
+.dtrack__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--border);
+  transform: translateY(-50%);
+}
+
+.dtrack__mid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 11px;
+  background: var(--border-strong);
+  opacity: 0.75;
+  transform: translate(-50%, -50%);
+}
+
+.dtrack__band {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cmp-a) 40%, transparent),
+    color-mix(in srgb, var(--cmp-b) 40%, transparent)
+  );
+  transition: left 320ms var(--ease), width 320ms var(--ease);
+}
+
+.dtrack__dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 320ms var(--ease);
+}
+
+.dtrack__dot--a {
+  background: var(--cmp-a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cmp-a) 15%, transparent);
+}
+
+.dtrack__dot--b {
+  background: var(--cmp-b);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cmp-b) 15%, transparent);
+}
+
+.dtrack__dot b {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dtrack__dot--a b { bottom: 13px; color: var(--cmp-a); }
+.dtrack__dot--b b { top: 13px; color: var(--cmp-b); }
+
+/* 极窄轨（生态位拆解里的小项）：不显示数值，不占高度 */
+.dtrack--sm { height: 16px; margin-top: 4px; }
+.dtrack--sm .dtrack__band { height: 4px; }
+.dtrack--sm .dtrack__dot { width: 7px; height: 7px; }
+
+/* ---------- 生态位卡片 · 逐维拆解抽屉 ---------- */
+.eco-break__foot-zone {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.eco-break__toggle {
+  width: 100%;
+  padding: 7px 10px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: 1px solid var(--border-hair);
+  border-radius: var(--radius-pill);
+  transition: color 220ms var(--ease), border-color 220ms var(--ease),
+    background 220ms var(--ease);
+}
+
+.eco-break__toggle:hover {
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 42%, transparent);
+  background: var(--gold-wash);
+}
+
+.eco-card.is-open .eco-break__toggle { color: var(--gold); }
+
+.eco-break__wrap,
+.cmp-mpanel__wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 420ms var(--ease);
+}
+
+.eco-card.is-open .eco-break__wrap,
+.cmp-mrow.is-open .cmp-mpanel__wrap {
+  grid-template-rows: 1fr;
+}
+
+.eco-break__inner,
+.cmp-mpanel__inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.eco-break__body {
+  padding: 14px 0 2px;
+}
+
+.eco-prow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-hair);
+}
+
+.eco-prow:last-of-type { border-bottom: none; }
+
+.eco-prow__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.eco-prow__name {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eco-prow__kind {
+  flex: none;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.eco-prow__scores {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.eco-prow__ab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.eco-prow__ab i {
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  max-width: 46px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
+.eco-prow__ab i.is-a { color: var(--cmp-a); }
+.eco-prow__ab i.is-b { color: var(--cmp-b); }
+
+.eco-prow__ab b {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.eco-prow__ab em {
+  font-style: normal;
+  font-size: 9.5px;
+  color: var(--text-tertiary);
+  padding: 0 2px;
+}
+
+.eco-prow__contrib {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.eco-prow .dtrack { grid-column: 1 / -1; }
+
+.eco-prow--hit { grid-template-columns: minmax(0, 1fr) auto; }
+
+.eco-prow--hit .eco-prow__name {
+  color: var(--vol1);
+  font-size: 11.5px;
+  white-space: normal;
+}
+
+.eco-break__hits {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--vol1) 26%, transparent);
+  background: color-mix(in srgb, var(--vol1) 5%, transparent);
+}
+
+.eco-break__hits-h {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--vol1);
+  margin-bottom: 4px;
+}
+
+.eco-break__foot {
+  margin-top: 10px;
+  font-size: 10.5px;
+  line-height: 1.85;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+/* ---------- 全维度双人逐项显微镜 ---------- */
+.cmp-micro { margin-top: 10px; }
+
+.cmp-micro__legend {
+  position: sticky;
+  top: var(--masthead-h);
+  z-index: 12;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-veil);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.cmp-micro__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.cmp-micro__pills {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+}
+
+.cmp-pill {
+  padding: 7px 15px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-pill);
+  transition: color 200ms var(--ease), background 200ms var(--ease);
+  white-space: nowrap;
+}
+
+.cmp-pill:hover { color: var(--text-primary); }
+
+.cmp-pill.is-on {
+  color: var(--text-inverse);
+  background: var(--gold);
+}
+
+.cmp-micro__select,
+.cmp-micro__search {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  transition: border-color 220ms var(--ease);
+}
+
+.cmp-micro__select { min-width: 150px; }
+.cmp-micro__search { flex: 1 1 200px; min-width: 0; }
+.cmp-micro__search::placeholder { color: var(--text-tertiary); }
+.cmp-micro__select:focus,
+.cmp-micro__search:focus { outline: none; border-color: var(--gold-soft); }
+
+.cmp-micro__list {
+  border-top: 1px solid var(--border);
+}
+
+.cmp-mrow {
+  display: grid;
+  grid-template-columns: minmax(0, 176px) minmax(140px, 1fr) auto;
+  gap: 4px 20px;
+  align-items: center;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--border-hair);
+  cursor: pointer;
+  transition: background 220ms var(--ease);
+}
+
+.cmp-mrow:hover { background: var(--bg-page-tint); }
+.cmp-mrow.is-open { background: var(--bg-page-tint); }
+
+.cmp-mrow__lead {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  min-width: 0;
+}
+
+.cmp-mrow__name {
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmp-mrow__vol {
+  flex: none;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  opacity: 0.75;
+}
+
+.cmp-mrow__tail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cmp-delta {
+  min-width: 52px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.cmp-band {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-hair);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* 状态标签配色：同频 / 互补 / 分叉，只用语义卷色与金，不引新色相 */
+.cmp-delta.is-resonance-high,
+.cmp-band.is-resonance-high {
+  color: var(--tier-4);
+  border-color: color-mix(in srgb, var(--tier-4) 34%, transparent);
+  background: color-mix(in srgb, var(--tier-4) 6%, transparent);
+}
+
+.cmp-delta.is-resonance-low,
+.cmp-band.is-resonance-low {
+  color: var(--tier-2);
+  border-color: color-mix(in srgb, var(--tier-2) 34%, transparent);
+  background: color-mix(in srgb, var(--tier-2) 6%, transparent);
+}
+
+.cmp-delta.is-sync,
+.cmp-band.is-sync {
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 32%, transparent);
+  background: var(--gold-wash);
+}
+
+.cmp-delta.is-tension,
+.cmp-band.is-tension {
+  color: var(--vol3);
+  border-color: color-mix(in srgb, var(--vol3) 32%, transparent);
+  background: color-mix(in srgb, var(--vol3) 7%, transparent);
+}
+
+.cmp-delta.is-fork,
+.cmp-band.is-fork {
+  color: var(--vol1);
+  border-color: color-mix(in srgb, var(--vol1) 32%, transparent);
+  background: color-mix(in srgb, var(--vol1) 6%, transparent);
+}
+
+.cmp-delta.is-mild,
+.cmp-band.is-mild {
+  color: var(--text-secondary);
+}
+
+.cmp-micro__count {
+  margin-top: 14px;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+}
+
+.cmp-micro__empty {
+  padding: 34px 20px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.95;
+  color: var(--text-tertiary);
+}
+
+/* ---------- 单维深度释义面板 ---------- */
+.cmp-mpanel__wrap { grid-column: 1 / -1; }
+
+.cmp-mpanel__body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  padding: 6px 0 18px;
+}
+
+.cmp-mface {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border-left: 2px solid var(--border-strong);
+}
+
+.cmp-mface.is-a { border-left-color: var(--cmp-a); }
+.cmp-mface.is-b { border-left-color: var(--cmp-b); }
+
+.cmp-mface__head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.cmp-mface__who {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+.cmp-mface.is-a .cmp-mface__who { color: var(--cmp-a); }
+.cmp-mface.is-b .cmp-mface__who { color: var(--cmp-b); }
+
+.cmp-mface__label {
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.cmp-mface__gift,
+.cmp-mface__shadow {
+  display: grid;
+  gap: 2px;
+  padding: 7px 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.cmp-mface__gift b,
+.cmp-mface__shadow b {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.cmp-mface__gift span,
+.cmp-mface__shadow span {
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.cmp-mface__shadow b { color: var(--vol1); }
+
+.cmp-mface__tip {
+  margin-top: 6px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.cmp-mpanel__hint {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  line-height: 1.95;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  border-left: 2px solid var(--gold);
+}
+
+/* ---------- 375px 竖屏 ---------- */
+@media (max-width: 760px) {
+  .cmp-micro__legend {
+    position: static;
+    padding: 9px 13px;
+    font-size: 10.5px;
+    gap: 12px;
+  }
+
+  .cmp-micro__legend .cmp-legend__mid {
+    padding-left: 0;
+    border-left: none;
+    flex-basis: 100%;
+  }
+
+  .cmp-micro__bar { gap: 9px; }
+
+  .cmp-micro__pills {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cmp-micro__pills::-webkit-scrollbar { display: none; }
+
+  .cmp-pill {
+    flex: 1 0 auto;
+    padding: 7px 11px;
+    font-size: 10.5px;
+  }
+
+  .cmp-micro__select { flex: 1 1 45%; min-width: 0; }
+  .cmp-micro__search { flex: 1 1 45%; }
+
+  .cmp-mrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    padding: 12px 2px;
+  }
+
+  .cmp-mrow .dtrack { grid-column: 1 / -1; grid-row: 2; }
+
+  .cmp-mrow__tail {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 6px;
+  }
+
+  .cmp-delta { min-width: 44px; font-size: 10.5px; padding: 2px 7px; }
+  .cmp-band { font-size: 9.5px; padding: 2px 8px; }
+
+  .cmp-mpanel__body {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 4px 0 14px;
+  }
+
+  .eco-break__body { padding: 10px 0 0; }
+  .eco-prow__name { font-size: 11.5px; }
+  .eco-prow__contrib { font-size: 9.5px; }
+}
+
+@media (max-width: 420px) {
+  .cmp-band { display: none; }
+  .cmp-mrow__name { font-size: 13px; }
+}
+
+.cmp-micro__title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cmp-micro__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
 </style>
 <style>/* print.css（内部已自带 @media print 作用域） */
 /* ============================================================
@@ -6105,9 +6790,14 @@ function decodeHA3(payload, dimOrder) {
     if (b !== 255 && dimOrder[i]) computedScores[dimOrder[i]] = b;
   }
 
+  /* HA3- 老码同样可能只带分数、不带卷位（极速版的祖先形态） */
+  const isExpressOnly = completedVolumes.length === 0
+    && Object.values(computedScores).filter(Number.isFinite).length >= 10;
+
   return {
     ok: true,
     legacy: true,
+    isExpressOnly,
     state: {
       version: SCHEMA_VERSION,
       nickname: dec(bytes.subarray(66, bytes.length - 1)).replace(/\u0000/g, '').trim(),
@@ -6149,7 +6839,6 @@ function decodeSoulCode(code, dimOrder = []) {
   const dimCount = Math.max(0, Math.min(dimOrder.length, bytes.length - headerLen - 1));
 
   const doneMask = bytes[1] | (bytes[2] << 8);
-  const completedVolumes = ALL_VOLUMES.filter((_, i) => doneMask & (1 << i));
 
   const year = 2000 + bytes[3];
   const month = Math.max(1, Math.min(12, bytes[4] || 1));
@@ -6162,10 +6851,20 @@ function decodeSoulCode(code, dimOrder = []) {
   }
 
   const tail = bytes.subarray(headerLen + dimCount, bytes.length - 1);
+  const completedVolumes = ALL_VOLUMES.filter((_, i) => doneMask & (1 << i));
+
+  /* 「只做了 28 题极速版」的合法档：一卷都没标记完成，但有≥10 个维度分。
+     极速版有意不写 completedVolumes（28 题≠完成一整卷），旧版合盘却拿
+     «有没有共同卷» 当门禁，于是极速用户永远被拦在外面。
+     这里不拒绝任何空卷存档码（字节布局与空态往返完全不变），
+     只额外打一个标记，让下游 UI 自己决定文案与放行。 */
+  const finiteCount = Object.values(computedScores).filter(Number.isFinite).length;
+  const isExpressOnly = completedVolumes.length === 0 && finiteCount >= 10;
 
   return {
     ok: true,
     legacy: false,
+    isExpressOnly,
     state: {
       version: SCHEMA_VERSION,
       nickname: dec(tail).replace(/\u0000/g, '').trim(),
@@ -6268,11 +6967,23 @@ function initialSnapshotOf(state, volumeId) {
   return state.initialSnapshot?.[volumeId] || null;
 }
 
-/** 清空某卷作答（保留初印象快照），用于「封存初印象并重测」 */
-function retakeVolume(state, volumeId) {
+/** 清空某卷作答（保留初印象快照），用于「封存初印象并重测」
+ *
+ * v5.2.2：recompute() 改为「已有分数为底盘」的双源融合后，
+ * 光删作答已经不能把该卷旧分洗掉（live 为空，底盘里仍然有它）。
+ * 这里同步删除该卷维度的 computedScores / zScores，保证重测语义不变。
+ * 字节布局与存档码编解码不受影响。
+ */
+function retakeVolume(state, volumeId, dimIds = null) {
   state.completedVolumes = (state.completedVolumes || []).filter((v) => v !== volumeId);
   if (state.inProgress) delete state.inProgress[volumeId];
   if (state.answersByVolume) delete state.answersByVolume[volumeId];
+  if (Array.isArray(dimIds)) {
+    for (const d of dimIds) {
+      if (state.computedScores) delete state.computedScores[d];
+      if (state.zScores) delete state.zScores[d];
+    }
+  }
   return state;
 }
 
@@ -7477,6 +8188,717 @@ function normalizeScores(raw, dimOrder) {
   return out;
 }
 
+/* ───────── src/core/synthesizer.js ───────── */
+/* ============================================================
+   synthesizer.js — 单卷 / 全息报告拼装
+   · 维度四面镜选取与四档分级
+   · 24 原型匹配
+   · 35 条跨卷交叉规则触发
+   · 顺境 / 高压双态推演
+   · 人生使用说明书
+   ============================================================ */
+
+
+
+
+/* ------------------------------------------------------------
+   双源无损融合：live 现算 ∪ 存档分数
+   ------------------------------------------------------------ */
+
+/**
+ * 个人内部相对尖峰 Z。
+ * 与 scoring.js 的 scorePool() 尾部保持同一把尺子：σ 下限 6.0。
+ */
+function zFromScores(scores, dims) {
+  const vals = dims.map((d) => scores[d]).filter(Number.isFinite);
+  const mu = vals.length ? mean(vals) : 50;
+  const variance = vals.length
+    ? vals.reduce((a, v) => a + (v - mu) ** 2, 0) / vals.length
+    : 0;
+  const sigma = Math.max(6, Math.sqrt(variance));
+  const out = {};
+  for (const d of dims) {
+    if (!Number.isFinite(scores[d])) continue;
+    out[d] = round((scores[d] - mu) / sigma, 2);
+  }
+  return out;
+}
+
+/**
+ * 有效分数（v5.2.2）。
+ *
+ * 背景：HA4- 存档码只编码「完成卷位掩码 + 127 个维度分 + 面具 + 价值 + 昵称」，
+ * 不含 answersByVolume。导入后 computeAll() 只能看到空作答池，于是 live 里全是 null。
+ * 旧实现直接 `state.computedScores = {}` 再从 live 填回去 —— 导入的 60–99 个维度
+ * 被整对象覆盖洗白，报告页便被空态门禁拦成「档案尚未启封」。
+ *
+ * 现在的规则：
+ *   1. 底盘 = state.computedScores（内存/导入/本地存档里已有的分）
+ *   2. 只用 live 里【有限】的值覆盖，null 绝不参与覆盖
+ *   3. mask / topValues / pressure 同理：live 没有就回落到存档值
+ *   4. Z 分：live 覆盖不到合并后的全部维度时，按合并后的分布重算（σ 下限 6.0）
+ *
+ * @param {Object} state 任意 HA 状态（可只带 computedScores，无 answersByVolume）
+ * @param {Object} DATA  { volumes, dimensions, dimOrder, ... }
+ * @returns {{ scores, zScores, mask, maskDetail, topValues, pressure, live, completedVolumes }}
+ */
+function resolveEffectiveComputed(state, DATA) {
+  const live = computeAll(state, DATA);
+
+  const dimOrder = (DATA.dimOrder && DATA.dimOrder.length)
+    ? DATA.dimOrder
+    : (DATA.dimensions?.dims || []).map((d) => d.id);
+  const valid = new Set(dimOrder);
+
+  /* ---- 1. 底盘：存档里已有的分 ---- */
+  const scores = {};
+  for (const [d, v] of Object.entries(state?.computedScores || {})) {
+    if (!valid.has(d)) continue;
+    if (Number.isFinite(v)) scores[d] = v;
+  }
+
+  /* ---- 2. live 覆盖（仅有限值，且仅在「本地真的答过这一卷」时） ----
+     单纯「live 是有限值就覆盖」还不够。反例：
+       导入 vol1–8（只带 computedScores，无作答原文）→ 接着答 vol9
+       vol9 的选项会顺带在 big5_open 之类的维度上产生交叉载荷，
+       于是 live.big5_open 是个有限值（58.6），它会把导入的 8 卷聚合值覆盖掉。
+       一次单卷作答就打穿了八卷的证据量 —— 这正是「洗白」的另一种形式，
+       只是从「变成 null」变成了「变成另一个数」。
+     所以再加一道：只有该维度属于【本地确有作答】的卷，live 才有权覆盖。
+     本地没答过的卷，它的分来自存档码，没有新证据，一律保留存档值。 */
+  const localVols = new Set();
+  for (const [v, bucket] of Object.entries(state?.answersByVolume || {})) {
+    /* 虚拟桶不算「答过某卷」：它的分归属到真实卷，由 commitExpress 负责写回。
+       若留在桶里，DATA.volumes['__express'] 是 undefined，不会产生任何归属，
+       所以这里直接跳过即可。 */
+    if (v === '__express') continue;
+    if (bucket && Object.keys(bucket).length) localVols.add(v);
+  }
+  const liveOwnedDims = new Set();
+  for (const v of localVols) {
+    const vol = DATA?.volumes?.[v];
+    for (const d of vol?.dimensions || []) liveOwnedDims.add(d);
+  }
+
+  for (const d of dimOrder) {
+    const v = live?.scores?.[d];
+    if (!Number.isFinite(v)) continue;
+    /* 本地零作答（纯导入态）：live 完全无权覆盖，全部保留存档值。
+       否则 live 会把「没有任何证据的空计算」写进底盘。 */
+    if (!liveOwnedDims.size) continue;
+    if (!liveOwnedDims.has(d)) continue;
+    scores[d] = v;
+  }
+
+  /* ---- 3. Z 分 ---- */
+  const finiteDims = dimOrder.filter((d) => Number.isFinite(scores[d]));
+  const liveZ = live?.zScores || {};
+  const liveZCovers = finiteDims.every((d) => Number.isFinite(liveZ[d]));
+  const zScores = liveZCovers
+    ? Object.fromEntries(finiteDims.map((d) => [d, liveZ[d]]))
+    : zFromScores(scores, finiteDims);
+
+  /* ---- 4. 面具：live 为 null 时回落存档值 ---- */
+  const liveMask = live?.mask && typeof live.mask === 'object' ? live.mask : null;
+  let maskValue = Number.isFinite(liveMask?.value) ? liveMask.value : null;
+  if (maskValue === null && Number.isFinite(state?.maskIndex)) maskValue = state.maskIndex;
+  const maskTier = maskValue === null ? null : maskTierOf(maskValue);
+  const mask = {
+    ...(liveMask || {}),
+    value: maskValue,
+    tier: maskTier,
+  };
+
+  const baseDetail = state?.maskDetail && typeof state.maskDetail === 'object'
+    ? { ...state.maskDetail }
+    : {};
+  const liveParts = Array.isArray(liveMask?.parts) ? liveMask.parts : [];
+  const maskDetail = {
+    ...baseDetail,
+    ...(liveMask || {}),
+    parts: liveParts.length ? liveParts : (Array.isArray(baseDetail.parts) ? baseDetail.parts : []),
+    value: maskValue,
+    tier: maskTier,
+  };
+
+  /* ---- 5. 价值金字塔 / 压力退行态 ---- */
+  const topValues = (Array.isArray(live?.topValues) && live.topValues.length)
+    ? live.topValues
+    : [...(state?.topValues || [])];
+  const pressure = live?.pressure || state?.pressureStyle || null;
+
+  return {
+    scores,
+    zScores,
+    mask,
+    maskDetail,
+    topValues,
+    pressure,
+    live,
+    completedVolumes: [...(state?.completedVolumes || [])],
+  };
+}
+
+/* ------------------------------------------------------------
+   维度解读：一维四面镜 → 当前档位应取的那一面
+   ------------------------------------------------------------ */
+
+function mirrorFor(dim, score, MIRRORS) {
+  const m = MIRRORS[dim];
+  if (!m) return null;
+  const s = Number.isFinite(score) ? score : 50;
+  const tier = tierOf(s);
+  const side = s >= 50 ? 'high' : 'low';
+  const face = m[side];
+  if (!face) return null;
+  return {
+    dim,
+    name: m.name,
+    category: m.category,
+    volume: m.volume,
+    polar: !!m.polar,
+    ...(m.negLabel ? { negLabel: m.negLabel } : {}),
+    ...(m.posLabel ? { posLabel: m.posLabel } : {}),
+    score: s,
+    tier,
+    side,
+    label: face.label,
+    gift_title: face.gift_title,
+    gift_desc: face.gift_desc,
+    shadow_title: face.shadow_title,
+    shadow_desc: face.shadow_desc,
+    alchemy_tip: face.alchemy_tip,
+  };
+}
+
+function mirrorAll(scores, MIRRORS) {
+  const out = {};
+  for (const dim of Object.keys(MIRRORS)) {
+    if (!Number.isFinite(scores[dim])) continue;
+    out[dim] = mirrorFor(dim, scores[dim], MIRRORS);
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------
+   王牌天赋卡 / 阴影预警卡
+   ------------------------------------------------------------ */
+
+/**
+ * 王牌天赋卡。
+ * v4.2 起综合「绝对分」与「个人内部相对尖峰 Z」：
+ *   composite = 0.62 · strength + 0.38 · zNorm
+ * 只靠绝对分会永远选出那几个天生就高的维度，
+ * 加入 Z 才能把「这个人身上真正突出的那一处」翻出来。
+ *
+ * @param {Object} zScores 可选的 Z 分数表；缺省时退化为纯绝对分
+ */
+function topGifts(scores, MIRRORS, limit = 3, zScores = null) {
+  const rows = [];
+  for (const [dim, s] of Object.entries(scores)) {
+    if (!Number.isFinite(s)) continue;
+    const m = mirrorFor(dim, s, MIRRORS);
+    if (!m) continue;
+    // 极显锋芒 / 清晰倾向 → 高分面；反向深潜 → 低分隐藏优势
+    const strength = m.side === 'high' ? s : 100 - s;
+    const z = Number.isFinite(zScores?.[dim]) ? zScores[dim] : 0;
+    // v4.4 修复：strength 在低分侧已翻转为 (100 − s)，zNorm 也必须跟着翻转。
+    // 旧实现直接用原始 z，导致「低分隐藏天赋」的 Z 为负（因为 s < μ），
+    // zNorm 被压到 50 以下，反而拉低了 composite —— 低分侧的天赋永远选不出来。
+    const alignedZ = m.side === 'high' ? z : -z;
+    const zNorm = clamp(50 + 25 * alignedZ, 0, 100);
+    const composite = zScores ? 0.62 * strength + 0.38 * zNorm : strength;
+    rows.push({
+      ...m, strength: round(strength, 1), z: round(z, 2), composite: round(composite, 1),
+    });
+  }
+  return sortBy(rows, (r) => r.composite, -1).slice(0, limit);
+}
+
+function topShadows(scores, MIRRORS, limit = 3, zScores = null) {
+  const rows = [];
+  for (const [dim, s] of Object.entries(scores)) {
+    if (!Number.isFinite(s)) continue;
+    const m = mirrorFor(dim, s, MIRRORS);
+    if (!m) continue;
+    // 两侧极端化的程度 = 离 50 的距离；越极端，失控风险越高
+    const intensity = Math.abs(s - 50) * 2;
+    const z = Number.isFinite(zScores?.[dim]) ? zScores[dim] : 0;
+    const zNorm = clamp(Math.abs(z) * 26, 0, 100);
+    const composite = zScores ? 0.55 * intensity + 0.45 * zNorm : intensity;
+    rows.push({ ...m, intensity: round(intensity, 1), z: round(z, 2), composite: round(composite, 1) });
+  }
+  return sortBy(rows, (r) => r.composite, -1).slice(0, limit);
+}
+
+/* ------------------------------------------------------------
+   原型匹配
+   ------------------------------------------------------------ */
+
+/**
+ * 原型匹配。
+ *
+ * v4.5 修复「单维劫持」：
+ *   旧实现把未测维度直接跳过，只用「已测的那几项」求平均。
+ *   于是某个原型只要 1 个维度恰好高分，就能凭 100% 的单维平均分
+ *   反杀另一个扎实命中 4 个维度的原型。
+ *
+ * 现在按三步走：
+ *   1. 统计 totalW / coveredW，算出覆盖率
+ *   2. 硬闸门：coverage >= 0.60 且头号核心维度已测，才有资格进候选池
+ *   3. 覆盖率置信惩罚：fit = rawFit × (0.75 + 0.25 × coverage)
+ *
+ * 若没有任何原型达标，返回 { eligible: false }，由单卷分型接管封面，
+ * 绝不硬塞一个跨卷大原型。
+ */
+const ARCH_COVERAGE_MIN = 0.6;
+const ARCH_COMPOSITE_GAP = 8;
+
+function matchArchetype(scores, ARCHETYPES) {
+  const list = ARCHETYPES.archetypes || [];
+  if (!list.length) return null;
+
+  const graded = list.map((a) => {
+    const weights = a.weights || {};
+    const negWeights = a.negWeights || {};
+
+    /* ---- 1. 总权重 / 已覆盖权重 / 头号核心维度 ---- */
+    let totalW = 0;
+    let coveredW = 0;
+    let primaryDim = null;
+    let primaryMag = -1;
+
+    for (const [dim, w] of Object.entries(weights)) {
+      const mag = Math.abs(w);
+      totalW += mag;
+      if (mag > primaryMag) { primaryMag = mag; primaryDim = dim; }
+      if (Number.isFinite(scores[dim])) coveredW += mag;
+    }
+    for (const [dim, w] of Object.entries(negWeights)) {
+      const mag = Math.abs(w);
+      totalW += mag;
+      if (mag > primaryMag) { primaryMag = mag; primaryDim = dim; }
+      if (Number.isFinite(scores[dim])) coveredW += mag;
+    }
+
+    const coverage = totalW > 0 ? coveredW / totalW : 0;
+    const primaryCovered = primaryDim ? Number.isFinite(scores[primaryDim]) : false;
+    const eligible = coverage >= ARCH_COVERAGE_MIN && primaryCovered;
+
+    /* ---- 2. 只用已测维度算原始契合度 ---- */
+    let acc = 0;
+    let wSum = 0;
+    const hits = [];
+
+    for (const [dim, w] of Object.entries(weights)) {
+      const sc = scores[dim];
+      if (!Number.isFinite(sc)) continue;
+      const mag = Math.abs(w);
+      // weights 里的负号含义是「该维度越低越像」，按 (100 − sc) 参与累加
+      acc += (w < 0 ? 100 - sc : sc) * mag;
+      wSum += mag;
+      if (mag >= 0.9) hits.push({ dim, score: round(sc, 0), w, inverse: w < 0 });
+    }
+    for (const [dim, w] of Object.entries(negWeights)) {
+      const sc = scores[dim];
+      if (!Number.isFinite(sc)) continue;
+      const mag = Math.abs(w);
+      acc += (100 - sc) * mag;
+      wSum += mag;
+      if (mag >= 0.9) hits.push({ dim, score: round(sc, 0), w: -mag, inverse: true });
+    }
+
+    const rawFit = wSum > 0 ? clamp(acc / wSum, 0, 100) : 0;
+
+    /* ---- 3. 覆盖率置信惩罚 ---- */
+    const fit = clamp(rawFit * (0.75 + 0.25 * coverage), 0, 100);
+
+    return {
+      ...a,
+      fit: round(fit, 1),
+      rawFit: round(rawFit, 1),
+      coverage: round(coverage, 2),
+      primaryDim,
+      primaryCovered,
+      eligible,
+      hitCount: hits.length,
+      hits,
+    };
+  });
+
+  const ranked = sortBy(graded, (r) => r.fit, -1);
+
+  /* 只有达标原型才有资格上封面 */
+  const pool = ranked.filter((r) => r.eligible);
+  if (!pool.length) {
+    return {
+      eligible: false,
+      best: null,
+      runnerUp: null,
+      isComposite: false,
+      coverage: 0,
+      ranked,
+      reason: '共同维度不足以支撑任何跨卷原型',
+    };
+  }
+
+  const best = pool[0];
+  const runnerUp = pool[1] || null;
+  const isComposite = Boolean(runnerUp && (best.fit - runnerUp.fit) <= ARCH_COMPOSITE_GAP);
+
+  return {
+    eligible: true,
+    best,
+    runnerUp,
+    isComposite,
+    coverage: best.coverage,
+    ranked,
+    pool,
+  };
+}
+
+/* ------------------------------------------------------------
+   跨卷交叉规则
+   ------------------------------------------------------------ */
+
+function testCondition(cond, scores, mask) {
+  // v4.4：mask 可能直接传数值，也可能传 { value, tier } 对象
+  const v = cond.dim === 'mask'
+    ? (typeof mask === 'number' ? mask : mask?.value)
+    : scores[cond.dim];
+  if (!Number.isFinite(v)) return false;
+  switch (cond.op) {
+    case '>=': return v >= cond.val;
+    case '>': return v > cond.val;
+    case '<=': return v <= cond.val;
+    case '<': return v < cond.val;
+    default: return false;
+  }
+}
+
+function matchCrossRules(scores, mask, CROSS_RULES, completedVolumes = []) {
+  const out = [];
+  for (const rule of CROSS_RULES) {
+    const reqs = rule.required_volumes || [];
+    if (reqs.some((v) => !completedVolumes.includes(v))) continue;
+    const ok = (rule.conditions || []).every((c) => testCondition(c, scores, mask));
+    if (!ok) continue;
+    const hits = (rule.conditions || [])
+      .map((c) => ({
+        dim: c.dim,
+        name: c.dim === 'mask' ? '社会面具厚度' : null,
+        score: c.dim === 'mask' ? mask?.value : scores[c.dim],
+      }))
+      .filter((h) => Number.isFinite(h.score));
+    out.push({ ...rule, hits });
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------
+   顺境 / 高压双态推演
+   ------------------------------------------------------------ */
+
+const PRESSURE_MAP = {
+  burst: {
+    name: '爆发攻击型',
+    pattern: '你的压力会瞬间外化为怒火。先掀桌，再后悔，事后又要花很长时间修补关系。',
+    trigger: '被当众否定、被抢功、边界被反复跨越',
+    brake: '在最高温的那二十分钟里，先不发任何消息。把要说的话写下来，第二天再决定要不要发。',
+  },
+  cutoff: {
+    name: '彻底断联型',
+    pattern: '你的压力会把所有人关在门外。消失、沉默、把自己藏起来，直到一切自己变轻。',
+    trigger: '被消耗到极限、被背叛、感觉没人真正懂',
+    brake: '在关掉之前，至少留下一句「我需要一点时间，不是不要你」。一句解释能救下很多关系。',
+  },
+  cold: {
+    name: '冰冷黑化型',
+    pattern: '你的压力会让情绪归零，只剩计算。你会非常冷静，也非常不近人情，用效率把所有人请出局。',
+    trigger: '被欺骗、被当傻子、退路被切断',
+    brake: '在你做出那个「正确但冷」的决定之前，告诉一个旁观者。第三人视角能校正大部分过度反应。',
+  },
+  collapse: {
+    name: '自我坍塌型',
+    pattern: '你的压力会把攻击转向自己。自责、失眠、耗竭，最后连起床都需要理由。',
+    trigger: '长期高压、被否定、无法控制的外部变化',
+    brake: '把「我是不是不行」换成「我现在需要什么」。前者是审判，后者才有出口。',
+  },
+};
+
+function dualState(scores, MIRRORS, pressure) {
+  const gifts = topGifts(scores, MIRRORS, 3);
+  const shadows = topShadows(scores, MIRRORS, 3);
+  const style = PRESSURE_MAP[pressure?.key] || null;
+
+  const flourish = gifts.length
+    ? `在资源充足、被信任、能自己做主的顺境里，你会表现出${gifts.map((g) => `「${g.gift_title}」`).join('、')}。这正是你最好的生态位：有足够的空间，有值得的事，有少数懂你的人。`
+    : '完成更多卷宗后，这里会逐渐显影出你在顺境中的真实形态。';
+
+  const underPressure = [
+    style ? `当压力超过阈值，你的第一反应倾向于「${style.name}」：${style.pattern}` : null,
+    shadows.length
+      ? `同时，最容易被放大的阴影是「${shadows[0].shadow_title}」——${shadows[0].shadow_desc}`
+      : null,
+  ].filter(Boolean).join(' ') || '完成更多卷宗后，这里会逐渐显影出你在高压下的退行方向。';
+
+  return {
+    flourish,
+    underPressure,
+    style,
+    gifts,
+    shadows,
+    brakes: shadows.length ? shadows.map((s) => ({ title: s.shadow_title, tip: s.alchemy_tip })) : [],
+  };
+}
+
+/* ------------------------------------------------------------
+   人生使用说明书
+   ------------------------------------------------------------ */
+
+const OCCUPATION_MAP = [
+  { dim: 'big5_open', high: true, text: '需要持续接触新问题的领域：早期产品、研究、跨界策划、内容创作' },
+  { dim: 'big5_order', high: true, text: '需要极高确定性的领域：工程、财务、运营、项目管理、法务' },
+  { dim: 'cog_global', high: true, text: '需要判断方向的位置：战略、架构、投资、创始人型角色' },
+  { dim: 'cog_logic', high: true, text: '需要冷静取舍的位置：风控、审计、谈判、复杂决策支持' },
+  { dim: 'mot_autonomy', high: true, text: '自主度高的形态：独立执业、远程协作、自营业务、项目制合作' },
+  { dim: 'mot_mastery', high: true, text: '有明确上升阶梯的环境：竞争型组织、成长型团队、能被看见的战功体系' },
+  { dim: 'mot_belonging', high: true, text: '高信任小团队：长期搭档、深度协作型组织、需要长期关系的服务业' },
+  { dim: 'mot_purpose', high: true, text: '有社会回响的领域：教育、医疗、公益、文化、基础设施' },
+  { dim: 'big5_compassion', high: true, text: '以人为核心的工作：咨询、教练、医疗照护、用户研究、人力发展' },
+  { dim: 'big5_assert', high: true, text: '需要前台能量的角色：销售、BD、对外沟通、需要代表团队发声的位置' },
+  { dim: 'big5_assert', high: false, text: '安静但高价值的位置：深度研究、独立开发、写作、专业顾问' },
+  { dim: 'big5_social', high: false, text: '低社交密度的形态：独立作业、异步协作、可自由控制交互量的工作' },
+  { dim: 'dark_psycho', high: true, text: '需要果断止损的位置：危机管理、重组、审计追责、需要拍板的一线' },
+  { dim: 'big5_compliance', high: true, text: '需要极强协同的位置：跨部门统筹、客户成功、长期关系维护' },
+];
+
+function pickOccupation(scores) {
+  const hits = [];
+  for (const rule of OCCUPATION_MAP) {
+    const s = scores[rule.dim];
+    if (!Number.isFinite(s)) continue;
+    const ok = rule.high ? s >= 60 : s <= 42;
+    if (ok) hits.push({ ...rule, score: s });
+  }
+  return sortBy(hits, (h) => Math.abs(h.score - 50), -1).slice(0, 4).map((h) => h.text);
+}
+
+function pickPartner(scores) {
+  const out = [];
+  const av = scores.att_avoidance;
+  const an = scores.att_anxiety;
+  if (av >= 62) {
+    out.push('一个不太需要高频确认、能给足空间的人。他不必时刻在场，但每次出现都是真的在场。');
+  } else if (an >= 62) {
+    out.push('一个表达稳定、承诺清楚的人。你需要的不是浪漫，而是可预期的回应。');
+  } else {
+    out.push('一个情绪稳定、边界清晰的人。你不太需要戏剧性，你需要的是长期的可靠。');
+  }
+  if (scores.mot_mastery >= 62) {
+    out.push('一个同样有自己目标的人。你无法长期尊重一个没有方向感的人，哪怕他很温柔。');
+  }
+  if (scores.cog_global >= 62) {
+    out.push('一个能和你聊到结构层面的人。你会在「聊不到一起」的关系里慢慢失去兴趣。');
+  } else {
+    out.push('一个说到做到、不太空谈的人。你会被具体的行动打动，而不是宏大的表达。');
+  }
+  if (scores.big5_compassion >= 62) {
+    out.push('一个愿意把脆弱交给你的人。你需要被需要，也需要真的能接住对方。');
+  }
+  return out.slice(0, 3);
+}
+
+function pickToxic(scores) {
+  const out = [];
+  if (scores.def_fawn >= 58) {
+    out.push('习惯用情绪施压的人：你一读空气就自动让步，这段关系会迅速变成单向消耗。');
+  }
+  if (scores.att_avoidance >= 60) {
+    out.push('需要全天候黏连的人：他的靠近会被你体验成入侵，最后你会用冷淡把关系弄坏。');
+  }
+  if (scores.att_anxiety >= 60) {
+    out.push('长期含糊其辞的人：他会不断触发你的猜测循环，把你拖进反复确认的漩涡。');
+  }
+  if (scores.val_moral >= 60) {
+    out.push('把原则当筹码的人：你会在每一次「这次特殊」里被磨掉信任，最后连自己都怀疑。');
+  } else {
+    out.push('把一切都上升为道德审判的人：你会被长期的正确感压住，最后只想逃。');
+  }
+  if (scores.dark_mach >= 62) {
+    out.push('同样善于布局的人：你们会互相防备到极致，关系最后只剩博弈。');
+  }
+  return out.slice(0, 3);
+}
+
+function pickActions(scores) {
+  const out = [];
+  if (scores.big5_rumination >= 60) out.push('每晚睡前写三行「今天发生的事实」，不带评价。让反刍停在纸上。');
+  if (scores.big5_alert >= 60) out.push('每周做一次「风险清单」：写下担心的事、概率、应对方案，然后合上。');
+  if (scores.sin_sloth >= 58) out.push('把最难启动的那件事，拆到「两分钟能做完」的粒度，只做那两分钟。');
+  if (scores.def_intellectual >= 60) out.push('每周留一次「不分析时间」：只说感受，不允许解释原因。');
+  if (scores.def_fawn >= 58) out.push('每天练一次「不解释的拒绝」，一句话即可，不必给理由。');
+  if (scores.mot_autonomy >= 65) out.push('每季度做一件完全由自己决定、不被任何人评价的选择。');
+  if (scores.big5_industry >= 65) out.push('把休息写进日程，并给它一个明确的结束时间。');
+  if (scores.dark_narc >= 60) out.push('每季度写一次「我为自己骄傲的小事」，不给任何人看。');
+  if (out.length < 3) out.push('每周留一段完全不产出的时间，只用来恢复感受力。');
+  return out.slice(0, 3);
+}
+
+function useManual(scores, pressure) {
+  const style = PRESSURE_MAP[pressure?.key] || null;
+  return {
+    occupation: pickOccupation(scores),
+    partner: pickPartner(scores),
+    toxic: pickToxic(scores),
+    actions: pickActions(scores),
+    pressureBrake: style ? style.brake : null,
+    pressureTrigger: style ? style.trigger : null,
+  };
+}
+
+/* ------------------------------------------------------------
+   单卷报告
+   ------------------------------------------------------------ */
+
+function buildVolumeReport(state, DATA, volId) {
+  const vol = DATA.volumes[volId];
+  if (!vol) return null;
+
+  const qs = (vol.questions || []);
+  const ans = state.answersByVolume?.[volId] || {};
+  const answered = qs.filter((q) => ans[q.id]?.value !== undefined);
+
+  /* 分数底盘：state.computedScores。只有当它完全为空（例如只拿到 answersByVolume
+     的原始态）时才现场融合一次，不重复计算。 */
+  const hasStored = Object.values(state?.computedScores || {}).some(Number.isFinite);
+  const eff = hasStored ? null : resolveEffectiveComputed(state, DATA);
+  const scoreMap = hasStored ? (state.computedScores || {}) : eff.scores;
+  const zMap = (hasStored && Object.keys(state?.zScores || {}).length)
+    ? state.zScores
+    : (eff ? eff.zScores : (state?.zScores || null));
+
+  const dims = {};
+  for (const d of vol.dimensions || []) {
+    const v = scoreMap[d];
+    if (Number.isFinite(v)) dims[d] = v;
+  }
+
+  const mirrors = mirrorAll(dims, DATA.mirrors);
+  const gifts = topGifts(dims, DATA.mirrors, 3, zMap);
+  const shadows = topShadows(dims, DATA.mirrors, 3, zMap);
+  const maskV = Number.isFinite(state.maskIndex) ? state.maskIndex : (eff?.mask?.value ?? null);
+  const mask = maskV === null || maskV === undefined ? null : maskV;
+
+  return {
+    volumeId: volId,
+    volume: vol,
+    answers: answered,
+    total: qs.length,
+    answeredCount: answered.length,
+    dims,
+    mirrors,
+    gifts,
+    shadows,
+    mask,
+    maskTier: mask === null ? null : maskTierOf(mask),
+    pressure: null,
+    keywords: (gifts.length ? gifts : Object.values(mirrors)).slice(0, 3).map((g) => g.gift_title || g.label),
+    verdict: buildVolumeVerdict(vol, gifts, shadows, answered.length, qs.length),
+  };
+}
+
+function buildVolumeVerdict(vol, gifts, shadows, answered, total) {
+  const done = answered >= total;
+  const giftPart = gifts.length
+    ? `在这一卷的坐标里，你最亮的地方是「${gifts[0].gift_title}」——${gifts[0].gift_desc.split('，')[0]}。`
+    : '';
+  const shadowPart = shadows.length
+    ? `需要留意的反面是「${shadows[0].shadow_title}」。它不是缺陷，而是同一股力量在能量不足时显影的另一种形状。`
+    : '';
+  const prefix = done ? '' : `（本卷已完成 ${answered}/${total} 题，以下解读基于目前作答。）`;
+  return `${prefix}${giftPart}${shadowPart}`;
+}
+
+/* ------------------------------------------------------------
+   全息报告（≥3 卷）
+   ------------------------------------------------------------ */
+
+function buildHolographicReport(state, DATA) {
+  /* 分数底盘：优先用 state.computedScores（renderReport 已先算好融合态传进来）；
+     只有当它完全为空时，才现场融合一次 —— 保证任何直接调用本函数的
+     地方（导出工作室 / 验收脚本 / 其他视图）不会拿到一份全空报告。 */
+  const hasStored = Object.values(state?.computedScores || {}).some(Number.isFinite);
+  const eff = hasStored ? null : resolveEffectiveComputed(state, DATA);
+  const scores = hasStored ? (state.computedScores || {}) : eff.scores;
+  const zScores = (hasStored && Object.keys(state?.zScores || {}).length)
+    ? state.zScores
+    : (eff ? eff.zScores : (state?.zScores || {}));
+  const completed = state.completedVolumes || [];
+  const maskValue = Number.isFinite(state.maskIndex) ? state.maskIndex : (eff?.mask?.value ?? null);
+  const mask = {
+    value: maskValue,
+    tier: Number.isFinite(maskValue) ? maskTierOf(maskValue) : null,
+  };
+
+  const cross = matchCrossRules(scores, mask, DATA.crossRules, completed);
+  const archetype = matchArchetype(scores, DATA.archetypes);
+  const dual = dualState(scores, DATA.mirrors, state.pressureStyle || eff?.pressure || null);
+  const manual = useManual(scores, state.pressureStyle || eff?.pressure || null);
+
+  const values = (state.topValues?.length ? state.topValues : (eff?.topValues || [])).map((id) => {
+    const v = (DATA.dimensions.values || []).find((x) => x.id === id);
+    return v ? { id: v.id, name: v.name, desc: v.desc } : { id, name: id, desc: '' };
+  });
+
+  return {
+    completed,
+    totalVolumes: Object.keys(DATA.volumes || {}).length,
+    scores,
+    zScores,
+    mask,
+    cross,
+    archetype,
+    dual,
+    manual,
+    values,
+    pressure: state.pressureStyle || eff?.pressure || null,
+    gifts: topGifts(scores, DATA.mirrors, 4, zScores),
+    shadows: topShadows(scores, DATA.mirrors, 3, zScores),
+  };
+}
+
+/** 单卷 vs 全息：按完成卷数选择呈现深度（v4.2 五阶） */
+function reportDepth(completedCount) {
+  if (completedCount >= 16) return { stage: 5, name: '破圈全启', desc: '十六卷全通 · 终极典藏版已解锁' };
+  if (completedCount >= 8) return { stage: 4, name: '全息大成', desc: '核心八卷闭环 · 全息白皮书已解锁' };
+  if (completedCount >= 5) return { stage: 3, name: '面具显影', desc: '常态 / 高压叠层与面具校准已解锁' };
+  if (completedCount >= 3) return { stage: 2, name: '交叉读心', desc: '跨卷化学反应已激活' };
+  if (completedCount >= 1) return { stage: 1, name: '单点透视', desc: '单卷深度报告可查看' };
+  return { stage: 0, name: '未启封', desc: '完成任意一卷即可解锁' };
+}
+
+/** 用于存档码 / 分享卡的简短判词 */
+function soulVerdict(state, DATA) {
+  const hasStored = Object.values(state?.computedScores || {}).some(Number.isFinite);
+  const scores = hasStored ? (state.computedScores || {}) : resolveEffectiveComputed(state, DATA).scores;
+  const arch = matchArchetype(scores, DATA.archetypes);
+  if (!arch?.best) return null;
+  return {
+    name: arch.best.name,
+    latin: arch.best.latin,
+    verdict: arch.best.verdict,
+    keywords: arch.best.keywords,
+    fit: round(arch.best.fit, 1),
+  };
+}
+
+/** 平均值（用于双人对比的总体倾向） */
+function meanOfScores(scores, dims) {
+  const vals = dims.map((d) => scores[d]).filter(Number.isFinite);
+  return vals.length ? round(mean(vals), 1) : null;
+}
+
 /* ───────── src/viz/emblemsSvg.js ───────── */
 /* ============================================================
    emblemsSvg.js — 十六卷专属几何纹章
@@ -8412,14 +9834,26 @@ function renderHub(root, ctx) {
           ]));
           merged.answersByVolume = { ...(r.state.answersByVolume || {}), ...(App.state.answersByVolume || {}) };
           merged.inProgress = { ...(r.state.inProgress || {}), ...(App.state.inProgress || {}) };
+          /* 本地分优先于导入分（与 importSoulCode 的合并口径一致） */
+          merged.computedScores = { ...(r.state.computedScores || {}), ...(App.state.computedScores || {}) };
+          merged.zScores = { ...(r.state.zScores || {}), ...(App.state.zScores || {}) };
           merged.nickname = App.state.nickname || r.state.nickname || '';
+          merged.maskIndex = Number.isFinite(App.state.maskIndex) ? App.state.maskIndex : r.state.maskIndex;
+          if (!App.state.topValues?.length && r.state.topValues?.length) merged.topValues = r.state.topValues;
           App.state = merged;
           save(App.state, { immediate: true });
-          recompute();
+          recompute({ silent: true });
         }
         return r;
       },
-      onDone: () => go('#/'),
+      /* 导入成功后直接落盘并跳到全息报告：
+         HA4- 只带分数，若停在原地，用户会以为只有「卷已归档」却没有报告。
+         recompute() 现在走双源融合，导入分不会再被空作答池洗掉。 */
+      onDone: () => {
+        save(App.state, { immediate: true });
+        const dims = Object.values(App.state.computedScores || {}).filter(Number.isFinite).length;
+        go(dims > 0 ? '#/report' : '#/');
+      },
     }),
   ));
 
@@ -9428,559 +10862,6 @@ function renderQuiz(root, ctx) {
   window.addEventListener('hashchange', cleanup, { once: true });
 
   renderQuestion();
-}
-
-/* ───────── src/core/synthesizer.js ───────── */
-/* ============================================================
-   synthesizer.js — 单卷 / 全息报告拼装
-   · 维度四面镜选取与四档分级
-   · 24 原型匹配
-   · 35 条跨卷交叉规则触发
-   · 顺境 / 高压双态推演
-   · 人生使用说明书
-   ============================================================ */
-
-
-
-
-/* ------------------------------------------------------------
-   维度解读：一维四面镜 → 当前档位应取的那一面
-   ------------------------------------------------------------ */
-
-function mirrorFor(dim, score, MIRRORS) {
-  const m = MIRRORS[dim];
-  if (!m) return null;
-  const s = Number.isFinite(score) ? score : 50;
-  const tier = tierOf(s);
-  const side = s >= 50 ? 'high' : 'low';
-  const face = m[side];
-  if (!face) return null;
-  return {
-    dim,
-    name: m.name,
-    category: m.category,
-    volume: m.volume,
-    polar: !!m.polar,
-    ...(m.negLabel ? { negLabel: m.negLabel } : {}),
-    ...(m.posLabel ? { posLabel: m.posLabel } : {}),
-    score: s,
-    tier,
-    side,
-    label: face.label,
-    gift_title: face.gift_title,
-    gift_desc: face.gift_desc,
-    shadow_title: face.shadow_title,
-    shadow_desc: face.shadow_desc,
-    alchemy_tip: face.alchemy_tip,
-  };
-}
-
-function mirrorAll(scores, MIRRORS) {
-  const out = {};
-  for (const dim of Object.keys(MIRRORS)) {
-    if (!Number.isFinite(scores[dim])) continue;
-    out[dim] = mirrorFor(dim, scores[dim], MIRRORS);
-  }
-  return out;
-}
-
-/* ------------------------------------------------------------
-   王牌天赋卡 / 阴影预警卡
-   ------------------------------------------------------------ */
-
-/**
- * 王牌天赋卡。
- * v4.2 起综合「绝对分」与「个人内部相对尖峰 Z」：
- *   composite = 0.62 · strength + 0.38 · zNorm
- * 只靠绝对分会永远选出那几个天生就高的维度，
- * 加入 Z 才能把「这个人身上真正突出的那一处」翻出来。
- *
- * @param {Object} zScores 可选的 Z 分数表；缺省时退化为纯绝对分
- */
-function topGifts(scores, MIRRORS, limit = 3, zScores = null) {
-  const rows = [];
-  for (const [dim, s] of Object.entries(scores)) {
-    if (!Number.isFinite(s)) continue;
-    const m = mirrorFor(dim, s, MIRRORS);
-    if (!m) continue;
-    // 极显锋芒 / 清晰倾向 → 高分面；反向深潜 → 低分隐藏优势
-    const strength = m.side === 'high' ? s : 100 - s;
-    const z = Number.isFinite(zScores?.[dim]) ? zScores[dim] : 0;
-    // v4.4 修复：strength 在低分侧已翻转为 (100 − s)，zNorm 也必须跟着翻转。
-    // 旧实现直接用原始 z，导致「低分隐藏天赋」的 Z 为负（因为 s < μ），
-    // zNorm 被压到 50 以下，反而拉低了 composite —— 低分侧的天赋永远选不出来。
-    const alignedZ = m.side === 'high' ? z : -z;
-    const zNorm = clamp(50 + 25 * alignedZ, 0, 100);
-    const composite = zScores ? 0.62 * strength + 0.38 * zNorm : strength;
-    rows.push({
-      ...m, strength: round(strength, 1), z: round(z, 2), composite: round(composite, 1),
-    });
-  }
-  return sortBy(rows, (r) => r.composite, -1).slice(0, limit);
-}
-
-function topShadows(scores, MIRRORS, limit = 3, zScores = null) {
-  const rows = [];
-  for (const [dim, s] of Object.entries(scores)) {
-    if (!Number.isFinite(s)) continue;
-    const m = mirrorFor(dim, s, MIRRORS);
-    if (!m) continue;
-    // 两侧极端化的程度 = 离 50 的距离；越极端，失控风险越高
-    const intensity = Math.abs(s - 50) * 2;
-    const z = Number.isFinite(zScores?.[dim]) ? zScores[dim] : 0;
-    const zNorm = clamp(Math.abs(z) * 26, 0, 100);
-    const composite = zScores ? 0.55 * intensity + 0.45 * zNorm : intensity;
-    rows.push({ ...m, intensity: round(intensity, 1), z: round(z, 2), composite: round(composite, 1) });
-  }
-  return sortBy(rows, (r) => r.composite, -1).slice(0, limit);
-}
-
-/* ------------------------------------------------------------
-   原型匹配
-   ------------------------------------------------------------ */
-
-/**
- * 原型匹配。
- *
- * v4.5 修复「单维劫持」：
- *   旧实现把未测维度直接跳过，只用「已测的那几项」求平均。
- *   于是某个原型只要 1 个维度恰好高分，就能凭 100% 的单维平均分
- *   反杀另一个扎实命中 4 个维度的原型。
- *
- * 现在按三步走：
- *   1. 统计 totalW / coveredW，算出覆盖率
- *   2. 硬闸门：coverage >= 0.60 且头号核心维度已测，才有资格进候选池
- *   3. 覆盖率置信惩罚：fit = rawFit × (0.75 + 0.25 × coverage)
- *
- * 若没有任何原型达标，返回 { eligible: false }，由单卷分型接管封面，
- * 绝不硬塞一个跨卷大原型。
- */
-const ARCH_COVERAGE_MIN = 0.6;
-const ARCH_COMPOSITE_GAP = 8;
-
-function matchArchetype(scores, ARCHETYPES) {
-  const list = ARCHETYPES.archetypes || [];
-  if (!list.length) return null;
-
-  const graded = list.map((a) => {
-    const weights = a.weights || {};
-    const negWeights = a.negWeights || {};
-
-    /* ---- 1. 总权重 / 已覆盖权重 / 头号核心维度 ---- */
-    let totalW = 0;
-    let coveredW = 0;
-    let primaryDim = null;
-    let primaryMag = -1;
-
-    for (const [dim, w] of Object.entries(weights)) {
-      const mag = Math.abs(w);
-      totalW += mag;
-      if (mag > primaryMag) { primaryMag = mag; primaryDim = dim; }
-      if (Number.isFinite(scores[dim])) coveredW += mag;
-    }
-    for (const [dim, w] of Object.entries(negWeights)) {
-      const mag = Math.abs(w);
-      totalW += mag;
-      if (mag > primaryMag) { primaryMag = mag; primaryDim = dim; }
-      if (Number.isFinite(scores[dim])) coveredW += mag;
-    }
-
-    const coverage = totalW > 0 ? coveredW / totalW : 0;
-    const primaryCovered = primaryDim ? Number.isFinite(scores[primaryDim]) : false;
-    const eligible = coverage >= ARCH_COVERAGE_MIN && primaryCovered;
-
-    /* ---- 2. 只用已测维度算原始契合度 ---- */
-    let acc = 0;
-    let wSum = 0;
-    const hits = [];
-
-    for (const [dim, w] of Object.entries(weights)) {
-      const sc = scores[dim];
-      if (!Number.isFinite(sc)) continue;
-      const mag = Math.abs(w);
-      // weights 里的负号含义是「该维度越低越像」，按 (100 − sc) 参与累加
-      acc += (w < 0 ? 100 - sc : sc) * mag;
-      wSum += mag;
-      if (mag >= 0.9) hits.push({ dim, score: round(sc, 0), w, inverse: w < 0 });
-    }
-    for (const [dim, w] of Object.entries(negWeights)) {
-      const sc = scores[dim];
-      if (!Number.isFinite(sc)) continue;
-      const mag = Math.abs(w);
-      acc += (100 - sc) * mag;
-      wSum += mag;
-      if (mag >= 0.9) hits.push({ dim, score: round(sc, 0), w: -mag, inverse: true });
-    }
-
-    const rawFit = wSum > 0 ? clamp(acc / wSum, 0, 100) : 0;
-
-    /* ---- 3. 覆盖率置信惩罚 ---- */
-    const fit = clamp(rawFit * (0.75 + 0.25 * coverage), 0, 100);
-
-    return {
-      ...a,
-      fit: round(fit, 1),
-      rawFit: round(rawFit, 1),
-      coverage: round(coverage, 2),
-      primaryDim,
-      primaryCovered,
-      eligible,
-      hitCount: hits.length,
-      hits,
-    };
-  });
-
-  const ranked = sortBy(graded, (r) => r.fit, -1);
-
-  /* 只有达标原型才有资格上封面 */
-  const pool = ranked.filter((r) => r.eligible);
-  if (!pool.length) {
-    return {
-      eligible: false,
-      best: null,
-      runnerUp: null,
-      isComposite: false,
-      coverage: 0,
-      ranked,
-      reason: '共同维度不足以支撑任何跨卷原型',
-    };
-  }
-
-  const best = pool[0];
-  const runnerUp = pool[1] || null;
-  const isComposite = Boolean(runnerUp && (best.fit - runnerUp.fit) <= ARCH_COMPOSITE_GAP);
-
-  return {
-    eligible: true,
-    best,
-    runnerUp,
-    isComposite,
-    coverage: best.coverage,
-    ranked,
-    pool,
-  };
-}
-
-/* ------------------------------------------------------------
-   跨卷交叉规则
-   ------------------------------------------------------------ */
-
-function testCondition(cond, scores, mask) {
-  // v4.4：mask 可能直接传数值，也可能传 { value, tier } 对象
-  const v = cond.dim === 'mask'
-    ? (typeof mask === 'number' ? mask : mask?.value)
-    : scores[cond.dim];
-  if (!Number.isFinite(v)) return false;
-  switch (cond.op) {
-    case '>=': return v >= cond.val;
-    case '>': return v > cond.val;
-    case '<=': return v <= cond.val;
-    case '<': return v < cond.val;
-    default: return false;
-  }
-}
-
-function matchCrossRules(scores, mask, CROSS_RULES, completedVolumes = []) {
-  const out = [];
-  for (const rule of CROSS_RULES) {
-    const reqs = rule.required_volumes || [];
-    if (reqs.some((v) => !completedVolumes.includes(v))) continue;
-    const ok = (rule.conditions || []).every((c) => testCondition(c, scores, mask));
-    if (!ok) continue;
-    const hits = (rule.conditions || [])
-      .map((c) => ({
-        dim: c.dim,
-        name: c.dim === 'mask' ? '社会面具厚度' : null,
-        score: c.dim === 'mask' ? mask?.value : scores[c.dim],
-      }))
-      .filter((h) => Number.isFinite(h.score));
-    out.push({ ...rule, hits });
-  }
-  return out;
-}
-
-/* ------------------------------------------------------------
-   顺境 / 高压双态推演
-   ------------------------------------------------------------ */
-
-const PRESSURE_MAP = {
-  burst: {
-    name: '爆发攻击型',
-    pattern: '你的压力会瞬间外化为怒火。先掀桌，再后悔，事后又要花很长时间修补关系。',
-    trigger: '被当众否定、被抢功、边界被反复跨越',
-    brake: '在最高温的那二十分钟里，先不发任何消息。把要说的话写下来，第二天再决定要不要发。',
-  },
-  cutoff: {
-    name: '彻底断联型',
-    pattern: '你的压力会把所有人关在门外。消失、沉默、把自己藏起来，直到一切自己变轻。',
-    trigger: '被消耗到极限、被背叛、感觉没人真正懂',
-    brake: '在关掉之前，至少留下一句「我需要一点时间，不是不要你」。一句解释能救下很多关系。',
-  },
-  cold: {
-    name: '冰冷黑化型',
-    pattern: '你的压力会让情绪归零，只剩计算。你会非常冷静，也非常不近人情，用效率把所有人请出局。',
-    trigger: '被欺骗、被当傻子、退路被切断',
-    brake: '在你做出那个「正确但冷」的决定之前，告诉一个旁观者。第三人视角能校正大部分过度反应。',
-  },
-  collapse: {
-    name: '自我坍塌型',
-    pattern: '你的压力会把攻击转向自己。自责、失眠、耗竭，最后连起床都需要理由。',
-    trigger: '长期高压、被否定、无法控制的外部变化',
-    brake: '把「我是不是不行」换成「我现在需要什么」。前者是审判，后者才有出口。',
-  },
-};
-
-function dualState(scores, MIRRORS, pressure) {
-  const gifts = topGifts(scores, MIRRORS, 3);
-  const shadows = topShadows(scores, MIRRORS, 3);
-  const style = PRESSURE_MAP[pressure?.key] || null;
-
-  const flourish = gifts.length
-    ? `在资源充足、被信任、能自己做主的顺境里，你会表现出${gifts.map((g) => `「${g.gift_title}」`).join('、')}。这正是你最好的生态位：有足够的空间，有值得的事，有少数懂你的人。`
-    : '完成更多卷宗后，这里会逐渐显影出你在顺境中的真实形态。';
-
-  const underPressure = [
-    style ? `当压力超过阈值，你的第一反应倾向于「${style.name}」：${style.pattern}` : null,
-    shadows.length
-      ? `同时，最容易被放大的阴影是「${shadows[0].shadow_title}」——${shadows[0].shadow_desc}`
-      : null,
-  ].filter(Boolean).join(' ') || '完成更多卷宗后，这里会逐渐显影出你在高压下的退行方向。';
-
-  return {
-    flourish,
-    underPressure,
-    style,
-    gifts,
-    shadows,
-    brakes: shadows.length ? shadows.map((s) => ({ title: s.shadow_title, tip: s.alchemy_tip })) : [],
-  };
-}
-
-/* ------------------------------------------------------------
-   人生使用说明书
-   ------------------------------------------------------------ */
-
-const OCCUPATION_MAP = [
-  { dim: 'big5_open', high: true, text: '需要持续接触新问题的领域：早期产品、研究、跨界策划、内容创作' },
-  { dim: 'big5_order', high: true, text: '需要极高确定性的领域：工程、财务、运营、项目管理、法务' },
-  { dim: 'cog_global', high: true, text: '需要判断方向的位置：战略、架构、投资、创始人型角色' },
-  { dim: 'cog_logic', high: true, text: '需要冷静取舍的位置：风控、审计、谈判、复杂决策支持' },
-  { dim: 'mot_autonomy', high: true, text: '自主度高的形态：独立执业、远程协作、自营业务、项目制合作' },
-  { dim: 'mot_mastery', high: true, text: '有明确上升阶梯的环境：竞争型组织、成长型团队、能被看见的战功体系' },
-  { dim: 'mot_belonging', high: true, text: '高信任小团队：长期搭档、深度协作型组织、需要长期关系的服务业' },
-  { dim: 'mot_purpose', high: true, text: '有社会回响的领域：教育、医疗、公益、文化、基础设施' },
-  { dim: 'big5_compassion', high: true, text: '以人为核心的工作：咨询、教练、医疗照护、用户研究、人力发展' },
-  { dim: 'big5_assert', high: true, text: '需要前台能量的角色：销售、BD、对外沟通、需要代表团队发声的位置' },
-  { dim: 'big5_assert', high: false, text: '安静但高价值的位置：深度研究、独立开发、写作、专业顾问' },
-  { dim: 'big5_social', high: false, text: '低社交密度的形态：独立作业、异步协作、可自由控制交互量的工作' },
-  { dim: 'dark_psycho', high: true, text: '需要果断止损的位置：危机管理、重组、审计追责、需要拍板的一线' },
-  { dim: 'big5_compliance', high: true, text: '需要极强协同的位置：跨部门统筹、客户成功、长期关系维护' },
-];
-
-function pickOccupation(scores) {
-  const hits = [];
-  for (const rule of OCCUPATION_MAP) {
-    const s = scores[rule.dim];
-    if (!Number.isFinite(s)) continue;
-    const ok = rule.high ? s >= 60 : s <= 42;
-    if (ok) hits.push({ ...rule, score: s });
-  }
-  return sortBy(hits, (h) => Math.abs(h.score - 50), -1).slice(0, 4).map((h) => h.text);
-}
-
-function pickPartner(scores) {
-  const out = [];
-  const av = scores.att_avoidance;
-  const an = scores.att_anxiety;
-  if (av >= 62) {
-    out.push('一个不太需要高频确认、能给足空间的人。他不必时刻在场，但每次出现都是真的在场。');
-  } else if (an >= 62) {
-    out.push('一个表达稳定、承诺清楚的人。你需要的不是浪漫，而是可预期的回应。');
-  } else {
-    out.push('一个情绪稳定、边界清晰的人。你不太需要戏剧性，你需要的是长期的可靠。');
-  }
-  if (scores.mot_mastery >= 62) {
-    out.push('一个同样有自己目标的人。你无法长期尊重一个没有方向感的人，哪怕他很温柔。');
-  }
-  if (scores.cog_global >= 62) {
-    out.push('一个能和你聊到结构层面的人。你会在「聊不到一起」的关系里慢慢失去兴趣。');
-  } else {
-    out.push('一个说到做到、不太空谈的人。你会被具体的行动打动，而不是宏大的表达。');
-  }
-  if (scores.big5_compassion >= 62) {
-    out.push('一个愿意把脆弱交给你的人。你需要被需要，也需要真的能接住对方。');
-  }
-  return out.slice(0, 3);
-}
-
-function pickToxic(scores) {
-  const out = [];
-  if (scores.def_fawn >= 58) {
-    out.push('习惯用情绪施压的人：你一读空气就自动让步，这段关系会迅速变成单向消耗。');
-  }
-  if (scores.att_avoidance >= 60) {
-    out.push('需要全天候黏连的人：他的靠近会被你体验成入侵，最后你会用冷淡把关系弄坏。');
-  }
-  if (scores.att_anxiety >= 60) {
-    out.push('长期含糊其辞的人：他会不断触发你的猜测循环，把你拖进反复确认的漩涡。');
-  }
-  if (scores.val_moral >= 60) {
-    out.push('把原则当筹码的人：你会在每一次「这次特殊」里被磨掉信任，最后连自己都怀疑。');
-  } else {
-    out.push('把一切都上升为道德审判的人：你会被长期的正确感压住，最后只想逃。');
-  }
-  if (scores.dark_mach >= 62) {
-    out.push('同样善于布局的人：你们会互相防备到极致，关系最后只剩博弈。');
-  }
-  return out.slice(0, 3);
-}
-
-function pickActions(scores) {
-  const out = [];
-  if (scores.big5_rumination >= 60) out.push('每晚睡前写三行「今天发生的事实」，不带评价。让反刍停在纸上。');
-  if (scores.big5_alert >= 60) out.push('每周做一次「风险清单」：写下担心的事、概率、应对方案，然后合上。');
-  if (scores.sin_sloth >= 58) out.push('把最难启动的那件事，拆到「两分钟能做完」的粒度，只做那两分钟。');
-  if (scores.def_intellectual >= 60) out.push('每周留一次「不分析时间」：只说感受，不允许解释原因。');
-  if (scores.def_fawn >= 58) out.push('每天练一次「不解释的拒绝」，一句话即可，不必给理由。');
-  if (scores.mot_autonomy >= 65) out.push('每季度做一件完全由自己决定、不被任何人评价的选择。');
-  if (scores.big5_industry >= 65) out.push('把休息写进日程，并给它一个明确的结束时间。');
-  if (scores.dark_narc >= 60) out.push('每季度写一次「我为自己骄傲的小事」，不给任何人看。');
-  if (out.length < 3) out.push('每周留一段完全不产出的时间，只用来恢复感受力。');
-  return out.slice(0, 3);
-}
-
-function useManual(scores, pressure) {
-  const style = PRESSURE_MAP[pressure?.key] || null;
-  return {
-    occupation: pickOccupation(scores),
-    partner: pickPartner(scores),
-    toxic: pickToxic(scores),
-    actions: pickActions(scores),
-    pressureBrake: style ? style.brake : null,
-    pressureTrigger: style ? style.trigger : null,
-  };
-}
-
-/* ------------------------------------------------------------
-   单卷报告
-   ------------------------------------------------------------ */
-
-function buildVolumeReport(state, DATA, volId) {
-  const vol = DATA.volumes[volId];
-  if (!vol) return null;
-
-  const qs = (vol.questions || []);
-  const ans = state.answersByVolume?.[volId] || {};
-  const answered = qs.filter((q) => ans[q.id]?.value !== undefined);
-
-  const dims = {};
-  for (const d of vol.dimensions || []) {
-    const v = state.computedScores?.[d];
-    if (Number.isFinite(v)) dims[d] = v;
-  }
-
-  const mirrors = mirrorAll(dims, DATA.mirrors);
-  const gifts = topGifts(dims, DATA.mirrors, 3, state.zScores || null);
-  const shadows = topShadows(dims, DATA.mirrors, 3, state.zScores || null);
-  const mask = state.maskIndex === null || state.maskIndex === undefined ? null : state.maskIndex;
-
-  return {
-    volumeId: volId,
-    volume: vol,
-    answers: answered,
-    total: qs.length,
-    answeredCount: answered.length,
-    dims,
-    mirrors,
-    gifts,
-    shadows,
-    mask,
-    maskTier: mask === null ? null : maskTierOf(mask),
-    pressure: null,
-    keywords: (gifts.length ? gifts : Object.values(mirrors)).slice(0, 3).map((g) => g.gift_title || g.label),
-    verdict: buildVolumeVerdict(vol, gifts, shadows, answered.length, qs.length),
-  };
-}
-
-function buildVolumeVerdict(vol, gifts, shadows, answered, total) {
-  const done = answered >= total;
-  const giftPart = gifts.length
-    ? `在这一卷的坐标里，你最亮的地方是「${gifts[0].gift_title}」——${gifts[0].gift_desc.split('，')[0]}。`
-    : '';
-  const shadowPart = shadows.length
-    ? `需要留意的反面是「${shadows[0].shadow_title}」。它不是缺陷，而是同一股力量在能量不足时显影的另一种形状。`
-    : '';
-  const prefix = done ? '' : `（本卷已完成 ${answered}/${total} 题，以下解读基于目前作答。）`;
-  return `${prefix}${giftPart}${shadowPart}`;
-}
-
-/* ------------------------------------------------------------
-   全息报告（≥3 卷）
-   ------------------------------------------------------------ */
-
-function buildHolographicReport(state, DATA) {
-  const scores = state.computedScores || {};
-  const completed = state.completedVolumes || [];
-  const mask = {
-    value: state.maskIndex,
-    tier: Number.isFinite(state.maskIndex) ? maskTierOf(state.maskIndex) : null,
-  };
-
-  const cross = matchCrossRules(scores, mask, DATA.crossRules, completed);
-  const archetype = matchArchetype(scores, DATA.archetypes);
-  const dual = dualState(scores, DATA.mirrors, state.pressureStyle || null);
-  const manual = useManual(scores, state.pressureStyle || null);
-
-  const values = (state.topValues || []).map((id) => {
-    const v = (DATA.dimensions.values || []).find((x) => x.id === id);
-    return v ? { id: v.id, name: v.name, desc: v.desc } : { id, name: id, desc: '' };
-  });
-
-  return {
-    completed,
-    totalVolumes: Object.keys(DATA.volumes || {}).length,
-    scores,
-    zScores: state.zScores || {},
-    mask,
-    cross,
-    archetype,
-    dual,
-    manual,
-    values,
-    pressure: state.pressureStyle || null,
-    gifts: topGifts(scores, DATA.mirrors, 4, state.zScores || null),
-    shadows: topShadows(scores, DATA.mirrors, 3, state.zScores || null),
-  };
-}
-
-/** 单卷 vs 全息：按完成卷数选择呈现深度（v4.2 五阶） */
-function reportDepth(completedCount) {
-  if (completedCount >= 16) return { stage: 5, name: '破圈全启', desc: '十六卷全通 · 终极典藏版已解锁' };
-  if (completedCount >= 8) return { stage: 4, name: '全息大成', desc: '核心八卷闭环 · 全息白皮书已解锁' };
-  if (completedCount >= 5) return { stage: 3, name: '面具显影', desc: '常态 / 高压叠层与面具校准已解锁' };
-  if (completedCount >= 3) return { stage: 2, name: '交叉读心', desc: '跨卷化学反应已激活' };
-  if (completedCount >= 1) return { stage: 1, name: '单点透视', desc: '单卷深度报告可查看' };
-  return { stage: 0, name: '未启封', desc: '完成任意一卷即可解锁' };
-}
-
-/** 用于存档码 / 分享卡的简短判词 */
-function soulVerdict(state, DATA) {
-  const scores = state.computedScores || {};
-  const arch = matchArchetype(scores, DATA.archetypes);
-  if (!arch?.best) return null;
-  return {
-    name: arch.best.name,
-    latin: arch.best.latin,
-    verdict: arch.best.verdict,
-    keywords: arch.best.keywords,
-    fit: round(arch.best.fit, 1),
-  };
-}
-
-/** 平均值（用于双人对比的总体倾向） */
-function meanOfScores(scores, dims) {
-  const vals = dims.map((d) => scores[d]).filter(Number.isFinite);
-  return vals.length ? round(mean(vals), 1) : null;
 }
 
 /* ───────── src/core/typology.js ───────── */
@@ -14097,7 +14978,12 @@ function renderEmptyDossier(root, ctx) {
           ]));
           merged.answersByVolume = { ...(r.state.answersByVolume || {}), ...(App.state.answersByVolume || {}) };
           merged.inProgress = { ...(r.state.inProgress || {}), ...(App.state.inProgress || {}) };
+          /* 本地分优先于导入分（与 importSoulCode 的合并口径一致） */
+          merged.computedScores = { ...(r.state.computedScores || {}), ...(App.state.computedScores || {}) };
+          merged.zScores = { ...(r.state.zScores || {}), ...(App.state.zScores || {}) };
           merged.nickname = App.state.nickname || r.state.nickname || '';
+          merged.maskIndex = Number.isFinite(App.state.maskIndex) ? App.state.maskIndex : r.state.maskIndex;
+          if (!App.state.topValues?.length && r.state.topValues?.length) merged.topValues = r.state.topValues;
           App.state = merged;
           window.HumanAtlas?.recompute?.();
         }
@@ -14105,8 +14991,12 @@ function renderEmptyDossier(root, ctx) {
       },
       onDone: () => {
         window.HumanAtlas?.recompute?.();
-        /* hash 没变时浏览器不会自己触发 hashchange，这里手动补一次重渲染 */
+        /* hash 没变时浏览器不会自己触发 hashchange，这里手动补一次重渲染。
+           recompute 现在走双源融合，导入的分不会再被空作答池洗掉，
+           所以这次重渲染会直接进入报告主体，而不是继续停在空态。 */
         window.dispatchEvent(new Event('hashchange'));
+        const dims = Object.values(App.state.computedScores || {}).filter(Number.isFinite).length;
+        if (dims > 0) toast(`已载入 ${dims} 个维度`);
       },
     });
   });
@@ -14137,9 +15027,30 @@ function renderReport(root, ctx) {
   const state = App.state;
   const C = themeColors();
 
+  /* ---------- 双源融合 ----------
+     HA4- 存档码只带分数、不带 answersByVolume。如果直接用 state.computedScores，
+     导入后只要 recompute 跑过一次就可能被空作答池洗成 0 维 —— 报告页就被
+     空态门禁拦成『档案尚未启封』。这里先算融合态，所有下游一律看 eff。 */
+  const eff = resolveEffectiveComputed(state, DATA);
+  const effectiveScores = eff.scores;
+  const hasEffective = Object.keys(effectiveScores).length > 0;
+
+  /* 丢掉旧 state 里已经失效的分，把融合后的分喂给下游（报告 / 单卷报告 / 导出）。 */
+  const effState = hasEffective
+    ? {
+      ...state,
+      computedScores: effectiveScores,
+      zScores: eff.zScores,
+      maskIndex: eff.mask?.value ?? state.maskIndex,
+      maskDetail: eff.maskDetail || state.maskDetail || null,
+      topValues: eff.topValues,
+      pressureStyle: eff.pressure || state.pressureStyle || null,
+    }
+    : state;
+
   // 单卷报告
   if (volId && DATA.volumes[volId]) {
-    renderVolumeReport(root, ctx, volId);
+    renderVolumeReport(root, { ...ctx, effectiveState: effState, effective: eff }, volId);
     return;
   }
 
@@ -14149,9 +15060,9 @@ function renderReport(root, ctx) {
      「有维度分、completedVolumes 为空」的档案，或者在中途重置过进度时，
      会出现「有分数但没完成卷」的半空状态 —— 报告照样往下渲染，
      于是所有图表用 ?? 50 补出全 50 的假点、跨卷规则输出 0/65 的空壳。
-     现在改成以「已测维度数」为唯一门禁。 */
-  const measuredDims = Object.keys(state.computedScores || {})
-    .filter((d) => Number.isFinite(state.computedScores[d]));
+     现在以【双源融合后的已测维度数】为唯一门禁。 */
+  const measuredDims = Object.keys(effectiveScores)
+    .filter((d) => Number.isFinite(effectiveScores[d]));
   const completed = state.completedVolumes || [];
 
   if (!measuredDims.length) {
@@ -14159,7 +15070,7 @@ function renderReport(root, ctx) {
     return;
   }
 
-  const report = buildHolographicReport(state, DATA);
+  const report = buildHolographicReport(effState, DATA);
   const depth = reportDepth(completed.length);
   const archPack = report.archetype || null;
   const arch = archPack?.eligible === false ? null : archPack?.best;
@@ -14251,8 +15162,11 @@ function renderReport(root, ctx) {
   }
 
   const lightDark = computeLightDark(report.scores);
-  const maskV = Number.isFinite(state.maskIndex) ? Math.round(state.maskIndex) : '—';
-  const maskTier = Number.isFinite(state.maskIndex) ? maskTierOf(state.maskIndex) : null;
+  /* 面具读报告对象里的融合值（effState.maskIndex），不直接读 App.state ——
+     导入的档可能只有 maskIndex 没有作答，重算前后会短暂不一致。 */
+  const maskNum = report.mask?.value;
+  const maskV = Number.isFinite(maskNum) ? Math.round(maskNum) : '—';
+  const maskTier = Number.isFinite(maskNum) ? maskTierOf(maskNum) : null;
 
   cover.appendChild(el('div', { class: 'gauges' }, [
     gauge('光暗能量比', lightDark.text, lightDark.note),
@@ -15055,15 +15969,28 @@ function renderReport(root, ctx) {
    ------------------------------------------------------------ */
 
 function renderVolumeReport(root, ctx, volId) {
-  const { App, DATA, VOL_IDS } = ctx;
-  const state = App.state;
+  const { App, DATA, VOL_IDS, effectiveState, effective } = ctx;
+  const state = effectiveState || App.state;
   const vol = DATA.volumes[volId];
   const P = themeColors();
   const ans = state.answersByVolume?.[volId] || {};
 
+  /* 分数底盘：融合后的 state.computedScores。
+     导入存档码后 answersByVolume 为空，靠右上角三个 gauge 与下方维度明细
+     必须能看到导入的分 —— 否则 `#/report/vol1` 会渲染成一张空壳。 */
+  const scoreSource = state.computedScores && Object.keys(state.computedScores).length
+    ? state.computedScores
+    : (effective?.scores || {});
+
   const dims = (vol.dimensions || [])
-    .map((d) => ({ id: d, score: state.computedScores?.[d] }))
+    .map((d) => ({ id: d, score: scoreSource?.[d] }))
     .filter((d) => Number.isFinite(d.score));
+
+  /* 该卷一个可渲染维度都没有时，同样走空态而不是空白页。 */
+  if (!dims.length) {
+    renderEmptyDossier(root, ctx);
+    return;
+  }
 
   const mirrors = {};
   dims.forEach((d) => {
@@ -15739,7 +16666,7 @@ function renderVolumeReport(root, ctx, volId) {
           confirmText: hasSnap ? '封存并重测' : '清空并重测',
           danger: !hasSnap,
           onConfirm: () => {
-            retakeVolume(state, volId);
+            retakeVolume(state, volId, vol.dimensions || []);
             recompute({ silent: true });
             toast('已清空本卷作答');
             go(`#/quiz/${volId}`);
@@ -15889,16 +16816,29 @@ function commonVolumes(a, b) {
 }
 
 function commonDims(a, b, DATA) {
-  const vols = commonVolumes(a, b);
-  const set = new Set();
-  for (const v of vols) {
-    const vol = DATA.volumes[v];
-    for (const d of vol?.dimensions || []) set.add(d);
-  }
-  return Array.from(set).filter(
-    (d) => Number.isFinite(a.computedScores?.[d]) && Number.isFinite(b.computedScores?.[d]),
-  );
+  /* v5.3：不再绕道 commonVolumes。
+     28 题极速档不写 completedVolumes，靠 activeVolumes 也只能找回“被答过的原卷”；
+     而两份极速档各自抽的 28 题很可能来自完全不同的卷，交集于是恒为空，
+     合盘直接返回「你们还没有共同完成任何一卷」。
+     可比性真正的判定标准只有一个：同一维度双方都有【有限】分数。 */
+  const order = (DATA?.dimOrder && DATA.dimOrder.length)
+    ? DATA.dimOrder
+    : Object.keys(DATA?.dimMap || {});
+  const aS = a?.computedScores || {};
+  const bS = b?.computedScores || {};
+  return order.filter((d) => Number.isFinite(aS[d]) && Number.isFinite(bS[d]));
 }
+
+/** 该档是否只有「28 题极速数据」：一卷都没标记完成，但确实有足够维度分 */
+function isExpressOnly(state) {
+  const done = (state?.completedVolumes || []).length;
+  if (done > 0) return false;
+  const finite = Object.values(state?.computedScores || {}).filter(Number.isFinite).length;
+  return finite >= MIN_COMPARABLE_DIMS;
+}
+
+/** 合盘最少可比维度：低于此数任何结论都是噪声 */
+const MIN_COMPARABLE_DIMS = 10;
 
 /** 底层共振度 R_sync = 100 − 平均绝对差 */
 function resonance(a, b, dims, DATA) {
@@ -16009,16 +16949,29 @@ function compareStates(a, b, DATA) {
   const common = commonVolumes(a, b);
   const dims = commonDims(a, b, DATA);
 
-  if (!common.length || !dims.length) {
+  /* 放行闸门：看可比维度数，不看是否同卷。
+     两份 28 题极速档往往一卷都不重合，但有 85–110 个共同维度，
+     完全足够算生态位与契合度。 */
+  if (dims.length < MIN_COMPARABLE_DIMS) {
     return {
       ok: false,
       common,
       dims,
-      reason: common.length
-        ? '双方共同完成的卷宗里，还没有可比较的维度。'
-        : '你们还没有共同完成任何一卷，暂时无法计算契合度。',
+      isExpressPair: false,
+      reason: dims.length
+        ? `双方只有 ${dims.length} 个可比较维度，不足 ${MIN_COMPARABLE_DIMS} 个，暂时算不出可信的契合度。`
+        : '双方还没有任何重叠的可测维度，暂时无法计算契合度。',
     };
   }
+
+  /* 极速对档：卷交集为空，但维度足够。
+     两点补充：
+       1. 解码后的存档码 answersByVolume 恒为空 → common 必为空，命中前半条；
+       2. 内存里刚做完 28 题的状态，commitExpress 会把答案写回原卷，
+          activeVolumes 于是能枚举出 16 卷，common 不再是空数组 ——
+          所以再用 isExpressOnly() 看「谁一卷都没标记完成」兜底。 */
+  const isExpressPair = (common.length === 0 || isExpressOnly(a) || isExpressOnly(b))
+    && dims.length >= MIN_COMPARABLE_DIMS;
 
   const res = resonance(a, b, dims, DATA);
   const comp = complement(a, b, dims, DATA);
@@ -16058,6 +17011,7 @@ function compareStates(a, b, DATA) {
     ok: true,
     common,
     dims,
+    isExpressPair,
     sync: res,
     complement: comp,
     collisions: coll,
@@ -17075,14 +18029,124 @@ function chemistryBoard(A, B) {
 
 
 
-const SLOT_COLORS = { a: '#8C4A32', b: '#3B4D70' };
+/* A/B 两点专属色：优先读 styles/main.css 里的 --cmp-a / --cmp-b（日夜双轨），
+   这里的常量只作为 getComputedStyle 不可用（如 SSR / 测试环境）时的兜底：
+     #9a7b45 = tokens.css 白昼档 --gold（与 var(--gold) 同值，不是新色）；
+     #8c4a32 = B 点专属陶土赭，全项目唯一新增裸 hex。 */
+const SLOT_FALLBACK = { a: '#9a7b45', b: '#8c4a32' };
+
+/* 生态位「匹配法则」小徽章文案 */
+const KIND_LABEL = {
+  syncHigh: '双高同频',
+  tension: '互补张力',
+  syncLow: '双低稳态',
+  sync: '相近同步',
+  bothHigh: '强强对撞',
+};
+
+function slotColors() {
+  if (typeof document === 'undefined') return { ...SLOT_FALLBACK };
+  const cs = getComputedStyle(document.documentElement);
+  const a = cs.getPropertyValue('--cmp-a').trim() || SLOT_FALLBACK.a;
+  const b = cs.getPropertyValue('--cmp-b').trim() || SLOT_FALLBACK.b;
+  return { a, b };
+}
+
+/* ------------------------------------------------------------
+   小工具：档位描述 / 差值状态 / 双人哑铃对照轨
+   ------------------------------------------------------------ */
+
+/** 绝对分 → 一句档位描述，用于自动生成的对比提示 */
+function toneLabel(v) {
+  if (!Number.isFinite(v)) return '未知';
+  if (v >= 70) return '极显';
+  if (v >= 58) return '偏高';
+  if (v > 42) return '居中';
+  if (v > 30) return '偏低';
+  return '极低';
+}
+
+/**
+ * 差值状态标签。
+ * |Δ| ≤ 10 → 高度同频（双高≥62 → 双高共振；双低≤38 → 双低共鸣）
+ * 15 ≤ |Δ| ≤ 35 → 张力互补　|Δ| > 35 → 显著分叉　其余 → 温和差异
+ */
+function diffBand(av, bv) {
+  const d = Math.abs(av - bv);
+  if (d <= 10) {
+    if (av >= 62 && bv >= 62) return { key: 'resonance-high', label: '双高共振' };
+    if (av <= 38 && bv <= 38) return { key: 'resonance-low', label: '双低共鸣' };
+    return { key: 'sync', label: '高度同频' };
+  }
+  if (d >= 15 && d <= 35) return { key: 'tension', label: '张力互补' };
+  if (d > 35) return { key: 'fork', label: '显著分叉' };
+  return { key: 'mild', label: '温和差异' };
+}
+
+/**
+ * 0–100 双人对照轨。
+ * A 点用 --cmp-a（金），B 点用 --cmp-b（楚石），两点之间是一条柔色连接带。
+ * 值过于接近时两点会重叠，自动向两侧微推。
+ */
+function dualTrack(av, bv, { numbers = true, compact = false } = {}) {
+  const a = clamp(Number(av), 0, 100);
+  const b = clamp(Number(bv), 0, 100);
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const crowded = Math.abs(a - b) < 9;
+
+  const track = el('span', { class: `dtrack${compact ? ' dtrack--sm' : ''}`, 'aria-hidden': 'true' });
+  track.appendChild(el('span', { class: 'dtrack__rule' }));
+  track.appendChild(el('span', { class: 'dtrack__mid' }));
+  track.appendChild(el('span', {
+    class: 'dtrack__band',
+    style: { left: `${lo}%`, width: `${Math.max(1.2, hi - lo)}%` },
+  }));
+
+  const dotA = el('span', {
+    class: `dtrack__dot dtrack__dot--a${crowded ? ' is-crowded' : ''}`,
+    style: { left: `${a}%` },
+  }, numbers ? [el('b', { text: String(Math.round(a)) })] : []);
+  const dotB = el('span', {
+    class: `dtrack__dot dtrack__dot--b${crowded ? ' is-crowded' : ''}`,
+    style: { left: `${b}%` },
+  }, numbers ? [el('b', { text: String(Math.round(b)) })] : []);
+  track.appendChild(dotA);
+  track.appendChild(dotB);
+
+  return track;
+}
+/** 展开面板：0fr → 1fr（与 guide-card__bodywrap 同一手法） */
+function disclosure(btn, panelCls, build) {
+  const wrap = el('div', { class: `${panelCls}__wrap` });
+  const inner = el('div', { class: `${panelCls}__inner` });
+  wrap.appendChild(inner);
+  let built = false;
+  let open = false;
+
+  const toggle = (next) => {
+    open = next === undefined ? !open : next;
+    if (open && !built) { inner.appendChild(build()); built = true; }
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const host = btn.closest('[data-openable]') || btn.closest('.eco-card');
+    if (host) host.classList.toggle('is-open', open);
+    wrap.setAttribute('data-open', open ? 'true' : 'false');
+  };
+
+  btn.addEventListener('click', () => toggle());
+  /* 面板内部点击不能回传给触发器（否则展开后点内容会把抽屉收起来） */
+  wrap.addEventListener('click', (e) => e.stopPropagation());
+  wrap.addEventListener('keydown', (e) => e.stopPropagation());
+  return { wrap, toggle };
+}
 
 /* ------------------------------------------------------------
    输入槽
    ------------------------------------------------------------ */
 
 function slotInput(key, label, initial, onParse, dimOrder = []) {
-  const color = SLOT_COLORS[key];
+  const COLORS = slotColors();
+  const color = key === 'a' ? COLORS.a : COLORS.b;
 
   const ta = el('textarea', {
     class: 'field field--code',
@@ -17135,7 +18199,10 @@ function slotInput(key, label, initial, onParse, dimOrder = []) {
       onParse(null);
       return;
     }
-    status.textContent = `${displayName(res.state)} · ${res.state.completedVolumes.length} 卷`;
+    const who = displayName(res.state, key === 'a' ? '我' : '对方');
+    status.textContent = res.isExpressOnly
+      ? `${who} · 极速速写`
+      : `${who} · ${res.state.completedVolumes.length} 卷`;
     status.className = 'cmp-slot__status is-ok';
     onParse(res.state);
   };
@@ -17168,7 +18235,7 @@ function renderCompare(root, ctx) {
     el('div', { class: 'eyebrow', style: { marginBottom: '14px' }, text: 'Soul Alignment · 双人对比' }),
     el('h1', { text: '两个人的暗线' }),
     el('p', {
-      text: '把两份存档码放进同一个房间。系统只比较你们共同完成的卷宗——不必强迫任何一方做满 152 题。它会算出你们的价值共振、性格互补，以及那些最容易在深夜引爆的阴影碰撞。',
+      text: '把两份存档码放进同一个房间。系统只比较你们真正都测过的那批维度——不必强迫任何一方做满 152 题。它会算出你们的价值共振、性格互补，以及那些最容易在深夜引爆的阴影碰撞。',
     }),
   ]));
 
@@ -17177,12 +18244,16 @@ function renderCompare(root, ctx) {
 
   const resultBox = el('div', { id: 'cmp-result' });
 
-  const selfCode = App.state.completedVolumes.length ? soulCode() : '';
+  /* 自己有分就自动填：completedVolumes 为空但做过 28 题极速版的人，
+     同样应该能直接开合盘。 */
+  const selfHasData = (App.state.completedVolumes || []).length > 0
+    || Object.keys(App.state.computedScores || {}).some((d) => Number.isFinite(App.state.computedScores[d]));
+  const selfCode = selfHasData ? soulCode() : '';
 
   const form = el('div', { class: 'cmp-form' });
 
   const slotA = slotInput('a', 'A · 你', selfCode, (s) => {
-    stateA = s ? hydrate({ ...s, nickname: s.nickname || App.state.nickname || '你' }) : null;
+    stateA = s ? hydrate({ ...s, nickname: s.nickname || App.state.nickname || '' }) : null;
     maybeRender();
   }, DATA.dimOrder);
   const slotB = slotInput('b', 'B · 对方', '', (s) => {
@@ -17213,8 +18284,8 @@ function renderCompare(root, ctx) {
         resultBox.innerHTML = '';
       },
     }),
-    !App.state.completedVolumes.length
-      ? el('span', { class: 'chip', style: { alignSelf: 'center', padding: '8px 14px' }, text: '先完成至少一卷，才能生成你自己的存档码' })
+    !selfHasData
+      ? el('span', { class: 'chip', style: { alignSelf: 'center', padding: '8px 14px' }, text: '先做完 28 题极速版或一卷完整卷宗，才能生成你自己的存档码' })
       : null,
   ]);
   wrap.appendChild(actions);
@@ -17261,17 +18332,22 @@ function renderResult(box, A, B, { DATA, col }) {
   box.innerHTML = '';
   const res = compareStates(A, B, DATA);
 
-  const nameA = displayName(A, 'A');
-  const nameB = displayName(B, 'B');
+  const COL = slotColors();
+  const nameA = displayName(A, '我');
+  const nameB = displayName(B, '对方');
 
   if (!res.ok) {
     box.appendChild(el('div', { class: 'empty', style: { marginTop: '30px' } }, [
-      el('h3', { text: '还没有可比较的交集' }),
+      el('h3', { text: '可比维度还不够' }),
       el('p', { text: res.reason || '' }),
       el('a', { class: 'btn', href: '#/', text: '返回卷宗大厅' }),
     ]));
     return;
   }
+
+  /* 极速档：一卷都没标记完成，但双方有几十个共同维度。
+     文案不能再提「交汇卷宗」，否则会出现「交汇卷宗：」后面一片空白。 */
+  const pairLabel = res.isExpressPair ? '极速速写' : `${res.common.length} 卷`;
 
   /* ---------- 判词 ---------- */
   const verdict = el('div', { class: 'cmp-verdict' });
@@ -17287,7 +18363,7 @@ function renderResult(box, A, B, { DATA, col }) {
     el('div', { class: 'cmp-metrics' }, [
       el('div', {}, [
         el('dt', { text: '交汇卷宗' }),
-        el('dd', { text: `${res.common.length} 卷` }),
+        el('dd', { text: pairLabel }),
       ]),
       el('div', {}, [
         el('dt', { text: '可比维度' }),
@@ -17342,7 +18418,7 @@ function renderResult(box, A, B, { DATA, col }) {
         .filter(Boolean);
       radarBody.appendChild(ecologySvg(ordered, {
         width: 520,
-        color: SLOT_COLORS.a,
+        color: COL.a,
         colorText: col('--text-primary'),
         colorMuted: col('--text-tertiary'),
         colorBorder: col('--border'),
@@ -17352,7 +18428,7 @@ function renderResult(box, A, B, { DATA, col }) {
       radarCard.appendChild(radarBody);
       box.appendChild(radarCard);
 
-      /* 六张卡 */
+      /* 六张卡 —— 每张底部可展开逐维拆解 */
       const ecoGrid = el('div', { class: 'eco-grid' });
       ordered.forEach((r) => {
         const isBest = r.id === eco.best?.id;
@@ -17372,6 +18448,63 @@ function renderResult(box, A, B, { DATA, col }) {
             : null,
           isBest ? el('div', { class: 'eco-card__badge', text: '最佳生态位' }) : null,
         ]);
+
+        const toggleBtn = el('button', {
+          class: 'eco-break__toggle',
+          type: 'button',
+          'aria-expanded': 'false',
+          text: `查看 ${r.parts.length} 项拆解 ↓`,
+        });
+
+        const panel = disclosure(toggleBtn, 'eco-break', () => {
+          const body = el('div', { class: 'eco-break__body' });
+
+          /* 逐项拆解：维度名 + 匹配法则 + 双人分 + 双点对照轨 + 贡献分/权重 */
+          r.parts.forEach((p) => {
+            const name = DATA.dimMap[p.id]?.name || p.id;
+            body.appendChild(el('div', { class: 'eco-prow' }, [
+              el('div', { class: 'eco-prow__head' }, [
+                el('span', { class: 'eco-prow__name', text: name }),
+                el('span', { class: 'eco-prow__kind', text: KIND_LABEL[p.kind] || p.kind }),
+              ]),
+              el('div', { class: 'eco-prow__scores' }, [
+                el('span', { class: 'eco-prow__ab' }, [
+                  el('i', { class: 'is-a', text: nameA }),
+                  el('b', { text: String(Math.round(p.av)) }),
+                  el('em', { text: 'vs' }),
+                  el('i', { class: 'is-b', text: nameB }),
+                  el('b', { text: String(Math.round(p.bv)) }),
+                ]),
+                el('span', {
+                  class: 'eco-prow__contrib',
+                  text: `贡献 ${round(p.score, 1)} · 权重 ${p.w}`,
+                }),
+              ]),
+              dualTrack(p.av, p.bv, { numbers: false, compact: true }),
+            ]));
+          });
+
+          /* 扣分雷区明细 */
+          if (r.hits.length) {
+            body.appendChild(el('div', { class: 'eco-break__hits' }, [
+              el('div', { class: 'eco-break__hits-h', text: `扣分雷区 · ${r.hits.length} 处` }),
+              ...r.hits.map((h) => el('div', { class: 'eco-prow eco-prow--hit' }, [
+                el('span', { class: 'eco-prow__name', text: h.label }),
+                el('span', { class: 'eco-prow__contrib', text: `− ${h.w}` }),
+              ])),
+            ]));
+          }
+
+          body.appendChild(el('p', {
+            class: 'eco-break__foot',
+            text: `校准后加权 ${round(r.weighted, 1)} · 原始均值 ${round(r.raw, 1)} · 雷区合计 −${round(r.penalty, 1)} → ${round(r.value, 1)}`,
+          }));
+
+          return body;
+        });
+
+        card.appendChild(el('div', { class: 'eco-break__foot-zone' }, [toggleBtn]));
+        card.appendChild(panel.wrap);
         ecoGrid.appendChild(card);
       });
       box.appendChild(ecoGrid);
@@ -17442,15 +18575,15 @@ function renderResult(box, A, B, { DATA, col }) {
         colorBorder: col('--border'),
         bg: col('--bg-card'),
         series: [
-          { name: nameA, values: radarList.map((d) => A.computedScores[d.id]), color: SLOT_COLORS.a, fillOpacity: 0.1 },
-          { name: nameB, values: radarList.map((d) => B.computedScores[d.id]), color: SLOT_COLORS.b, fillOpacity: 0.1 },
+          { name: nameA, values: radarList.map((d) => A.computedScores[d.id]), color: COL.a, fillOpacity: 0.1 },
+          { name: nameB, values: radarList.map((d) => B.computedScores[d.id]), color: COL.b, fillOpacity: 0.1 },
         ],
         labelSize: 10.5,
       },
     ));
     body.appendChild(el('div', { class: 'chart-legend' }, [
-      el('span', { style: { color: SLOT_COLORS.a }, html: `<i></i>${nameA}` }),
-      el('span', { style: { color: SLOT_COLORS.b }, html: `<i></i>${nameB}` }),
+      el('span', { style: { color: COL.a }, html: `<i></i>${nameA}` }),
+      el('span', { style: { color: COL.b }, html: `<i></i>${nameB}` }),
     ]));
     card.appendChild(body);
     box.appendChild(card);
@@ -17497,7 +18630,7 @@ function renderResult(box, A, B, { DATA, col }) {
         },
       }, [
         el('div', { style: { fontSize: '12px', color: 'var(--text-secondary)' }, text: name }),
-        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${SLOT_COLORS.a}">${Math.round(av)}</span> · <span style="color:${SLOT_COLORS.b}">${Math.round(bv)}</span>` }),
+        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${COL.a}">${Math.round(av)}</span> · <span style="color:${COL.b}">${Math.round(bv)}</span>` }),
         el('div', { style: { fontSize: '10.5px', letterSpacing: '0.08em', color: 'var(--text-tertiary)' }, text: `差 ${Math.round(r.diff)}` }),
       ]));
     });
@@ -17551,11 +18684,19 @@ function renderResult(box, A, B, { DATA, col }) {
         },
       }, [
         el('div', { style: { fontSize: '12px', color: 'var(--text-secondary)' }, text: name }),
-        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${SLOT_COLORS.a}">${Math.round(r.a)}</span> ↔ <span style="color:${SLOT_COLORS.b}">${Math.round(r.b)}</span>` }),
+        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${COL.a}">${Math.round(r.a)}</span> ↔ <span style="color:${COL.b}">${Math.round(r.b)}</span>` }),
         el('div', { style: { fontSize: '10.5px', letterSpacing: '0.08em', color: 'var(--text-tertiary)' }, text: `差 ${Math.round(r.diff)}` }),
       ]));
     });
     box.appendChild(card);
+  }
+
+  {
+    /* 全维度双人逐项显微镜 −− 放在六大生态位之后、三幕剧之前 */
+    const micro = microSection({
+      rows: res.rows || [], A, B, DATA, nameA, nameB,
+    });
+    if (micro) box.appendChild(micro);
   }
 
   /* ---------- 关系三幕剧 · 潜台词 · 红黑榜 ---------- */
@@ -17665,9 +18806,265 @@ function renderResult(box, A, B, { DATA, col }) {
       display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'space-between',
     },
   }, [
-    el('span', { text: `交汇卷宗：${res.common.map((v) => DATA.volumes[v]?.title || v).join(' · ')}` }),
+    el('span', {
+      text: res.isExpressPair
+        ? '交汇卷宗：极速速写 · 双方各自完成 28 题，按可比维度直接对齐'
+        : `交汇卷宗：${res.common.map((v) => DATA.volumes[v]?.title || v).join(' · ')}`,
+    }),
     el('span', { text: '全部计算在本地完成，双方数据均未离开设备' }),
   ]));
+}
+
+/* ------------------------------------------------------------
+   全维度双人逐项显微镜
+   · 4 种视图：按 16 卷分组 / 高度同频 / 最大反差 / 黄金互补
+   · 卷宗筛选 + 关键词搜索
+   · 每行 0–100 双人哑铃轨，点击展开单维深度释义
+   ------------------------------------------------------------ */
+
+/** 维度 → 所属卷短标（Vol.7） */
+function volTagOf(DATA, dim) {
+  const v = DATA.dimMap?.[dim]?.volume || '';
+  const n = Number(String(v).replace(/[^0-9]/g, ''));
+  return Number.isFinite(n) && n > 0 ? `Vol.${n}` : '';
+}
+
+function volIndex(DATA, dim) {
+  const v = DATA.dimMap?.[dim]?.volume || '';
+  const n = Number(String(v).replace(/[^0-9]/g, ''));
+  return Number.isFinite(n) ? n : 99;
+}
+
+/** 单维对比提示：一句人话 */
+function contrastHint(dim, av, bv, nameA, nameB, DATA) {
+  const label = DATA.dimMap?.[dim]?.name || dim;
+  const d = Math.round(Math.abs(av - bv));
+  const band = diffBand(av, bv);
+  const tail = {
+    'resonance-high': '你们都在高位，这件事上不需要解释就能对齐，也很容易一起高估风险。',
+    'resonance-low': '你们都在低位，这一块是共同的空白区——没人负责，也很少有人抱怨。',
+    sync: '两人读同一本书的同一页，分歧通常只发生在细节上。',
+    tension: '容易在遇到此类场景时形成一攻一守的节奏差。',
+    fork: '这是你们最容易互相误读的一处，同一件事会被翻译成两种完全不同的意思。',
+    mild: '差异不大，但在压力大的时候会被放大成小摩擦。',
+  }[band.key] || '';
+  return `${nameA}在此项${toneLabel(av)}（${Math.round(av)}），${nameB}${toneLabel(bv)}（${Math.round(bv)}），差值 ${d} 分 —— ${tail}（${label} · ${band.label}）`;
+}
+
+/** 单维深度释义面板 */
+function microPanel(dim, av, bv, nameA, nameB, DATA) {
+  const m = DATA.mirrors?.[dim];
+  const body = el('div', { class: 'cmp-mpanel__body' });
+
+  if (!m) {
+    body.appendChild(el('p', { class: 'cmp-mpanel__hint', text: '该维度暂无四面镜释义。' }));
+    return body;
+  }
+
+  const faceOf = (v) => (v >= 50 ? m.high : m.low) || m.high || null;
+
+  [
+    { who: nameA, v: av, cls: 'is-a' },
+    { who: nameB, v: bv, cls: 'is-b' },
+  ].forEach(({ who, v, cls }) => {
+    const face = faceOf(v);
+    if (!face) return;
+    const col = el('div', { class: `cmp-mface ${cls}` }, [
+      el('div', { class: 'cmp-mface__head' }, [
+        el('span', { class: 'cmp-mface__who', text: who }),
+        el('span', { class: 'cmp-mface__label', text: face.label || '' }),
+      ]),
+      el('div', { class: 'cmp-mface__gift' }, [
+        el('b', { text: face.gift_title || '' }),
+        el('span', { text: face.gift_desc || '' }),
+      ]),
+      el('div', { class: 'cmp-mface__shadow' }, [
+        el('b', { text: face.shadow_title || '' }),
+        el('span', { text: face.shadow_desc || '' }),
+      ]),
+      face.alchemy_tip
+        ? el('div', { class: 'cmp-mface__tip', text: face.alchemy_tip })
+        : null,
+    ]);
+    body.appendChild(col);
+  });
+
+  body.appendChild(el('p', {
+    class: 'cmp-mpanel__hint',
+    text: contrastHint(dim, av, bv, nameA, nameB, DATA),
+  }));
+
+  return body;
+}
+
+function microSection({ rows, A, B, DATA, nameA, nameB }) {
+  if (!rows || !rows.length) return null;
+
+  const valid = rows.filter((r) => Number.isFinite(r.a) && Number.isFinite(r.b));
+  if (!valid.length) return null;
+
+  const section = el('section', { class: 'cmp-micro', id: 'cmp-micro' });
+
+  section.appendChild(el('div', { class: 'section-head' }, [
+    el('div', { class: 'cmp-micro__title' }, [
+      el('span', { class: 'cmp-micro__no', text: '04' }),
+      el('h2', { text: '全维度双人逐项显微镜' }),
+    ]),
+    el('div', {
+      class: 'section-head__hint',
+      text: `${valid.length} 个可比维度 · 点击任意一行展开单维深度释义`,
+    }),
+  ]));
+
+  /* ---------- 顶部固定图例条 ---------- */
+  const legend = el('div', { class: 'cmp-micro__legend' }, [
+    el('span', { class: 'cmp-legend__item' }, [el('i', { class: 'is-a' }), el('span', { text: nameA })]),
+    el('span', { class: 'cmp-legend__item' }, [el('i', { class: 'is-b' }), el('span', { text: nameB })]),
+    el('span', { class: 'cmp-legend__mid', text: '中线 50 为人群中性' }),
+  ]);
+  section.appendChild(legend);
+
+  /* ---------- 工具栏 ---------- */
+  const MODES = [
+    { id: 'group', label: '按 16 卷分组' },
+    { id: 'sync', label: '高度同频' },
+    { id: 'gap', label: '最大反差' },
+    { id: 'golden', label: '黄金互补' },
+  ];
+  let mode = 'group';
+  let volFilter = 'all';
+  let keyword = '';
+
+  const toolbar = el('div', { class: 'cmp-micro__bar' });
+
+  const pillRow = el('div', { class: 'cmp-micro__pills', role: 'group', 'aria-label': '视图切换' });
+  const pillNodes = new Map();
+  MODES.forEach((m) => {
+    const b = el('button', {
+      class: `cmp-pill${m.id === mode ? ' is-on' : ''}`,
+      type: 'button',
+      'aria-pressed': m.id === mode ? 'true' : 'false',
+      text: m.label,
+      onclick: () => {
+        mode = m.id;
+        pillNodes.forEach((node, id) => {
+          node.classList.toggle('is-on', id === mode);
+          node.setAttribute('aria-pressed', id === mode ? 'true' : 'false');
+        });
+        paint();
+      },
+    });
+    pillNodes.set(m.id, b);
+    pillRow.appendChild(b);
+  });
+  toolbar.appendChild(pillRow);
+
+  /* 卷宗筛选：只列出双方真正有可比维度的卷 */
+  const volSet = new Map();
+  valid.forEach((r) => {
+    const v = DATA.dimMap?.[r.dim]?.volume;
+    if (!v) return;
+    volSet.set(v, (volSet.get(v) || 0) + 1);
+  });
+  const volSorted = Array.from(volSet.keys()).sort((x, y) => volIndex(DATA, x) - volIndex(DATA, y));
+
+  const select = el('select', { class: 'cmp-micro__select', 'aria-label': '卷宗筛选' });
+  select.appendChild(el('option', { value: 'all', text: `全部卷宗 · ${valid.length} 维` }));
+  volSorted.forEach((v) => {
+    const n = Number(String(v).replace(/[^0-9]/g, ''));
+    select.appendChild(el('option', {
+      value: v,
+      text: `${n ? `Vol.${n}` : v} · ${volSet.get(v)} 维`,
+    }));
+  });
+  select.addEventListener('change', () => { volFilter = select.value; paint(); });
+  toolbar.appendChild(select);
+
+  const search = el('input', {
+    class: 'cmp-micro__search',
+    type: 'search',
+    placeholder: '搜索维度名，例如「共情」',
+    'aria-label': '按维度中文名过滤',
+  });
+  search.addEventListener('input', () => { keyword = search.value.trim(); paint(); });
+  toolbar.appendChild(search);
+
+  section.appendChild(toolbar);
+
+  /* ---------- 列表 ---------- */
+  const list = el('div', { class: 'cmp-micro__list' });
+  const counter = el('div', { class: 'cmp-micro__count', text: '' });
+  section.appendChild(list);
+  section.appendChild(counter);
+
+  function paint() {
+    list.innerHTML = '';
+
+    let picked = valid.filter((r) => {
+      if (volFilter !== 'all' && DATA.dimMap?.[r.dim]?.volume !== volFilter) return false;
+      if (!keyword) return true;
+      const name = DATA.dimMap?.[r.dim]?.name || r.dim;
+      return name.includes(keyword) || String(r.dim).includes(keyword);
+    });
+
+    if (mode === 'golden') {
+      picked = picked.filter((r) => {
+        const d = Math.abs(r.a - r.b);
+        return d >= 15 && d <= 35;
+      });
+    }
+
+    if (mode === 'sync') picked.sort((x, y) => Math.abs(x.a - x.b) - Math.abs(y.a - y.b));
+    else if (mode === 'gap') picked.sort((x, y) => Math.abs(y.a - y.b) - Math.abs(x.a - x.b));
+    else if (mode === 'golden') picked.sort((x, y) => Math.abs(25 - Math.abs(x.a - x.b)) - Math.abs(25 - Math.abs(y.a - y.b)));
+    else {
+      picked.sort((x, y) => (volIndex(DATA, x.dim) - volIndex(DATA, y.dim))
+        || String(DATA.dimMap?.[x.dim]?.name || x.dim).localeCompare(String(DATA.dimMap?.[y.dim]?.name || y.dim), 'zh'));
+    }
+
+    if (!picked.length) {
+      list.appendChild(el('div', { class: 'cmp-micro__empty', text: mode === 'golden'
+        ? '当前筛选下没有落在 15–35 分差区间的维度 —— 你们在剩下的维度上要么太像，要么分得太开。'
+        : '没有匹配的维度，试试清空搜索词或切换卷宗。' }));
+      counter.textContent = '';
+      return;
+    }
+
+    picked.forEach((r) => {
+      const band = diffBand(r.a, r.b);
+      const row = el('div', {
+        class: 'cmp-mrow',
+        'data-openable': '',
+        role: 'button',
+        tabindex: '0',
+        'aria-expanded': 'false',
+      }, [
+        el('div', { class: 'cmp-mrow__lead' }, [
+          el('span', { class: 'cmp-mrow__name', text: DATA.dimMap?.[r.dim]?.name || r.dim }),
+          el('span', { class: 'cmp-mrow__vol', text: volTagOf(DATA, r.dim) }),
+        ]),
+        dualTrack(r.a, r.b, { numbers: true }),
+        el('div', { class: 'cmp-mrow__tail' }, [
+          el('span', { class: `cmp-delta is-${band.key}`, text: `Δ ${Math.round(Math.abs(r.a - r.b))}` }),
+          el('span', { class: `cmp-band is-${band.key}`, text: band.label }),
+        ]),
+      ]);
+
+      const panel = disclosure(row, 'cmp-mpanel', () => microPanel(r.dim, r.a, r.b, nameA, nameB, DATA));
+      row.appendChild(panel.wrap);
+
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+      });
+
+      list.appendChild(row);
+    });
+
+    counter.textContent = `显示 ${picked.length} / ${valid.length} 个可比维度`;
+  }
+
+  paint();
+  return section;
 }
 
 /* ───────── src/core/express.js ───────── */
@@ -17869,12 +19266,20 @@ function renderExpressResult(root, ctx) {
   const state = App.state;
   const vol = buildExpressVolume(DATA, DATA.express);
 
-  // 把虚拟桶的答案写回真实卷，然后重算
-  const moved = commitExpress(state, vol);
-  if (moved) {
-    save(state, { immediate: true });
-    recompute({ silent: true });
-  }
+  /* ---------- 出码时序（P0 · 28 题存档码） ----------
+     commitExpress（虚拟桶 → 原卷）
+       → recompute（内部走 resolveEffectiveComputed：computeAll + 双源融合）
+       → state.computedScores / zScores / maskIndex / topValues 落盘
+       → encodeSoulCode（下方用的就是这份 state）
+     以前只有 moved > 0 才 recompute：直接刷新 #/express/result、
+     或答案已在原卷里而虚拟桶为空时，computedScores 可能还是空的，
+     生成的存档码会只有 0 个维度分。现在无条件重算一次。 */
+  commitExpress(state, vol);
+  recompute({ silent: true });
+
+  /* 展示层一律看融合后的分：就算某次 recompute 被主线程挤掉，
+     也不会把一份有分的极速档渲染成「已测维度 0」。 */
+  const eff = resolveEffectiveComputed(state, DATA);
 
   const answers = state.answersByVolume || {};
   const answeredCount = vol.questions.filter((q) => {
@@ -17898,7 +19303,7 @@ function renderExpressResult(root, ctx) {
 
   /* ---------- 得分 ---------- */
   const dims = (vol.dimensions || [])
-    .map((d) => ({ id: d, score: state.computedScores?.[d] }))
+    .map((d) => ({ id: d, score: eff.scores?.[d] ?? state.computedScores?.[d] }))
     .filter((d) => Number.isFinite(d.score));
 
   const gifts = topGifts(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
@@ -18033,6 +19438,9 @@ function renderExpressResult(root, ctx) {
   ]));
   const codeBody = el('div', { class: 'chart-card__body' });
   try {
+    /* 出码前再落一次盘：确保 encodeSoulCode 读到的是刚写入的 computedScores，
+       而不是空闲帧里还没合并的旧对象。 */
+    save(state, { immediate: true });
     const code = encodeSoulCode(state, DATA.dimOrder);
     codeBox.textContent = code;
   } catch {
@@ -18410,6 +19818,7 @@ function labelOf(dim, dimMap) {
 
 
 
+
 /* ------------------------------------------------------------
    1. 生态位角色
    ------------------------------------------------------------ */
@@ -18545,25 +19954,48 @@ function roleMeta(id) {
    ------------------------------------------------------------ */
 
 /**
+ * 缘分热力矩阵。
+ *
+ * v5.3：小队里可能混进「只做过 28 题极速版」的成员 —— 他们的 state 里
+ * completedVolumes 为空，只有 computedScores。这里不再依赖任何卷交集，
+ * 直接按维度对齐；每个格子都用 Number.isFinite 兜底，矩阵里永不出现 NaN。
+ *
  * @returns {{ matrix: number[][], best: {i,j,score}, worst: {i,j,score} }}
  */
 function affinityMatrix(members, DATA) {
   const n = members.length;
   const matrix = Array.from({ length: n }, () => Array(n).fill(null));
 
+  /* 每个成员先洗成「分数齐全再进合盘」的形态：
+     只有 answersByVolume 的成员靠融合补分，已带 computedScores 的成员原样保留。 */
+  const states = members.map((m) => {
+    const st = m?.state || {};
+    if (Object.values(st.computedScores || {}).some(Number.isFinite)) return st;
+    const eff = resolveEffectiveComputed(st, DATA);
+    return {
+      ...st,
+      computedScores: eff.scores,
+      zScores: eff.zScores,
+      maskIndex: eff.mask?.value ?? st.maskIndex ?? null,
+    };
+  });
+
   for (let i = 0; i < n; i += 1) {
     matrix[i][i] = 100;
     for (let j = i + 1; j < n; j += 1) {
       let score = null;
       try {
-        const res = compareStates(members[i].state, members[j].state, DATA);
-        if (res?.ok && Number.isFinite(res.overall)) score = round(res.overall, 1);
+        const res = compareStates(states[i], states[j], DATA);
+        const v = res?.overall;
+        if (res?.ok && Number.isFinite(v)) score = round(clamp(v, 0, 100), 1);
       } catch {
         score = null;
       }
-      matrix[i][j] = score;
-      matrix[j][i] = score;
+      /* 极端兜底：上面任何一步算出一个非有限值，都归为「不可比」，而不是 NaN。 */
+      matrix[i][j] = Number.isFinite(score) ? score : null;
+      matrix[j][i] = matrix[i][j];
     }
+    if (!Number.isFinite(matrix[i][i])) matrix[i][i] = 100;
   }
 
   const pairs = [];
@@ -20079,36 +21511,36 @@ function applyTheme(theme) {
    计分刷新
    ------------------------------------------------------------ */
 
+/**
+ * 重算并落盘。
+ *
+ * v5.2.2 关键修复（P0 · 导入存档码后报告页空态）：
+ *   旧实现是 `s.computedScores = {}` 后再用 computeAll() 的结果回填。
+ *   但 HA4- 存档码只带分数不带 answersByVolume，导入后 computeAll()
+ *   对每个维度都返回 null，于是导入的 60–99 个维度被整对象洗白，
+ *   报告页门禁（已测维度数 = 0）直接把用户拦成「档案尚未启封」。
+ *   现在改用 resolveEffectiveComputed()：以已有分数为底盘，
+ *   只用 live 中【有限】的值覆盖，null 永远不参与写入。
+ */
 function recompute({ silent = true } = {}) {
   const s = App.state;
 
-  // 逐卷算分并写回
-  const all = computeAll(s, DATA);
-  s.computedScores = {};
-  for (const d of DIM_ORDER) {
-    const v = all.scores[d];
-    if (Number.isFinite(v)) s.computedScores[d] = v;
-  }
+  const eff = resolveEffectiveComputed(s, DATA);
 
-  // 个人内部相对尖峰：报告的「王牌天赋 / 阴影预警」按 |Z| 排序时才用得到
-  s.zScores = {};
-  for (const d of DIM_ORDER) {
-    const z = all.zScores?.[d];
-    if (Number.isFinite(z)) s.zScores[d] = z;
-  }
+  s.computedScores = eff.scores;
+  s.zScores = eff.zScores;
 
-  const mask = maskIndex(s, DATA);
-  s.maskIndex = mask.value === null ? null : mask.value;
-  s.maskDetail = mask;
+  s.maskIndex = eff.mask?.value === null || eff.mask?.value === undefined ? null : eff.mask.value;
+  s.maskDetail = eff.maskDetail;
 
   // Top3 价值
-  s.topValues = all.topValues || [];
+  s.topValues = eff.topValues || [];
 
   // 压力退行态
-  s.pressureStyle = all.pressure || null;
+  s.pressureStyle = eff.pressure || null;
 
   save(s, { immediate: silent });
-  return all;
+  return eff.live;
 }
 
 /* ------------------------------------------------------------
@@ -20135,6 +21567,8 @@ function importSoulCode(text, { merge = true } = {}) {
     if (!s.topValues?.length) s.topValues = incoming.topValues || [];
     save(s, { immediate: true });
   }
+  /* recompute() 现在走 resolveEffectiveComputed()，
+     刚合并进来的导入分数不会再被空作答池洗掉。 */
   recompute({ silent: true });
   return { ok: true, state: App.state };
 }

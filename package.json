@@ -21,7 +21,8 @@
     "audit": "node tests/audit.mjs 10000",
     "audit:quick": "node tests/audit.mjs 1000",
     "build:pages": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node scripts/build-single.js && node scripts/build.js",
-    "test:v52": "node tests/audit-v52.mjs"
+    "test:v52": "node tests/audit-v52.mjs",
+    "studio": "node local-studio/server.mjs"
   },
   "engines": {
     "node": ">=18"

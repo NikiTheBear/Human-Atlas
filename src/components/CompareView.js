@@ -5,7 +5,7 @@
    · 共振 / 互补 / 阴影碰撞三段结论
    ============================================================ */
 
-import { el, round, toast } from '../core/utils.js';
+import { el, round, toast, clamp } from '../core/utils.js';
 import { decodeSoulCode } from '../core/storage.js';
 import { compareStates, displayName } from '../core/comparator.js';
 import { radarSvg } from '../viz/radarSvg.js';
@@ -15,14 +15,124 @@ import {
   CONFIDENCE_LABEL,
 } from '../core/ecology.js';
 
-const SLOT_COLORS = { a: '#8C4A32', b: '#3B4D70' };
+/* A/B 两点专属色：优先读 styles/main.css 里的 --cmp-a / --cmp-b（日夜双轨），
+   这里的常量只作为 getComputedStyle 不可用（如 SSR / 测试环境）时的兜底：
+     #9a7b45 = tokens.css 白昼档 --gold（与 var(--gold) 同值，不是新色）；
+     #8c4a32 = B 点专属陶土赭，全项目唯一新增裸 hex。 */
+const SLOT_FALLBACK = { a: '#9a7b45', b: '#8c4a32' };
+
+/* 生态位「匹配法则」小徽章文案 */
+const KIND_LABEL = {
+  syncHigh: '双高同频',
+  tension: '互补张力',
+  syncLow: '双低稳态',
+  sync: '相近同步',
+  bothHigh: '强强对撞',
+};
+
+function slotColors() {
+  if (typeof document === 'undefined') return { ...SLOT_FALLBACK };
+  const cs = getComputedStyle(document.documentElement);
+  const a = cs.getPropertyValue('--cmp-a').trim() || SLOT_FALLBACK.a;
+  const b = cs.getPropertyValue('--cmp-b').trim() || SLOT_FALLBACK.b;
+  return { a, b };
+}
+
+/* ------------------------------------------------------------
+   小工具：档位描述 / 差值状态 / 双人哑铃对照轨
+   ------------------------------------------------------------ */
+
+/** 绝对分 → 一句档位描述，用于自动生成的对比提示 */
+function toneLabel(v) {
+  if (!Number.isFinite(v)) return '未知';
+  if (v >= 70) return '极显';
+  if (v >= 58) return '偏高';
+  if (v > 42) return '居中';
+  if (v > 30) return '偏低';
+  return '极低';
+}
+
+/**
+ * 差值状态标签。
+ * |Δ| ≤ 10 → 高度同频（双高≥62 → 双高共振；双低≤38 → 双低共鸣）
+ * 15 ≤ |Δ| ≤ 35 → 张力互补　|Δ| > 35 → 显著分叉　其余 → 温和差异
+ */
+function diffBand(av, bv) {
+  const d = Math.abs(av - bv);
+  if (d <= 10) {
+    if (av >= 62 && bv >= 62) return { key: 'resonance-high', label: '双高共振' };
+    if (av <= 38 && bv <= 38) return { key: 'resonance-low', label: '双低共鸣' };
+    return { key: 'sync', label: '高度同频' };
+  }
+  if (d >= 15 && d <= 35) return { key: 'tension', label: '张力互补' };
+  if (d > 35) return { key: 'fork', label: '显著分叉' };
+  return { key: 'mild', label: '温和差异' };
+}
+
+/**
+ * 0–100 双人对照轨。
+ * A 点用 --cmp-a（金），B 点用 --cmp-b（楚石），两点之间是一条柔色连接带。
+ * 值过于接近时两点会重叠，自动向两侧微推。
+ */
+function dualTrack(av, bv, { numbers = true, compact = false } = {}) {
+  const a = clamp(Number(av), 0, 100);
+  const b = clamp(Number(bv), 0, 100);
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const crowded = Math.abs(a - b) < 9;
+
+  const track = el('span', { class: `dtrack${compact ? ' dtrack--sm' : ''}`, 'aria-hidden': 'true' });
+  track.appendChild(el('span', { class: 'dtrack__rule' }));
+  track.appendChild(el('span', { class: 'dtrack__mid' }));
+  track.appendChild(el('span', {
+    class: 'dtrack__band',
+    style: { left: `${lo}%`, width: `${Math.max(1.2, hi - lo)}%` },
+  }));
+
+  const dotA = el('span', {
+    class: `dtrack__dot dtrack__dot--a${crowded ? ' is-crowded' : ''}`,
+    style: { left: `${a}%` },
+  }, numbers ? [el('b', { text: String(Math.round(a)) })] : []);
+  const dotB = el('span', {
+    class: `dtrack__dot dtrack__dot--b${crowded ? ' is-crowded' : ''}`,
+    style: { left: `${b}%` },
+  }, numbers ? [el('b', { text: String(Math.round(b)) })] : []);
+  track.appendChild(dotA);
+  track.appendChild(dotB);
+
+  return track;
+}
+/** 展开面板：0fr → 1fr（与 guide-card__bodywrap 同一手法） */
+function disclosure(btn, panelCls, build) {
+  const wrap = el('div', { class: `${panelCls}__wrap` });
+  const inner = el('div', { class: `${panelCls}__inner` });
+  wrap.appendChild(inner);
+  let built = false;
+  let open = false;
+
+  const toggle = (next) => {
+    open = next === undefined ? !open : next;
+    if (open && !built) { inner.appendChild(build()); built = true; }
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const host = btn.closest('[data-openable]') || btn.closest('.eco-card');
+    if (host) host.classList.toggle('is-open', open);
+    wrap.setAttribute('data-open', open ? 'true' : 'false');
+  };
+
+  btn.addEventListener('click', () => toggle());
+  /* 面板内部点击不能回传给触发器（否则展开后点内容会把抽屉收起来） */
+  wrap.addEventListener('click', (e) => e.stopPropagation());
+  wrap.addEventListener('keydown', (e) => e.stopPropagation());
+  return { wrap, toggle };
+}
 
 /* ------------------------------------------------------------
    输入槽
    ------------------------------------------------------------ */
 
 function slotInput(key, label, initial, onParse, dimOrder = []) {
-  const color = SLOT_COLORS[key];
+  const COLORS = slotColors();
+  const color = key === 'a' ? COLORS.a : COLORS.b;
 
   const ta = el('textarea', {
     class: 'field field--code',
@@ -75,7 +185,10 @@ function slotInput(key, label, initial, onParse, dimOrder = []) {
       onParse(null);
       return;
     }
-    status.textContent = `${displayName(res.state)} · ${res.state.completedVolumes.length} 卷`;
+    const who = displayName(res.state, key === 'a' ? '我' : '对方');
+    status.textContent = res.isExpressOnly
+      ? `${who} · 极速速写`
+      : `${who} · ${res.state.completedVolumes.length} 卷`;
     status.className = 'cmp-slot__status is-ok';
     onParse(res.state);
   };
@@ -108,7 +221,7 @@ export function renderCompare(root, ctx) {
     el('div', { class: 'eyebrow', style: { marginBottom: '14px' }, text: 'Soul Alignment · 双人对比' }),
     el('h1', { text: '两个人的暗线' }),
     el('p', {
-      text: '把两份存档码放进同一个房间。系统只比较你们共同完成的卷宗——不必强迫任何一方做满 152 题。它会算出你们的价值共振、性格互补，以及那些最容易在深夜引爆的阴影碰撞。',
+      text: '把两份存档码放进同一个房间。系统只比较你们真正都测过的那批维度——不必强迫任何一方做满 152 题。它会算出你们的价值共振、性格互补，以及那些最容易在深夜引爆的阴影碰撞。',
     }),
   ]));
 
@@ -117,12 +230,16 @@ export function renderCompare(root, ctx) {
 
   const resultBox = el('div', { id: 'cmp-result' });
 
-  const selfCode = App.state.completedVolumes.length ? soulCode() : '';
+  /* 自己有分就自动填：completedVolumes 为空但做过 28 题极速版的人，
+     同样应该能直接开合盘。 */
+  const selfHasData = (App.state.completedVolumes || []).length > 0
+    || Object.keys(App.state.computedScores || {}).some((d) => Number.isFinite(App.state.computedScores[d]));
+  const selfCode = selfHasData ? soulCode() : '';
 
   const form = el('div', { class: 'cmp-form' });
 
   const slotA = slotInput('a', 'A · 你', selfCode, (s) => {
-    stateA = s ? hydrate({ ...s, nickname: s.nickname || App.state.nickname || '你' }) : null;
+    stateA = s ? hydrate({ ...s, nickname: s.nickname || App.state.nickname || '' }) : null;
     maybeRender();
   }, DATA.dimOrder);
   const slotB = slotInput('b', 'B · 对方', '', (s) => {
@@ -153,8 +270,8 @@ export function renderCompare(root, ctx) {
         resultBox.innerHTML = '';
       },
     }),
-    !App.state.completedVolumes.length
-      ? el('span', { class: 'chip', style: { alignSelf: 'center', padding: '8px 14px' }, text: '先完成至少一卷，才能生成你自己的存档码' })
+    !selfHasData
+      ? el('span', { class: 'chip', style: { alignSelf: 'center', padding: '8px 14px' }, text: '先做完 28 题极速版或一卷完整卷宗，才能生成你自己的存档码' })
       : null,
   ]);
   wrap.appendChild(actions);
@@ -201,17 +318,22 @@ function renderResult(box, A, B, { DATA, col }) {
   box.innerHTML = '';
   const res = compareStates(A, B, DATA);
 
-  const nameA = displayName(A, 'A');
-  const nameB = displayName(B, 'B');
+  const COL = slotColors();
+  const nameA = displayName(A, '我');
+  const nameB = displayName(B, '对方');
 
   if (!res.ok) {
     box.appendChild(el('div', { class: 'empty', style: { marginTop: '30px' } }, [
-      el('h3', { text: '还没有可比较的交集' }),
+      el('h3', { text: '可比维度还不够' }),
       el('p', { text: res.reason || '' }),
       el('a', { class: 'btn', href: '#/', text: '返回卷宗大厅' }),
     ]));
     return;
   }
+
+  /* 极速档：一卷都没标记完成，但双方有几十个共同维度。
+     文案不能再提「交汇卷宗」，否则会出现「交汇卷宗：」后面一片空白。 */
+  const pairLabel = res.isExpressPair ? '极速速写' : `${res.common.length} 卷`;
 
   /* ---------- 判词 ---------- */
   const verdict = el('div', { class: 'cmp-verdict' });
@@ -227,7 +349,7 @@ function renderResult(box, A, B, { DATA, col }) {
     el('div', { class: 'cmp-metrics' }, [
       el('div', {}, [
         el('dt', { text: '交汇卷宗' }),
-        el('dd', { text: `${res.common.length} 卷` }),
+        el('dd', { text: pairLabel }),
       ]),
       el('div', {}, [
         el('dt', { text: '可比维度' }),
@@ -282,7 +404,7 @@ function renderResult(box, A, B, { DATA, col }) {
         .filter(Boolean);
       radarBody.appendChild(ecologySvg(ordered, {
         width: 520,
-        color: SLOT_COLORS.a,
+        color: COL.a,
         colorText: col('--text-primary'),
         colorMuted: col('--text-tertiary'),
         colorBorder: col('--border'),
@@ -292,7 +414,7 @@ function renderResult(box, A, B, { DATA, col }) {
       radarCard.appendChild(radarBody);
       box.appendChild(radarCard);
 
-      /* 六张卡 */
+      /* 六张卡 —— 每张底部可展开逐维拆解 */
       const ecoGrid = el('div', { class: 'eco-grid' });
       ordered.forEach((r) => {
         const isBest = r.id === eco.best?.id;
@@ -312,6 +434,63 @@ function renderResult(box, A, B, { DATA, col }) {
             : null,
           isBest ? el('div', { class: 'eco-card__badge', text: '最佳生态位' }) : null,
         ]);
+
+        const toggleBtn = el('button', {
+          class: 'eco-break__toggle',
+          type: 'button',
+          'aria-expanded': 'false',
+          text: `查看 ${r.parts.length} 项拆解 ↓`,
+        });
+
+        const panel = disclosure(toggleBtn, 'eco-break', () => {
+          const body = el('div', { class: 'eco-break__body' });
+
+          /* 逐项拆解：维度名 + 匹配法则 + 双人分 + 双点对照轨 + 贡献分/权重 */
+          r.parts.forEach((p) => {
+            const name = DATA.dimMap[p.id]?.name || p.id;
+            body.appendChild(el('div', { class: 'eco-prow' }, [
+              el('div', { class: 'eco-prow__head' }, [
+                el('span', { class: 'eco-prow__name', text: name }),
+                el('span', { class: 'eco-prow__kind', text: KIND_LABEL[p.kind] || p.kind }),
+              ]),
+              el('div', { class: 'eco-prow__scores' }, [
+                el('span', { class: 'eco-prow__ab' }, [
+                  el('i', { class: 'is-a', text: nameA }),
+                  el('b', { text: String(Math.round(p.av)) }),
+                  el('em', { text: 'vs' }),
+                  el('i', { class: 'is-b', text: nameB }),
+                  el('b', { text: String(Math.round(p.bv)) }),
+                ]),
+                el('span', {
+                  class: 'eco-prow__contrib',
+                  text: `贡献 ${round(p.score, 1)} · 权重 ${p.w}`,
+                }),
+              ]),
+              dualTrack(p.av, p.bv, { numbers: false, compact: true }),
+            ]));
+          });
+
+          /* 扣分雷区明细 */
+          if (r.hits.length) {
+            body.appendChild(el('div', { class: 'eco-break__hits' }, [
+              el('div', { class: 'eco-break__hits-h', text: `扣分雷区 · ${r.hits.length} 处` }),
+              ...r.hits.map((h) => el('div', { class: 'eco-prow eco-prow--hit' }, [
+                el('span', { class: 'eco-prow__name', text: h.label }),
+                el('span', { class: 'eco-prow__contrib', text: `− ${h.w}` }),
+              ])),
+            ]));
+          }
+
+          body.appendChild(el('p', {
+            class: 'eco-break__foot',
+            text: `校准后加权 ${round(r.weighted, 1)} · 原始均值 ${round(r.raw, 1)} · 雷区合计 −${round(r.penalty, 1)} → ${round(r.value, 1)}`,
+          }));
+
+          return body;
+        });
+
+        card.appendChild(el('div', { class: 'eco-break__foot-zone' }, [toggleBtn]));
+        card.appendChild(panel.wrap);
         ecoGrid.appendChild(card);
       });
       box.appendChild(ecoGrid);
@@ -382,15 +561,15 @@ function renderResult(box, A, B, { DATA, col }) {
         colorBorder: col('--border'),
         bg: col('--bg-card'),
         series: [
-          { name: nameA, values: radarList.map((d) => A.computedScores[d.id]), color: SLOT_COLORS.a, fillOpacity: 0.1 },
-          { name: nameB, values: radarList.map((d) => B.computedScores[d.id]), color: SLOT_COLORS.b, fillOpacity: 0.1 },
+          { name: nameA, values: radarList.map((d) => A.computedScores[d.id]), color: COL.a, fillOpacity: 0.1 },
+          { name: nameB, values: radarList.map((d) => B.computedScores[d.id]), color: COL.b, fillOpacity: 0.1 },
         ],
         labelSize: 10.5,
       },
     ));
     body.appendChild(el('div', { class: 'chart-legend' }, [
-      el('span', { style: { color: SLOT_COLORS.a }, html: `<i></i>${nameA}` }),
-      el('span', { style: { color: SLOT_COLORS.b }, html: `<i></i>${nameB}` }),
+      el('span', { style: { color: COL.a }, html: `<i></i>${nameA}` }),
+      el('span', { style: { color: COL.b }, html: `<i></i>${nameB}` }),
     ]));
     card.appendChild(body);
     box.appendChild(card);
@@ -437,7 +616,7 @@ function renderResult(box, A, B, { DATA, col }) {
         },
       }, [
         el('div', { style: { fontSize: '12px', color: 'var(--text-secondary)' }, text: name }),
-        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${SLOT_COLORS.a}">${Math.round(av)}</span> · <span style="color:${SLOT_COLORS.b}">${Math.round(bv)}</span>` }),
+        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${COL.a}">${Math.round(av)}</span> · <span style="color:${COL.b}">${Math.round(bv)}</span>` }),
         el('div', { style: { fontSize: '10.5px', letterSpacing: '0.08em', color: 'var(--text-tertiary)' }, text: `差 ${Math.round(r.diff)}` }),
       ]));
     });
@@ -491,11 +670,19 @@ function renderResult(box, A, B, { DATA, col }) {
         },
       }, [
         el('div', { style: { fontSize: '12px', color: 'var(--text-secondary)' }, text: name }),
-        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${SLOT_COLORS.a}">${Math.round(r.a)}</span> ↔ <span style="color:${SLOT_COLORS.b}">${Math.round(r.b)}</span>` }),
+        el('div', { style: { fontSize: '11px', color: 'var(--text-tertiary)' }, html: `<span style="color:${COL.a}">${Math.round(r.a)}</span> ↔ <span style="color:${COL.b}">${Math.round(r.b)}</span>` }),
         el('div', { style: { fontSize: '10.5px', letterSpacing: '0.08em', color: 'var(--text-tertiary)' }, text: `差 ${Math.round(r.diff)}` }),
       ]));
     });
     box.appendChild(card);
+  }
+
+  {
+    /* 全维度双人逐项显微镜 −− 放在六大生态位之后、三幕剧之前 */
+    const micro = microSection({
+      rows: res.rows || [], A, B, DATA, nameA, nameB,
+    });
+    if (micro) box.appendChild(micro);
   }
 
   /* ---------- 关系三幕剧 · 潜台词 · 红黑榜 ---------- */
@@ -605,7 +792,263 @@ function renderResult(box, A, B, { DATA, col }) {
       display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'space-between',
     },
   }, [
-    el('span', { text: `交汇卷宗：${res.common.map((v) => DATA.volumes[v]?.title || v).join(' · ')}` }),
+    el('span', {
+      text: res.isExpressPair
+        ? '交汇卷宗：极速速写 · 双方各自完成 28 题，按可比维度直接对齐'
+        : `交汇卷宗：${res.common.map((v) => DATA.volumes[v]?.title || v).join(' · ')}`,
+    }),
     el('span', { text: '全部计算在本地完成，双方数据均未离开设备' }),
   ]));
+}
+
+/* ------------------------------------------------------------
+   全维度双人逐项显微镜
+   · 4 种视图：按 16 卷分组 / 高度同频 / 最大反差 / 黄金互补
+   · 卷宗筛选 + 关键词搜索
+   · 每行 0–100 双人哑铃轨，点击展开单维深度释义
+   ------------------------------------------------------------ */
+
+/** 维度 → 所属卷短标（Vol.7） */
+function volTagOf(DATA, dim) {
+  const v = DATA.dimMap?.[dim]?.volume || '';
+  const n = Number(String(v).replace(/[^0-9]/g, ''));
+  return Number.isFinite(n) && n > 0 ? `Vol.${n}` : '';
+}
+
+function volIndex(DATA, dim) {
+  const v = DATA.dimMap?.[dim]?.volume || '';
+  const n = Number(String(v).replace(/[^0-9]/g, ''));
+  return Number.isFinite(n) ? n : 99;
+}
+
+/** 单维对比提示：一句人话 */
+function contrastHint(dim, av, bv, nameA, nameB, DATA) {
+  const label = DATA.dimMap?.[dim]?.name || dim;
+  const d = Math.round(Math.abs(av - bv));
+  const band = diffBand(av, bv);
+  const tail = {
+    'resonance-high': '你们都在高位，这件事上不需要解释就能对齐，也很容易一起高估风险。',
+    'resonance-low': '你们都在低位，这一块是共同的空白区——没人负责，也很少有人抱怨。',
+    sync: '两人读同一本书的同一页，分歧通常只发生在细节上。',
+    tension: '容易在遇到此类场景时形成一攻一守的节奏差。',
+    fork: '这是你们最容易互相误读的一处，同一件事会被翻译成两种完全不同的意思。',
+    mild: '差异不大，但在压力大的时候会被放大成小摩擦。',
+  }[band.key] || '';
+  return `${nameA}在此项${toneLabel(av)}（${Math.round(av)}），${nameB}${toneLabel(bv)}（${Math.round(bv)}），差值 ${d} 分 —— ${tail}（${label} · ${band.label}）`;
+}
+
+/** 单维深度释义面板 */
+function microPanel(dim, av, bv, nameA, nameB, DATA) {
+  const m = DATA.mirrors?.[dim];
+  const body = el('div', { class: 'cmp-mpanel__body' });
+
+  if (!m) {
+    body.appendChild(el('p', { class: 'cmp-mpanel__hint', text: '该维度暂无四面镜释义。' }));
+    return body;
+  }
+
+  const faceOf = (v) => (v >= 50 ? m.high : m.low) || m.high || null;
+
+  [
+    { who: nameA, v: av, cls: 'is-a' },
+    { who: nameB, v: bv, cls: 'is-b' },
+  ].forEach(({ who, v, cls }) => {
+    const face = faceOf(v);
+    if (!face) return;
+    const col = el('div', { class: `cmp-mface ${cls}` }, [
+      el('div', { class: 'cmp-mface__head' }, [
+        el('span', { class: 'cmp-mface__who', text: who }),
+        el('span', { class: 'cmp-mface__label', text: face.label || '' }),
+      ]),
+      el('div', { class: 'cmp-mface__gift' }, [
+        el('b', { text: face.gift_title || '' }),
+        el('span', { text: face.gift_desc || '' }),
+      ]),
+      el('div', { class: 'cmp-mface__shadow' }, [
+        el('b', { text: face.shadow_title || '' }),
+        el('span', { text: face.shadow_desc || '' }),
+      ]),
+      face.alchemy_tip
+        ? el('div', { class: 'cmp-mface__tip', text: face.alchemy_tip })
+        : null,
+    ]);
+    body.appendChild(col);
+  });
+
+  body.appendChild(el('p', {
+    class: 'cmp-mpanel__hint',
+    text: contrastHint(dim, av, bv, nameA, nameB, DATA),
+  }));
+
+  return body;
+}
+
+function microSection({ rows, A, B, DATA, nameA, nameB }) {
+  if (!rows || !rows.length) return null;
+
+  const valid = rows.filter((r) => Number.isFinite(r.a) && Number.isFinite(r.b));
+  if (!valid.length) return null;
+
+  const section = el('section', { class: 'cmp-micro', id: 'cmp-micro' });
+
+  section.appendChild(el('div', { class: 'section-head' }, [
+    el('div', { class: 'cmp-micro__title' }, [
+      el('span', { class: 'cmp-micro__no', text: '04' }),
+      el('h2', { text: '全维度双人逐项显微镜' }),
+    ]),
+    el('div', {
+      class: 'section-head__hint',
+      text: `${valid.length} 个可比维度 · 点击任意一行展开单维深度释义`,
+    }),
+  ]));
+
+  /* ---------- 顶部固定图例条 ---------- */
+  const legend = el('div', { class: 'cmp-micro__legend' }, [
+    el('span', { class: 'cmp-legend__item' }, [el('i', { class: 'is-a' }), el('span', { text: nameA })]),
+    el('span', { class: 'cmp-legend__item' }, [el('i', { class: 'is-b' }), el('span', { text: nameB })]),
+    el('span', { class: 'cmp-legend__mid', text: '中线 50 为人群中性' }),
+  ]);
+  section.appendChild(legend);
+
+  /* ---------- 工具栏 ---------- */
+  const MODES = [
+    { id: 'group', label: '按 16 卷分组' },
+    { id: 'sync', label: '高度同频' },
+    { id: 'gap', label: '最大反差' },
+    { id: 'golden', label: '黄金互补' },
+  ];
+  let mode = 'group';
+  let volFilter = 'all';
+  let keyword = '';
+
+  const toolbar = el('div', { class: 'cmp-micro__bar' });
+
+  const pillRow = el('div', { class: 'cmp-micro__pills', role: 'group', 'aria-label': '视图切换' });
+  const pillNodes = new Map();
+  MODES.forEach((m) => {
+    const b = el('button', {
+      class: `cmp-pill${m.id === mode ? ' is-on' : ''}`,
+      type: 'button',
+      'aria-pressed': m.id === mode ? 'true' : 'false',
+      text: m.label,
+      onclick: () => {
+        mode = m.id;
+        pillNodes.forEach((node, id) => {
+          node.classList.toggle('is-on', id === mode);
+          node.setAttribute('aria-pressed', id === mode ? 'true' : 'false');
+        });
+        paint();
+      },
+    });
+    pillNodes.set(m.id, b);
+    pillRow.appendChild(b);
+  });
+  toolbar.appendChild(pillRow);
+
+  /* 卷宗筛选：只列出双方真正有可比维度的卷 */
+  const volSet = new Map();
+  valid.forEach((r) => {
+    const v = DATA.dimMap?.[r.dim]?.volume;
+    if (!v) return;
+    volSet.set(v, (volSet.get(v) || 0) + 1);
+  });
+  const volSorted = Array.from(volSet.keys()).sort((x, y) => volIndex(DATA, x) - volIndex(DATA, y));
+
+  const select = el('select', { class: 'cmp-micro__select', 'aria-label': '卷宗筛选' });
+  select.appendChild(el('option', { value: 'all', text: `全部卷宗 · ${valid.length} 维` }));
+  volSorted.forEach((v) => {
+    const n = Number(String(v).replace(/[^0-9]/g, ''));
+    select.appendChild(el('option', {
+      value: v,
+      text: `${n ? `Vol.${n}` : v} · ${volSet.get(v)} 维`,
+    }));
+  });
+  select.addEventListener('change', () => { volFilter = select.value; paint(); });
+  toolbar.appendChild(select);
+
+  const search = el('input', {
+    class: 'cmp-micro__search',
+    type: 'search',
+    placeholder: '搜索维度名，例如「共情」',
+    'aria-label': '按维度中文名过滤',
+  });
+  search.addEventListener('input', () => { keyword = search.value.trim(); paint(); });
+  toolbar.appendChild(search);
+
+  section.appendChild(toolbar);
+
+  /* ---------- 列表 ---------- */
+  const list = el('div', { class: 'cmp-micro__list' });
+  const counter = el('div', { class: 'cmp-micro__count', text: '' });
+  section.appendChild(list);
+  section.appendChild(counter);
+
+  function paint() {
+    list.innerHTML = '';
+
+    let picked = valid.filter((r) => {
+      if (volFilter !== 'all' && DATA.dimMap?.[r.dim]?.volume !== volFilter) return false;
+      if (!keyword) return true;
+      const name = DATA.dimMap?.[r.dim]?.name || r.dim;
+      return name.includes(keyword) || String(r.dim).includes(keyword);
+    });
+
+    if (mode === 'golden') {
+      picked = picked.filter((r) => {
+        const d = Math.abs(r.a - r.b);
+        return d >= 15 && d <= 35;
+      });
+    }
+
+    if (mode === 'sync') picked.sort((x, y) => Math.abs(x.a - x.b) - Math.abs(y.a - y.b));
+    else if (mode === 'gap') picked.sort((x, y) => Math.abs(y.a - y.b) - Math.abs(x.a - x.b));
+    else if (mode === 'golden') picked.sort((x, y) => Math.abs(25 - Math.abs(x.a - x.b)) - Math.abs(25 - Math.abs(y.a - y.b)));
+    else {
+      picked.sort((x, y) => (volIndex(DATA, x.dim) - volIndex(DATA, y.dim))
+        || String(DATA.dimMap?.[x.dim]?.name || x.dim).localeCompare(String(DATA.dimMap?.[y.dim]?.name || y.dim), 'zh'));
+    }
+
+    if (!picked.length) {
+      list.appendChild(el('div', { class: 'cmp-micro__empty', text: mode === 'golden'
+        ? '当前筛选下没有落在 15–35 分差区间的维度 —— 你们在剩下的维度上要么太像，要么分得太开。'
+        : '没有匹配的维度，试试清空搜索词或切换卷宗。' }));
+      counter.textContent = '';
+      return;
+    }
+
+    picked.forEach((r) => {
+      const band = diffBand(r.a, r.b);
+      const row = el('div', {
+        class: 'cmp-mrow',
+        'data-openable': '',
+        role: 'button',
+        tabindex: '0',
+        'aria-expanded': 'false',
+      }, [
+        el('div', { class: 'cmp-mrow__lead' }, [
+          el('span', { class: 'cmp-mrow__name', text: DATA.dimMap?.[r.dim]?.name || r.dim }),
+          el('span', { class: 'cmp-mrow__vol', text: volTagOf(DATA, r.dim) }),
+        ]),
+        dualTrack(r.a, r.b, { numbers: true }),
+        el('div', { class: 'cmp-mrow__tail' }, [
+          el('span', { class: `cmp-delta is-${band.key}`, text: `Δ ${Math.round(Math.abs(r.a - r.b))}` }),
+          el('span', { class: `cmp-band is-${band.key}`, text: band.label }),
+        ]),
+      ]);
+
+      const panel = disclosure(row, 'cmp-mpanel', () => microPanel(r.dim, r.a, r.b, nameA, nameB, DATA));
+      row.appendChild(panel.wrap);
+
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+      });
+
+      list.appendChild(row);
+    });
+
+    counter.textContent = `显示 ${picked.length} / ${valid.length} 个可比维度`;
+  }
+
+  paint();
+  return section;
 }
