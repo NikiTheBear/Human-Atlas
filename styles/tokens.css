@@ -89,9 +89,9 @@ html[data-theme='light'] {
   --text-tertiary: #6e736e;
   --text-inverse: #ffffff;
 
-  --border: rgba(23, 25, 24, 0.08);
-  --border-strong: rgba(23, 25, 24, 0.16);
-  --border-hair: rgba(23, 25, 24, 0.055);
+  --border: rgba(23, 25, 24, 0.11);
+  --border-strong: rgba(23, 25, 24, 0.20);
+  --border-hair: rgba(23, 25, 24, 0.075);
   --hairline: 1px;
 
   /* 拉丝古铜金 */
@@ -139,9 +139,9 @@ html[data-theme='dark'] {
   --text-tertiary: #7a808a;
   --text-inverse: #0b0c0e;
 
-  --border: rgba(242, 239, 233, 0.08);
-  --border-strong: rgba(242, 239, 233, 0.16);
-  --border-hair: rgba(242, 239, 233, 0.055);
+  --border: rgba(242, 239, 233, 0.11);
+  --border-strong: rgba(242, 239, 233, 0.20);
+  --border-hair: rgba(242, 239, 233, 0.075);
 
   /* 暖香槟金 */
   --gold: #d4b47b;

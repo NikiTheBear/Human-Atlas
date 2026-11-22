@@ -45,8 +45,8 @@ export function triadSvg(scores, opt = {}) {
 
   const R = Math.min(W * 0.2, H * 0.34);
   const centers = [
-    { cx: W * 0.27, cy: H * 0.52, items: LIGHT, color: cLight, name: '光明三角', vals: LIGHT.map((d) => clamp(scores[d.dim] ?? 50, 0, 100)) },
-    { cx: W * 0.73, cy: H * 0.52, items: DARK, color: cDark, name: '黑暗三角', vals: DARK.map((d) => clamp(scores[d.dim] ?? 50, 0, 100)) },
+    { cx: W * 0.25, cy: H * 0.53, items: LIGHT, color: cLight, name: '光明三角', vals: LIGHT.map((d) => clamp(scores[d.dim] ?? 50, 0, 100)) },
+    { cx: W * 0.75, cy: H * 0.53, items: DARK, color: cDark, name: '黑暗三角', vals: DARK.map((d) => clamp(scores[d.dim] ?? 50, 0, 100)) },
   ];
 
   const vertex = (cx, cy, i, f) => {
@@ -95,21 +95,28 @@ export function triadSvg(scores, opt = {}) {
       g.appendChild(svg('circle', { cx: x, cy: y, r: 3, fill: c.color, stroke: bg, 'stroke-width': 1.4 }));
     });
 
-    // 顶点标签 + 数值
+    /* 顶点标签 + 数值。
+       左右两枚三角形「内侧」的那两个标签最容易撞在一起：
+       W=560 时 外侧 1.32R 会让它们只隔 31px，而两个中文标签需要 ~40px。
+       所以内侧标签单独用更小的外扩半径，外侧保持宽松。 */
+    const OUTER_F = 1.3;
+    const INNER_F = 1.14;
     c.items.forEach((it, i) => {
-      const [x, y] = vertex(c.cx, c.cy, i, 1.32);
+      const isInner = (c.cx < W / 2 && i === 1) || (c.cx > W / 2 && i === 2);
+      const f = isInner ? INNER_F : OUTER_F;
+      const [x, y] = vertex(c.cx, c.cy, i, f);
       const anchor = i === 0 ? 'middle' : i === 1 ? 'start' : 'end';
       const dy = i === 0 ? -2 : 4;
       g.appendChild(svgText(it.short, {
         x, y: y + dy,
         'text-anchor': anchor,
-        'font-size': 10,
+        'font-size': 9.5,
         'font-family': "'Noto Sans SC','PingFang SC',sans-serif",
         fill: cMuted,
-        'letter-spacing': '0.06em',
+        'letter-spacing': '0.04em',
       }));
       g.appendChild(svgText(`${round(c.vals[i], 0)}`, {
-        x, y: y + dy + (i === 0 ? -13 : 13),
+        x, y: y + dy + (i === 0 ? -12 : 12),
         'text-anchor': anchor,
         'font-size': 11,
         'font-family': "'Noto Serif SC',Georgia,serif",
@@ -144,13 +151,14 @@ export function triadSvg(scores, opt = {}) {
   const ratio = darkAvg > 1 ? lightAvg / darkAvg : 9.9;
   g.appendChild(svgText(`${lightAvg.toFixed(0)} : ${darkAvg.toFixed(0)}`, {
     x: W / 2,
-    y: H * 0.52,
+    y: H * 0.53,
     'text-anchor': 'middle',
-    'font-size': 11,
+    'font-size': 12,
     'font-family': "'Noto Serif SC',Georgia,serif",
     fill: cText,
-    opacity: 0.55,
+    opacity: 0.5,
     'font-variant-numeric': 'tabular-nums',
+    'letter-spacing': '0.08em',
   }));
 
   return root;

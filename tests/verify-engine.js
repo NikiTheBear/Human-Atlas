@@ -13,6 +13,9 @@ import {
   topGifts, topShadows, buildVolumeReport,
 } from '../src/core/synthesizer.js';
 import { compareStates } from '../src/core/comparator.js';
+import {
+  scoreAllEcologies, relationshipScript, subtextDecoder, chemistryBoard,
+} from '../src/core/ecology.js';
 
 const DATA = {
   dimensions: DIMENSIONS,
@@ -423,6 +426,79 @@ function tc6() {
 }
 
 /* ------------------------------------------------------------
+   TC6c · 六大关系生态位引擎
+   ------------------------------------------------------------ */
+
+function tc6c() {
+  console.log('\n[TC6c] 六大关系生态位');
+
+  const mk = (over, mask = 50) => {
+    const s = {};
+    for (const d of DIM_ORDER) s[d] = 50;
+    Object.assign(s, over);
+    return { computedScores: s, maskIndex: mask };
+  };
+
+  // 全中性：六个生态位都该落在 45–70，不该有满分
+  const neutral = scoreAllEcologies(mk({}), mk({}), DIM_ORDER, { a: 50, b: 50 });
+  check('中性画像可算出生态位', neutral.list.length > 0, `${neutral.list.length}`);
+  check('中性画像无满分', neutral.list.every((r) => r.value < 80),
+    neutral.list.map((r) => `${r.id}:${r.value}`).join(' '));
+
+  // 精神同频：灵魂知己必须排第一
+  const same = {
+    phil_stoic: 76, phil_existential: 74, mft_care: 80, mft_fairness: 78,
+    big5_open: 78, cog_global: 76, mot_purpose: 74, light_humanism: 76,
+  };
+  const sameShift = Object.fromEntries(Object.entries(same).map(([k, v]) => [k, v - 3]));
+  const confidant = scoreAllEcologies(mk(same), mk(sameShift), DIM_ORDER, { a: 55, b: 52 });
+  check('精神同频时灵魂知己排第一', confidant.best?.id === 'confidant',
+    confidant.best?.id);
+
+  // 认知互补：事业搭档必须排第一
+  const workA = { cog_global: 82, cog_diverge: 84, cog_speed: 78, big5_order: 72, big5_industry: 78, light_kant: 74, wv_social: 70, time_future: 76 };
+  const workB = { cog_global: 34, cog_diverge: 36, cog_speed: 40, big5_order: 32, big5_industry: 74, light_kant: 70, wv_social: 66, time_future: 72 };
+  const cofounder = scoreAllEcologies(mk(workA), mk(workB), DIM_ORDER, { a: 50, b: 50 });
+  check('认知互补时事业搭档排第一', cofounder.best?.id === 'cofounder',
+    cofounder.best?.id);
+
+  // 双高锋芒：镜面宿敌必须排第一
+  const rivalOver = {
+    sin_pride: 78, sin_wrath: 72, dark_mach: 80, mot_mastery: 80,
+    enn_8: 76, tki_competing: 78, big5_assert: 76,
+  };
+  const rivalShift = Object.fromEntries(Object.entries(rivalOver).map(([k, v]) => [k, v - 4]));
+  const rival = scoreAllEcologies(mk(rivalOver), mk(rivalShift), DIM_ORDER, { a: 60, b: 58 });
+  check('双高锋芒时镜面宿敌排第一', rival.best?.id === 'rival', rival.best?.id);
+
+  // 置信度随维度数变化
+  const few = scoreAllEcologies(mk({ phil_stoic: 70, phil_existential: 68 }), mk({ phil_stoic: 68, phil_existential: 66 }), ['phil_stoic', 'phil_existential'], {});
+  check('维度少时置信度为初探', few.list.every((r) => r.confidence === 'low'),
+    few.list.map((r) => r.confidence).join(','));
+
+  // 三幕剧
+  const A = mk({ def_detach: 72, att_avoidance: 70, big5_social: 38 });
+  const B = mk({ att_anxiety: 70, def_fawn: 64, big5_social: 66 });
+  const script = relationshipScript(A, B, { a: 62, b: 38 });
+  check('三幕剧恰好三幕', script.acts.length === 3, `${script.acts.length}`);
+  check('三幕剧每幕都有正文', script.acts.every((x) => x.body && x.body.length > 20));
+  check('追逃组合被识别', script.acts[2].tags.includes('追逃循环'),
+    script.acts[2].tags.join('/'));
+
+  // 潜台词解码器
+  const dec = subtextDecoder(B);
+  check('解码器能给出至少 1 条', dec.length >= 1, `${dec.length}`);
+  check('解码器最多 3 条', dec.length <= 3, `${dec.length}`);
+  check('解码器每条三要素齐全', dec.every((x) => x.line && x.real && x.better));
+
+  // 红黑榜
+  const board = chemistryBoard(A, B);
+  check('红黑榜有加分项', board.green.length > 0, `${board.green.length}`);
+  check('红黑榜有禁区项', board.red.length > 0, `${board.red.length}`);
+  check('红黑榜每项都带 A/B 归属', [...board.green, ...board.red].every((x) => x.for === 'A' || x.for === 'B'));
+}
+
+/* ------------------------------------------------------------
    TC6b · 量表档位与语义文案必须严格一一对应
    ------------------------------------------------------------ */
 
@@ -538,6 +614,7 @@ function main() {
   tc5();
   tc6();
   tc6b();
+  tc6c();
   tc7();
 
   console.log('\n' + '─'.repeat(64));

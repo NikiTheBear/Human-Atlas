@@ -162,9 +162,10 @@ input, textarea, select {
   top: 0;
   z-index: 60;
   isolation: isolate;
-  backdrop-filter: blur(16px) saturate(1.08);
-  -webkit-backdrop-filter: blur(16px) saturate(1.08);
-  /* 不透明底：下面是 fixed 噪点层，半透明会让它透上来显得脏 */
+  /* 背景本就不透明，backdrop-filter 无效却会创建合成层，
+     在 Windows 的部分 GPU 上会在顶栏下缘留下一条色差带，所以去掉。 */
+  /* 与画布同色：接缝只靠 1px 极轻阴影暗示，不靠色差。
+     改 tint 会造出 Windows 上更明显的灰白带。 */
   background: var(--bg-page);
   /* 不用 1px 实线：改用极轻的阴影收边，消除顶栏与画布之间的灰白硬接缝 */
   border-bottom: 1px solid transparent;
@@ -505,7 +506,17 @@ html[data-theme='dark'] .masthead {
   font-variant-numeric: tabular-nums;
 }
 
-.dial__unit { font-size: 11px; letter-spacing: 0.24em; color: var(--text-tertiary); }
+.dial__unit {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--text-tertiary);
+  /* Windows 上回退字体更宽，不锁死会折成两行并顶出圆环 */
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .dial__unit { font-size: 9px; letter-spacing: 0.1em; }
+}
 
 .dial-stages {
   margin-top: 20px;
@@ -3401,4 +3412,300 @@ body.is-immersive .quiz__back {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 26px;
+}
+
+/* ============================================================
+   六大关系生态位
+   ============================================================ */
+.eco-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+  gap: 14px;
+}
+
+.eco-card {
+  position: relative;
+  padding: 22px 22px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  transition: border-color 260ms var(--ease), box-shadow 260ms var(--ease),
+    transform 320ms var(--ease);
+}
+
+.eco-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.eco-card.is-best {
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  box-shadow: var(--shadow-glow);
+}
+
+.eco-card__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
+.eco-card__name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.eco-card__score {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.eco-card.is-best .eco-card__score { color: var(--gold); }
+
+.eco-card__latin {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.eco-card__sum {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.85;
+  color: var(--text-secondary);
+}
+
+.eco-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  padding-top: 10px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.eco-card__hits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.eco-hit {
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--vol1) 34%, transparent);
+  color: var(--vol1);
+  background: color-mix(in srgb, var(--vol1) 6%, transparent);
+}
+
+.eco-card__badge {
+  position: absolute;
+  top: -1px;
+  right: 18px;
+  transform: translateY(-50%);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--text-inverse);
+}
+
+/* ============================================================
+   关系三幕剧
+   ============================================================ */
+.act-list { display: grid; gap: 0; }
+
+.act {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 20px;
+  padding: 22px 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.act:first-child { border-top: none; }
+
+.act__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  padding-top: 3px;
+}
+
+.act__title {
+  margin: 0 0 8px;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+.act__text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+.act__plus {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: var(--gold);
+  padding: 10px 14px;
+  border-left: 2px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  background: var(--gold-wash);
+}
+
+.act__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+.act-tag {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+}
+
+/* ============================================================
+   潜台词解码器
+   ============================================================ */
+.subtext-list { display: grid; gap: 12px; }
+
+.subtext {
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.subtext__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.subtext__tag {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.subtext__score {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.subtext__row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 14px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.subtext__k {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+  padding-top: 3px;
+}
+
+.subtext__v {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.subtext__row.is-tip .subtext__v { color: var(--text-primary); }
+.subtext__row.is-tip .subtext__k { color: var(--gold); }
+
+/* ============================================================
+   相处红黑榜
+   ============================================================ */
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.board-col {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.board-col.is-green { border-top: 2px solid var(--vol2); }
+.board-col.is-red { border-top: 2px solid var(--vol1); }
+
+.board-col__title {
+  margin: 0 0 14px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+
+.board-item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.board-item:first-of-type { border-top: none; }
+
+.board-item__who {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-family: var(--font-serif);
+  border: 1px solid var(--border-strong);
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+.board-item b {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.board-item p {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  line-height: 1.85;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+  .act { grid-template-columns: 1fr; gap: 6px; }
+  .subtext__row { grid-template-columns: 1fr; gap: 2px; }
+  .subtext__k { padding-top: 0; }
 }

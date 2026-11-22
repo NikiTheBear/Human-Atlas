@@ -9,6 +9,11 @@ import { el, round, toast } from '../core/utils.js';
 import { decodeSoulCode } from '../core/storage.js';
 import { compareStates, displayName } from '../core/comparator.js';
 import { radarSvg } from '../viz/radarSvg.js';
+import { ecologySvg } from '../viz/ecologySvg.js';
+import {
+  scoreAllEcologies, relationshipScript, subtextDecoder, chemistryBoard,
+  CONFIDENCE_LABEL,
+} from '../core/ecology.js';
 
 const SLOT_COLORS = { a: '#8C4A32', b: '#3B4D70' };
 
@@ -230,6 +235,84 @@ function renderResult(box, A, B, { DATA, col }) {
   ]));
   box.appendChild(verdict);
 
+  /* ---------- 六大关系生态位 ---------- */
+  {
+    const eco = scoreAllEcologies(A, B, res.dims, { a: A.maskIndex, b: B.maskIndex });
+
+    const head = el('div', { class: 'section-head' }, [
+      el('h2', { text: '六大关系生态位' }),
+      el('div', {
+        class: 'section-head__hint',
+        text: eco.best
+          ? `你们最合拍的位置是「${eco.best.name}」`
+          : '完成更多卷宗后可解锁更精准的推演',
+      }),
+    ]);
+    box.appendChild(head);
+
+    if (!eco.list.length) {
+      box.appendChild(el('div', { class: 'res-card' }, [
+        el('h4', { text: '交集维度还不足以推演生态位' }),
+        el('p', { text: '六套权重矩阵需要一定的共同维度才能给出可信结果。先各自再完成 1–2 卷。' }),
+      ]));
+    } else {
+      /* 雷达 */
+      const radarCard = el('div', { class: 'chart-card', style: { marginBottom: '18px' } });
+      radarCard.appendChild(el('div', { class: 'chart-card__head' }, [
+        el('h3', { text: '六维轮廓' }),
+        el('span', { class: 'chart-card__note', text: '顶点为各自生态位得分' }),
+      ]));
+      const radarBody = el('div', { class: 'chart-card__body' });
+      const ordered = ['partner', 'spark', 'confidant', 'cofounder', 'roommate', 'rival']
+        .map((id) => eco.list.find((r) => r.id === id))
+        .filter(Boolean);
+      radarBody.appendChild(ecologySvg(ordered, {
+        width: 520,
+        color: SLOT_COLORS.a,
+        colorText: col('--text-primary'),
+        colorMuted: col('--text-tertiary'),
+        colorBorder: col('--border'),
+        bg: col('--bg-card'),
+        bestId: eco.best?.id,
+      }));
+      radarCard.appendChild(radarBody);
+      box.appendChild(radarCard);
+
+      /* 六张卡 */
+      const ecoGrid = el('div', { class: 'eco-grid' });
+      ordered.forEach((r) => {
+        const isBest = r.id === eco.best?.id;
+        const card = el('div', { class: `eco-card${isBest ? ' is-best' : ''}` }, [
+          el('div', { class: 'eco-card__top' }, [
+            el('span', { class: 'eco-card__name', text: r.name }),
+            el('span', { class: 'eco-card__score', text: String(Math.round(r.value)) }),
+          ]),
+          el('div', { class: 'eco-card__latin', text: r.latin }),
+          el('p', { class: 'eco-card__sum', text: r.summary }),
+          el('div', { class: 'eco-card__meta' }, [
+            el('span', { text: CONFIDENCE_LABEL[r.confidence] || '' }),
+            el('span', { text: `${r.dimCount} 维参与` }),
+          ]),
+          r.hits.length
+            ? el('div', { class: 'eco-card__hits' }, r.hits.map((h) => el('span', { class: 'eco-hit', text: h.label })))
+            : null,
+          isBest ? el('div', { class: 'eco-card__badge', text: '最佳生态位' }) : null,
+        ]);
+        ecoGrid.appendChild(card);
+      });
+      box.appendChild(ecoGrid);
+
+      if (eco.missing.length) {
+        box.appendChild(el('p', {
+          style: {
+            marginTop: '14px', fontSize: '11.5px', color: 'var(--text-tertiary)', lineHeight: '1.9',
+          },
+          text: `另有 ${eco.missing.map((m) => m.name).join(' / ')} 因共同维度不足暂未计算，完成对应卷宗后解锁。`,
+        }));
+      }
+    }
+  }
+
   /* ---------- 双人雷达 ---------- */
   const radarDims = [
     'big5_open', 'big5_order', 'big5_assert', 'big5_compassion',
@@ -399,6 +482,105 @@ function renderResult(box, A, B, { DATA, col }) {
       ]));
     });
     box.appendChild(card);
+  }
+
+  /* ---------- 关系三幕剧 · 潜台词 · 红黑榜 ---------- */
+  {
+    const script = relationshipScript(A, B, { a: A.maskIndex, b: B.maskIndex });
+
+    const head = el('div', { class: 'section-head' }, [
+      el('h2', { text: '关系演变三幕剧' }),
+      el('div', { class: 'section-head__hint', text: '按你们各自的边界与防御推演，不是预言' }),
+    ]);
+    box.appendChild(head);
+
+    const timeline = el('div', { class: 'act-list' });
+    script.acts.forEach((act, i) => {
+      timeline.appendChild(el('div', { class: 'act' }, [
+        el('div', { class: 'act__no', text: `第${['一', '二', '三'][i]}幕` }),
+        el('div', { class: 'act__body' }, [
+          el('h4', { class: 'act__title', text: act.title.replace(/^第.幕 · /, '') }),
+          el('p', { class: 'act__text', text: act.body }),
+          act.bodyPlus ? el('p', { class: 'act__plus', text: act.bodyPlus }) : null,
+          act.tags.length
+            ? el('div', { class: 'act__tags' }, act.tags.map((t) => el('span', { class: 'act-tag', text: t })))
+            : null,
+        ]),
+      ]));
+    });
+    box.appendChild(timeline);
+
+    /* 潜台词解码器：默认解对方那一侧 */
+    const decoder = subtextDecoder(B, nameB);
+    if (decoder.length) {
+      const sh = el('div', { class: 'section-head' }, [
+        el('h2', { text: '潜台词解码器' }),
+        el('div', { class: 'section-head__hint', text: `${nameB} 说得最轻的那几句，通常最要紧` }),
+      ]);
+      box.appendChild(sh);
+
+      const list = el('div', { class: 'subtext-list' });
+      decoder.forEach((d) => {
+        list.appendChild(el('div', { class: 'subtext' }, [
+          el('div', { class: 'subtext__head' }, [
+            el('span', { class: 'subtext__tag', text: d.tag }),
+            el('span', { class: 'subtext__score', text: String(d.score) }),
+          ]),
+          el('div', { class: 'subtext__row' }, [
+            el('span', { class: 'subtext__k', text: '表面台词' }),
+            el('span', { class: 'subtext__v', text: d.line }),
+          ]),
+          el('div', { class: 'subtext__row' }, [
+            el('span', { class: 'subtext__k', text: '底层诉求' }),
+            el('span', { class: 'subtext__v', text: d.real }),
+          ]),
+          el('div', { class: 'subtext__row is-tip' }, [
+            el('span', { class: 'subtext__k', text: '不踩雷的回应' }),
+            el('span', { class: 'subtext__v', text: d.better }),
+          ]),
+        ]));
+      });
+      box.appendChild(list);
+    }
+
+    /* 红黑榜 */
+    const board = chemistryBoard(A, B);
+    if (board.green.length || board.red.length) {
+      const sh = el('div', { class: 'section-head' }, [
+        el('h2', { text: '相处红黑榜' }),
+        el('div', { class: 'section-head__hint', text: '从欲望引擎、童年图式与道德基础自动提炼' }),
+      ]);
+      box.appendChild(sh);
+
+      const grid2 = el('div', { class: 'board-grid' });
+      const col1 = el('div', { class: 'board-col is-green' }, [
+        el('h4', { class: 'board-col__title', text: '加分动作' }),
+      ]);
+      board.green.forEach((g) => {
+        col1.appendChild(el('div', { class: 'board-item' }, [
+          el('span', { class: 'board-item__who', text: g.for }),
+          el('div', {}, [
+            el('b', { text: g.title }),
+            el('p', { text: g.text }),
+          ]),
+        ]));
+      });
+      const col2 = el('div', { class: 'board-col is-red' }, [
+        el('h4', { class: 'board-col__title', text: '隐形禁区' }),
+      ]);
+      board.red.forEach((r) => {
+        col2.appendChild(el('div', { class: 'board-item' }, [
+          el('span', { class: 'board-item__who', text: r.for }),
+          el('div', {}, [
+            el('b', { text: r.title }),
+            el('p', { text: r.text }),
+          ]),
+        ]));
+      });
+      grid2.appendChild(col1);
+      grid2.appendChild(col2);
+      box.appendChild(grid2);
+    }
   }
 
   /* ---------- 页脚 ---------- */
