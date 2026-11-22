@@ -17860,7 +17860,8 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "dark_mach": -0.6
-      }
+      },
+      "psych_tag": "高原则底线 × 义愤驱动型"
     },
     {
       "id": "AR02",
@@ -17880,7 +17881,8 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "big5_assert": -0.3
-      }
+      },
+      "psych_tag": "高谋略 × 高妥协表象协同型"
     },
     {
       "id": "AR03",
@@ -17900,7 +17902,8 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "sin_sloth": -0.5
-      }
+      },
+      "psych_tag": "高秩序 × 高反刍的过载自驱型"
     },
     {
       "id": "AR04",
@@ -17920,7 +17923,8 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "big5_compliance": -0.6
-      }
+      },
+      "psych_tag": "高自主 × 高安全需求的双锚型"
     },
     {
       "id": "AR05",
@@ -17940,7 +17944,8 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "big5_compassion": -0.4
-      }
+      },
+      "psych_tag": "理智隔离 × 情感疏离的旁观型"
     },
     {
       "id": "AR06",
@@ -17957,11 +17962,12 @@ export const ARCHETYPES = {
         "def_fawn": 1.4,
         "mot_autonomy": 0.9,
         "virtue_temperance": -1
-      }
+      },
+      "psych_tag": "高放纵代偿 × 高讨好白昼割裂型"
     },
     {
       "id": "AR07",
-      "name": "以酸为燃料的攀登者",
+      "name": "酸质攀登者",
       "latin": "The Ascetic Climber",
       "keywords": [
         "横向敏感",
@@ -17974,11 +17980,12 @@ export const ARCHETYPES = {
         "mot_mastery": 1.4,
         "def_sublimate": 1.2,
         "big5_industry": 0.9
-      }
+      },
+      "psych_tag": "高比较敏感 × 高成就驱动型"
     },
     {
       "id": "AR08",
-      "name": "门廊上的深情观望者",
+      "name": "门廊观望者",
       "latin": "The Porch Watcher",
       "keywords": [
         "珍视深度",
@@ -17991,7 +17998,8 @@ export const ARCHETYPES = {
         "mot_belonging": 1.2,
         "def_detach": 0.9,
         "light_faith": 0.5
-      }
+      },
+      "psych_tag": "高回避依恋 × 高归属渴求型"
     },
     {
       "id": "AR09",
@@ -18008,11 +18016,12 @@ export const ARCHETYPES = {
         "att_anxiety": 1.3,
         "dark_narc": 0.8,
         "big5_rumination": 0.7
-      }
+      },
+      "psych_tag": "高焦虑 × 高先发反击型"
     },
     {
       "id": "AR10",
-      "name": "优雅偷懒者",
+      "name": "优雅省力者",
       "latin": "The Elegant Minimalist",
       "keywords": [
         "厌恶重复",
@@ -18025,11 +18034,12 @@ export const ARCHETYPES = {
         "cog_global": 1.3,
         "big5_open": 1.1,
         "cog_diverge": 0.8
-      }
+      },
+      "psych_tag": "高全局抽象 × 低勤勉投入型"
     },
     {
       "id": "AR11",
-      "name": "冷静的现实手术刀",
+      "name": "临床手术刀",
       "latin": "The Clinical Scalpel",
       "keywords": [
         "果断止损",
@@ -18042,11 +18052,12 @@ export const ARCHETYPES = {
         "light_humanism": 1.1,
         "cog_logic": 1.2,
         "def_detach": 0.8
-      }
+      },
+      "psych_tag": "低共情 × 高人性信念的矛盾型"
     },
     {
       "id": "AR12",
-      "name": "清醒的享乐务实家",
+      "name": "清醒享乐派",
       "latin": "The Lucid Hedonist",
       "keywords": [
         "坦荡谈钱",
@@ -18059,12 +18070,13 @@ export const ARCHETYPES = {
         "mot_hedonism": 1.4,
         "mot_mastery": 0.9,
         "big5_aesthetic": 0.8
-      }
+      },
+      "psych_tag": "高贪婪驱力 × 低幸福取向型"
     },
     {
       "id": "AR13",
-      "name": "被未知召唤的探索者",
-      "latin": "The Summoned Explorer",
+      "name": "可能性成瘾者",
+      "latin": "The Possibility Addict",
       "keywords": [
         "概念饥饿",
         "跨界联想",
@@ -18076,11 +18088,12 @@ export const ARCHETYPES = {
         "cog_diverge": 1.2,
         "cog_ambiguity": 1,
         "big5_aesthetic": 0.7
-      }
+      },
+      "psych_tag": "高开放性 × 高发散破局型"
     },
     {
       "id": "AR14",
-      "name": "一手证据的匠人",
+      "name": "证据匠人",
       "latin": "The Evidence Artisan",
       "keywords": [
         "细节精度",
@@ -18093,11 +18106,12 @@ export const ARCHETYPES = {
         "big5_order": 1.3,
         "big5_industry": 1.3,
         "cog_logic": 1
-      }
+      },
+      "psych_tag": "高秩序 × 高勤勉的实证型"
     },
     {
       "id": "AR15",
-      "name": "带刺的理想主义者",
+      "name": "带刺理想者",
       "latin": "The Thorned Idealist",
       "keywords": [
         "对不公过敏",
@@ -18110,7 +18124,8 @@ export const ARCHETYPES = {
         "val_standard": 1.2,
         "big5_assert": 1.1,
         "light_kant": 1
-      }
+      },
+      "psych_tag": "高道德底线 × 高易怒张力型"
     },
     {
       "id": "AR16",
@@ -18127,11 +18142,12 @@ export const ARCHETYPES = {
         "def_detach": 1.1,
         "big5_alert": -0.9,
         "mot_security": 0.8
-      }
+      },
+      "psych_tag": "低反刍 × 高情感隔离的稳态型"
     },
     {
       "id": "AR17",
-      "name": "通晓灰度的务实者",
+      "name": "灰度务实者",
       "latin": "The Grey Pragmatist",
       "keywords": [
         "灰度操作",
@@ -18144,11 +18160,12 @@ export const ARCHETYPES = {
         "val_moral": -1.2,
         "cog_speed": 1.1,
         "val_standard": -1
-      }
+      },
+      "psych_tag": "低社会契约 × 低道德绝对型"
     },
     {
       "id": "AR18",
-      "name": "愿意先给出的信任者",
+      "name": "先予者",
       "latin": "The First-Giver",
       "keywords": [
         "善意默认",
@@ -18161,11 +18178,12 @@ export const ARCHETYPES = {
         "wv_nature": 1.2,
         "big5_compassion": 1,
         "def_project": -1
-      }
+      },
+      "psych_tag": "高善意 × 高妥协顺从型"
     },
     {
       "id": "AR19",
-      "name": "读空气的顺流者",
+      "name": "顺流读风者",
       "latin": "The Air Reader",
       "keywords": [
         "情境敏锐",
@@ -18178,11 +18196,12 @@ export const ARCHETYPES = {
         "big5_compliance": 1.2,
         "att_anxiety": 0.9,
         "big5_assert": -0.8
-      }
+      },
+      "psych_tag": "高服从 × 高共情的接应型"
     },
     {
       "id": "AR20",
-      "name": "以自由为地基的人",
+      "name": "主权者",
       "latin": "The Self-Sovereign",
       "keywords": [
         "不依附",
@@ -18195,11 +18214,12 @@ export const ARCHETYPES = {
         "att_avoidance": 1.2,
         "val_boundary": 1.2,
         "big5_social": -0.6
-      }
+      },
+      "psych_tag": "高自主 × 高回避的独立型"
     },
     {
       "id": "AR21",
-      "name": "长期主义的苦行僧",
+      "name": "长程苦行者",
       "latin": "The Long-Haul Ascetic",
       "keywords": [
         "延迟满足",
@@ -18212,11 +18232,12 @@ export const ARCHETYPES = {
         "mot_hedonism": -1.2,
         "virtue_temperance": 1.1,
         "lv_suffering": 0.9
-      }
+      },
+      "psych_tag": "高勤勉 × 低享乐的自律型"
     },
     {
       "id": "AR22",
-      "name": "在废墟上重建的人",
+      "name": "重建者",
       "latin": "The Rebuilder",
       "keywords": [
         "创伤转化",
@@ -18229,11 +18250,12 @@ export const ARCHETYPES = {
         "def_sublimate": 1.3,
         "mot_purpose": 1.1,
         "big5_rumination": 0.7
-      }
+      },
+      "psych_tag": "高升华转化 × 低逃避倾向型"
     },
     {
       "id": "AR23",
-      "name": "安静的推进引擎",
+      "name": "静默引擎",
       "latin": "The Quiet Engine",
       "keywords": [
         "低噪音",
@@ -18246,11 +18268,12 @@ export const ARCHETYPES = {
         "big5_industry": 1.4,
         "virtue_diligence": 1.1,
         "big5_social": -0.7
-      }
+      },
+      "psych_tag": "低表达 × 高勤勉的内驱型"
     },
     {
       "id": "AR24",
-      "name": "棋盘上的野心家",
+      "name": "棋局野心家",
       "latin": "The Ambitious Player",
       "keywords": [
         "向上驱动",
@@ -18263,11 +18286,12 @@ export const ARCHETYPES = {
         "dark_narc": 1.1,
         "dark_psycho": 0.9,
         "covert_control": 0.8
-      }
+      },
+      "psych_tag": "高自尊 × 高成就渴求型"
     },
     {
       "id": "AR25",
-      "name": "把危机当坐标系的人",
+      "name": "危机制图师",
       "latin": "The Crisis Cartographer",
       "keywords": [
         "高压下最清醒",
@@ -18283,11 +18307,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "time_present_fate": -0.7
-      }
+      },
+      "psych_tag": "高压秩序 × 高情绪高敏型"
     },
     {
       "id": "AR26",
-      "name": "口头禅是「都行」的调停者",
+      "name": "静默调停者",
       "latin": "The Quiet Arbiter",
       "keywords": [
         "不站队",
@@ -18303,12 +18328,13 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "big5_assert": -0.8
-      }
+      },
+      "psych_tag": "高避冲突 × 高外倾情感型"
     },
     {
       "id": "AR27",
-      "name": "用数字确认安全的人",
-      "latin": "The Ledger Keeper",
+      "name": "量化守夜人",
+      "latin": "The Quantified Watchman",
       "keywords": [
         "记账即安心",
         "风险先算",
@@ -18323,11 +18349,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "time_present_hed": -0.7
-      }
+      },
+      "psych_tag": "高金钱警觉 × 未来秩序锚定型"
     },
     {
       "id": "AR28",
-      "name": "先冲再说的引擎型",
+      "name": "引擎型",
       "latin": "The Engine",
       "keywords": [
         "耐受极高",
@@ -18343,11 +18370,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "hsp_sensory": -0.9
-      }
+      },
+      "psych_tag": "高刺激耐受 × 高新奇寻求型"
     },
     {
       "id": "AR29",
-      "name": "深海型的接收器",
+      "name": "深海接收器",
       "latin": "The Deep Receiver",
       "keywords": [
         "细节极清",
@@ -18363,11 +18391,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "hss_novelty": -0.6
-      }
+      },
+      "psych_tag": "高感官高敏 × 高情绪高敏型"
     },
     {
       "id": "AR30",
-      "name": "随身带着旧地图的人",
+      "name": "旧图守持者",
       "latin": "The Map Keeper",
       "keywords": [
         "经验即锚",
@@ -18383,11 +18412,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "jung_ne": -0.7
-      }
+      },
+      "psych_tag": "高经验内倾 × 高忠诚恐惧型"
     },
     {
       "id": "AR31",
-      "name": "不肯接受现成剧本的人",
+      "name": "自撰者",
       "latin": "The Self-Author",
       "keywords": [
         "自己定义意义",
@@ -18403,11 +18433,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "dd_order": -0.6
-      }
+      },
+      "psych_tag": "高存在主义 × 高自主反对安排型"
     },
     {
       "id": "AR32",
-      "name": "在混乱里讲良心的少数派",
+      "name": "无证圣徒",
       "latin": "The Unlicensed Saint",
       "keywords": [
         "不信流程",
@@ -18422,11 +18453,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "dark_mach": -1
-      }
+      },
+      "psych_tag": "低制度信任 × 高道德严格型"
     },
     {
       "id": "AR33",
-      "name": "把冲突翻译成方案的人",
+      "name": "转译者",
       "latin": "The Translator",
       "keywords": [
         "先降噪",
@@ -18442,11 +18474,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "pac_child": -0.7
-      }
+      },
+      "psych_tag": "高成人自我态 × 高协作冲突型"
     },
     {
       "id": "AR34",
-      "name": "被管一下就浑身难受的人",
+      "name": "不服管者",
       "latin": "The Unruled",
       "keywords": [
         "反感被安排",
@@ -18461,11 +18494,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "big5_compliance": -1.1
-      }
+      },
+      "psych_tag": "高自由道德 × 高自主反对管控型"
     },
     {
       "id": "AR35",
-      "name": "靠高强度确认自己还活着",
+      "name": "高电压者",
       "latin": "The Voltage Seeker",
       "keywords": [
         "安静即失重",
@@ -18481,11 +18515,12 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "virtue_temperance": -0.9
-      }
+      },
+      "psych_tag": "高强度寻求 × 高放纵代偿型"
     },
     {
       "id": "AR36",
-      "name": "提前把最坏演完的人",
+      "name": "预演室",
       "latin": "The Rehearsal Room",
       "keywords": [
         "预演最坏",
@@ -18501,7 +18536,8 @@ export const ARCHETYPES = {
       },
       "negWeights": {
         "phil_epicurean": -0.6
-      }
+      },
+      "psych_tag": "高灾难预期 × 高情绪高敏型"
     }
   ]
 };

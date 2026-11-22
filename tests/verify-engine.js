@@ -13,6 +13,7 @@ import {
   topGifts, topShadows, buildVolumeReport,
 } from '../src/core/synthesizer.js';
 import { compareStates } from '../src/core/comparator.js';
+import { buildVolumeTypology } from '../src/core/typology.js';
 import {
   scoreAllEcologies, relationshipScript, subtextDecoder, chemistryBoard,
 } from '../src/core/ecology.js';
@@ -245,7 +246,8 @@ function tc3() {
   check('所有维度均非 NaN', Object.values(s.computedScores).every((v) => Number.isFinite(v)));
 
   const report = buildHolographicReport(s, DATA);
-  check('原型匹配成功', !!report.archetype?.best?.name);
+  check('原型匹配成功', report.archetype?.eligible === true && !!report.archetype?.best?.name,
+    `eligible=${report.archetype?.eligible}`);
   check('王牌天赋 4 张', report.gifts.length === 4);
   check('阴影预警 3 张', report.shadows.length === 3);
   check('跨卷规则不超总数', report.cross.length <= CROSS_RULES.length);
@@ -423,6 +425,60 @@ function tc6() {
     }
   }
   check('选项字数比 ≤1.7', worst <= 1.7, `${worst.toFixed(2)} @ ${worstId}`);
+}
+
+/* ------------------------------------------------------------
+   TC6d · 单卷分型与跨卷原型分家
+   ------------------------------------------------------------ */
+
+function tc6d() {
+  console.log('\n[TC6d] 单卷分型 / 跨卷原型分家');
+
+  const dm = DATA.dimMap;
+
+  // 每卷都必须有分型（用该卷维度给一组中性以上分数）
+  for (const vid of VOL_IDS) {
+    const vol = VOLUMES[vid];
+    const sc = {};
+    const z = {};
+    (vol.dimensions || []).forEach((d, i) => {
+      sc[d] = 62 + (i % 5) * 4;
+      z[d] = 0.4 + (i % 3) * 0.3;
+    });
+    const t = buildVolumeTypology(vid, sc, z, dm, { pressure: { key: 'cold', share: 42 }, mask: 58 });
+    check(`${vid} 有专属分型`, !!t && !!t.title, t?.title || '');
+  }
+
+  // Vol.10 阵营命名
+  const v10 = buildVolumeTypology('vol10', { dd_order: 72, dd_good: 45 }, {}, dm, {});
+  check('Vol.10 输出九宫格阵营', /守序中立|Lawful Neutral/.test(v10.title), v10.title);
+
+  // Vol.16 四象限
+  const v16 = buildVolumeTypology('vol16', {
+    hsp_sensory: 70, hsp_emotional: 66, hss_novelty: 68, hss_intensity: 72,
+  }, {}, dm, {});
+  check('Vol.16 识别 HSS/HSP 矛盾体', /HSS\/HSP/.test(v16.title), v16.title);
+
+  // Vol.7 依恋类型
+  const v7 = buildVolumeTypology('vol7', {
+    att_anxiety: 70, att_avoidance: 72, def_detach: 68,
+  }, {}, dm, {});
+  check('Vol.7 输出恐惧矛盾型', /恐惧矛盾型/.test(v7.title), v7.title);
+
+  // 36 原型命名规范
+  const noTag = ARCHETYPES.archetypes.filter((a) => !a.psych_tag);
+  check('36 原型全部有 psych_tag', noTag.length === 0, noTag.map((a) => a.id).join(','));
+  const longName = ARCHETYPES.archetypes.filter((a) => a.name.length > 6);
+  check('原型名不超过 6 字', longName.length === 0, longName.map((a) => a.name).join(','));
+  const noLatin = ARCHETYPES.archetypes.filter((a) => !a.latin || !/^The /.test(a.latin));
+  check('原型全部有英文副标', noLatin.length === 0, noLatin.map((a) => a.id).join(','));
+
+  // weights 未被改动：36 个原型都还有 3–5 个维度
+  const badWeights = ARCHETYPES.archetypes.filter((a) => {
+    const n = Object.keys(a.weights || {}).length;
+    return n < 3 || n > 5;
+  });
+  check('权重维度数未被改动（3–5）', badWeights.length === 0, badWeights.map((a) => a.id).join(','));
 }
 
 /* ------------------------------------------------------------
@@ -615,6 +671,7 @@ function main() {
   tc6();
   tc6b();
   tc6c();
+  tc6d();
   tc7();
 
   console.log('\n' + '─'.repeat(64));

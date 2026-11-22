@@ -13,7 +13,7 @@
 import { DIMENSIONS, VOLUMES, MIRRORS, ARCHETYPES, CROSS_RULES, DIM_ORDER } from '../src/data/bundle.js';
 import { computeAll, questionRange } from '../src/core/scoring.js';
 import { encodeSoulCode, decodeSoulCode } from '../src/core/storage.js';
-import { matchCrossRules } from '../src/core/synthesizer.js';
+import { matchCrossRules, matchArchetype } from '../src/core/synthesizer.js';
 import { recordAnswer } from '../src/core/telemetry.js';
 
 const ROUNDS = Number(process.argv[2]) || 10000;
@@ -572,6 +572,43 @@ for (const [label, ids] of [
   if (maxErrRounded === 0 && volsOk && nameOk) {
     ok(`${label} 往返：取整后误差 0（1 字节/维的量化误差上限 0.5），卷数与昵称一致`);
   }
+}
+
+/* ---------- 5a. 原型覆盖率闸门 ---------- */
+// 只完成 Vol.6 的用户，不该命中任何需要 Vol.14 维度（money_*）的原型。
+{
+  const sar = matchArchetype(
+    { mot_autonomy: 80, mot_mastery: 78, mot_belonging: 76, mot_security: 82, mot_purpose: 74, mot_hedonism: 70 },
+    ARCHETYPES,
+  );
+
+  const chk = (name, cond, detail = '') => {
+    if (cond) ok(`${name}${detail ? ` · ${detail}` : ''}`);
+    else fail(`${name}${detail ? ` · ${detail}` : ''}`);
+  };
+
+  chk('只测 Vol.6 时无原型达标', sar.eligible === false, `eligible=${sar.eligible}`);
+
+  const moneyArchetypes = ARCHETYPES.archetypes.filter(
+    (a) => Object.keys(a.weights || {}).some((d) => d.startsWith('money_'))
+      || Object.keys(a.negWeights || {}).some((d) => d.startsWith('money_')),
+  );
+  chk('存在依赖 money_* 的原型', moneyArchetypes.length > 0, `${moneyArchetypes.length} 个`);
+
+  const wronglyPassed = (sar.pool || sar.ranked || []).filter(
+    (r) => r.eligible && moneyArchetypes.some((a) => a.id === r.id),
+  );
+  chk('依赖 money_* 的原型全部被覆盖率拦截', wronglyPassed.length === 0,
+    wronglyPassed.map((r) => r.id).join(','));
+
+  // 全维度测完时，覆盖率闸门不该误伤
+  const full = {};
+  for (const d of DIM_ORDER) full[d] = 70;
+  const fullRes = matchArchetype(full, ARCHETYPES);
+  chk('全维测完时有原型达标', fullRes.eligible === true, fullRes.best?.id || '');
+  chk('全维测完时覆盖率为 1', Math.abs(fullRes.coverage - 1) < 1e-6, `${fullRes.coverage}`);
+  chk('fit 经过覆盖率置信惩罚', fullRes.best.fit <= fullRes.best.rawFit,
+    `${fullRes.best.fit} <= ${fullRes.best.rawFit}`);
 }
 
 /* ---------- 5b. DIM_ORDER 前 60 位与 v3 冻结顺序一致 ---------- */

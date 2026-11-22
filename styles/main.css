@@ -3709,3 +3709,44 @@ body.is-immersive .quiz__back {
   .subtext__row { grid-template-columns: 1fr; gap: 2px; }
   .subtext__k { padding-top: 0; }
 }
+
+/* 封面专业心理学副标 */
+.cover-psych {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  max-width: 46ch;
+}
+
+/* 契合度 / 锚定维度 / 覆盖度 三连 */
+.cover-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 30px;
+  margin: 18px 0 4px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.cover-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.cover-metric b {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cover-metric i {
+  font-style: normal;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+}

@@ -8,6 +8,7 @@ import { el, go, round, clamp, toast, downloadText, formatDate } from '../core/u
 import {
   mirrorFor, topGifts, topShadows, buildHolographicReport, reportDepth,
 } from '../core/synthesizer.js';
+import { buildVolumeTypology } from '../core/typology.js';
 import { tierOf, maskTierOf, layeredScores } from '../core/scoring.js';
 import { butterflySvg } from '../viz/butterflySvg.js';
 import { radarSvg, maskRadar } from '../viz/radarSvg.js';
@@ -228,7 +229,10 @@ export function renderReport(root, ctx) {
 
   const report = buildHolographicReport(state, DATA);
   const depth = reportDepth(completed.length);
-  const arch = report.archetype?.best;
+  const archPack = report.archetype || null;
+  const arch = archPack?.eligible === false ? null : archPack?.best;
+  const archRunner = archPack?.eligible === false ? null : archPack?.runnerUp;
+  const isComposite = Boolean(archPack?.isComposite && archRunner);
 
   root.classList.add('view');
   root.appendChild(el('div', { class: 'report', style: { '--vc': 'var(--gold)' } }));
@@ -247,7 +251,52 @@ export function renderReport(root, ctx) {
     el('div', { style: { fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-tertiary)' }, text: formatDate(state.updatedAt) }),
   ]));
 
-  cover.appendChild(el('h1', { class: 'cover-title', text: arch ? arch.name : '你的人性档案' }));
+  /* 主标题：复合原型时写成「主原型 × 副原型底色」 */
+  const archTitle = arch
+    ? (isComposite ? `${arch.name} × ${archRunner.name}底色` : arch.name)
+    : '你的人性档案';
+
+  cover.appendChild(el('div', {
+    style: {
+      fontSize: '10px',
+      letterSpacing: '0.3em',
+      textTransform: 'uppercase',
+      color: 'var(--gold)',
+      marginBottom: '12px',
+    },
+    text: arch ? (arch.latin || '') : '',
+  }));
+
+  cover.appendChild(el('h1', { class: 'cover-title', text: archTitle }));
+
+  /* 专业心理学结构副标 */
+  if (arch && arch.psych_tag) {
+    cover.appendChild(el('p', { class: 'cover-psych', text: arch.psych_tag }));
+  }
+
+  /* 契合度 + 锚定维度数 */
+  if (arch) {
+    const anchorN = arch.hitCount || arch.hits?.length || 0;
+    cover.appendChild(el('div', { class: 'cover-metrics' }, [
+      el('span', { class: 'cover-metric' }, [
+        el('b', { text: `${Math.round(arch.fit)}%` }),
+        el('i', { text: '契合度' }),
+      ]),
+      el('span', { class: 'cover-metric' }, [
+        el('b', { text: `${anchorN}` }),
+        el('i', { text: '项核心特质锚定' }),
+      ]),
+      el('span', { class: 'cover-metric' }, [
+        el('b', { text: `${Math.round((arch.coverage || 0) * 100)}%` }),
+        el('i', { text: '维度覆盖' }),
+      ]),
+    ]));
+  } else {
+    cover.appendChild(el('p', {
+      class: 'cover-psych',
+      text: '已完成卷宗还不足以支撑跨卷原型判定。继续完成 1–2 卷后，这里会给出主原型与副原型底色。',
+    }));
+  }
 
   if (nickname) {
     cover.appendChild(el('div', {
@@ -257,8 +306,16 @@ export function renderReport(root, ctx) {
   }
 
   if (arch) {
-    cover.appendChild(el('div', { class: 'cover-keywords' }, arch.keywords.map((k) => el('span', { class: 'kw', text: k }))));
+    cover.appendChild(el('div', { class: 'cover-keywords' }, (arch.keywords || []).map((k) => el('span', { class: 'kw', text: k }))));
     cover.appendChild(el('p', { class: 'cover-verdict', text: arch.verdict }));
+    if (isComposite) {
+      cover.appendChild(el('p', {
+        style: {
+          margin: '6px 0 0', fontSize: '11.5px', color: 'var(--text-tertiary)', letterSpacing: '0.04em',
+        },
+        text: `副原型「${archRunner.name}」只差 ${Math.round(arch.fit - archRunner.fit)} 分，底色同样成立。`,
+      }));
+    }
   }
 
   const lightDark = computeLightDark(report.scores);
@@ -1009,7 +1066,40 @@ function renderVolumeReport(root, ctx, volId) {
     el('div', { style: { fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-tertiary)' }, text: formatDate(state.updatedAt) }),
   ]));
 
-  cover.appendChild(el('h1', { class: 'cover-title', text: vol.title }));
+  /* 主标题：本卷专属分型（不是 36 个跨卷原型）
+     卷名降为上方的小字副标，分型成为封面主角。 */
+  const scoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
+  const zMap = {};
+  for (const d of Object.keys(typoScoreMap)) {
+    const z = state.zScores?.[d];
+    if (Number.isFinite(z)) zMap[d] = z;
+  }
+  const typo = buildVolumeTypology(volId, typoScoreMap, zMap, DATA.dimMap, {
+    pressure: state.pressureStyle || null,
+    mask: state.maskIndex,
+  });
+
+  cover.appendChild(el('div', {
+    style: {
+      fontSize: '11px',
+      letterSpacing: '0.22em',
+      color: 'var(--text-tertiary)',
+      marginBottom: '10px',
+    },
+    text: vol.title,
+  }));
+
+  cover.appendChild(el('h1', {
+    class: 'cover-title',
+    text: typo ? typo.title : vol.title,
+  }));
+
+  if (typo && typo.tag) {
+    cover.appendChild(el('p', {
+      class: 'cover-psych',
+      text: typo.tag,
+    }));
+  }
 
   if (state.nickname) {
     cover.appendChild(el('div', {
@@ -1056,7 +1146,7 @@ function renderVolumeReport(root, ctx, volId) {
     return body;
   };
 
-  const scoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
+  const typoScoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
 
   if (volId === 'vol1') {
     const body = chartCard('七美德 × 七原罪 · 双翼蝶形', '左翼为秩序，右翼为驱力');

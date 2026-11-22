@@ -106,37 +106,126 @@ export function topShadows(scores, MIRRORS, limit = 3, zScores = null) {
    原型匹配
    ------------------------------------------------------------ */
 
+/**
+ * 原型匹配。
+ *
+ * v4.5 修复「单维劫持」：
+ *   旧实现把未测维度直接跳过，只用「已测的那几项」求平均。
+ *   于是某个原型只要 1 个维度恰好高分，就能凭 100% 的单维平均分
+ *   反杀另一个扎实命中 4 个维度的原型。
+ *
+ * 现在按三步走：
+ *   1. 统计 totalW / coveredW，算出覆盖率
+ *   2. 硬闸门：coverage >= 0.60 且头号核心维度已测，才有资格进候选池
+ *   3. 覆盖率置信惩罚：fit = rawFit × (0.75 + 0.25 × coverage)
+ *
+ * 若没有任何原型达标，返回 { eligible: false }，由单卷分型接管封面，
+ * 绝不硬塞一个跨卷大原型。
+ */
+export const ARCH_COVERAGE_MIN = 0.6;
+export const ARCH_COMPOSITE_GAP = 8;
+
 export function matchArchetype(scores, ARCHETYPES) {
   const list = ARCHETYPES.archetypes || [];
   if (!list.length) return null;
 
   const graded = list.map((a) => {
-    let wSum = 0;
-    let acc = 0;
-    const hits = [];
-    for (const [dim, w] of Object.entries(a.weights || {})) {
-      const s = scores[dim];
-      if (!Number.isFinite(s)) continue;
-      // v4.2.1：weights 里的负号含义是「该维度越低越像」，
-      // 必须按 (100 − s) 参与累加。旧实现写 acc += s * w，
-      // 会让「低分才匹配」的原型在低分时反而被扣分（例如 AR16 深海稳压器
-      // 在完美画像下只能拿到 25.7），这类原型因此永远无法命中。
+    const weights = a.weights || {};
+    const negWeights = a.negWeights || {};
+
+    /* ---- 1. 总权重 / 已覆盖权重 / 头号核心维度 ---- */
+    let totalW = 0;
+    let coveredW = 0;
+    let primaryDim = null;
+    let primaryMag = -1;
+
+    for (const [dim, w] of Object.entries(weights)) {
       const mag = Math.abs(w);
-      acc += (w < 0 ? 100 - s : s) * mag;
+      totalW += mag;
+      if (mag > primaryMag) { primaryMag = mag; primaryDim = dim; }
+      if (Number.isFinite(scores[dim])) coveredW += mag;
+    }
+    for (const [dim, w] of Object.entries(negWeights)) {
+      const mag = Math.abs(w);
+      totalW += mag;
+      if (mag > primaryMag) { primaryMag = mag; primaryDim = dim; }
+      if (Number.isFinite(scores[dim])) coveredW += mag;
+    }
+
+    const coverage = totalW > 0 ? coveredW / totalW : 0;
+    const primaryCovered = primaryDim ? Number.isFinite(scores[primaryDim]) : false;
+    const eligible = coverage >= ARCH_COVERAGE_MIN && primaryCovered;
+
+    /* ---- 2. 只用已测维度算原始契合度 ---- */
+    let acc = 0;
+    let wSum = 0;
+    const hits = [];
+
+    for (const [dim, w] of Object.entries(weights)) {
+      const sc = scores[dim];
+      if (!Number.isFinite(sc)) continue;
+      const mag = Math.abs(w);
+      // weights 里的负号含义是「该维度越低越像」，按 (100 − sc) 参与累加
+      acc += (w < 0 ? 100 - sc : sc) * mag;
       wSum += mag;
-      if (mag >= 0.9) hits.push({ dim, score: round(s, 0), w, inverse: w < 0 });
+      if (mag >= 0.9) hits.push({ dim, score: round(sc, 0), w, inverse: w < 0 });
     }
-    for (const [dim, w] of Object.entries(a.negWeights || {})) {
-      const s = scores[dim];
-      if (!Number.isFinite(s)) continue;
-      acc += (100 - s) * Math.abs(w);
-      wSum += Math.abs(w);
+    for (const [dim, w] of Object.entries(negWeights)) {
+      const sc = scores[dim];
+      if (!Number.isFinite(sc)) continue;
+      const mag = Math.abs(w);
+      acc += (100 - sc) * mag;
+      wSum += mag;
+      if (mag >= 0.9) hits.push({ dim, score: round(sc, 0), w: -mag, inverse: true });
     }
-    return { ...a, fit: wSum > 0 ? clamp(acc / wSum, 0, 100) : 0, hits };
+
+    const rawFit = wSum > 0 ? clamp(acc / wSum, 0, 100) : 0;
+
+    /* ---- 3. 覆盖率置信惩罚 ---- */
+    const fit = clamp(rawFit * (0.75 + 0.25 * coverage), 0, 100);
+
+    return {
+      ...a,
+      fit: round(fit, 1),
+      rawFit: round(rawFit, 1),
+      coverage: round(coverage, 2),
+      primaryDim,
+      primaryCovered,
+      eligible,
+      hitCount: hits.length,
+      hits,
+    };
   });
 
   const ranked = sortBy(graded, (r) => r.fit, -1);
-  return { best: ranked[0], runnerUp: ranked[1] || null, ranked };
+
+  /* 只有达标原型才有资格上封面 */
+  const pool = ranked.filter((r) => r.eligible);
+  if (!pool.length) {
+    return {
+      eligible: false,
+      best: null,
+      runnerUp: null,
+      isComposite: false,
+      coverage: 0,
+      ranked,
+      reason: '共同维度不足以支撑任何跨卷原型',
+    };
+  }
+
+  const best = pool[0];
+  const runnerUp = pool[1] || null;
+  const isComposite = Boolean(runnerUp && (best.fit - runnerUp.fit) <= ARCH_COMPOSITE_GAP);
+
+  return {
+    eligible: true,
+    best,
+    runnerUp,
+    isComposite,
+    coverage: best.coverage,
+    ranked,
+    pool,
+  };
 }
 
 /* ------------------------------------------------------------
