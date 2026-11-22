@@ -14,6 +14,10 @@ import { DIMENSIONS, VOLUMES, MIRRORS, ARCHETYPES, CROSS_RULES, DIM_ORDER } from
 import { computeAll, questionRange } from '../src/core/scoring.js';
 import { encodeSoulCode, decodeSoulCode } from '../src/core/storage.js';
 import { matchCrossRules, matchArchetype } from '../src/core/synthesizer.js';
+import { pressureSandbox, innerParliament, timelineDiff } from '../src/core/lab.js';
+import { encodeJohari, decodeJohari, JOHARI_DIMS } from '../src/core/johari.js';
+import { assignRoles, affinityMatrix } from '../src/core/squad.js';
+import { LocalOnlyAdapter, getAdapter } from '../src/core/cloudAdapter.js';
 import { recordAnswer } from '../src/core/telemetry.js';
 
 const ROUNDS = Number(process.argv[2]) || 10000;
@@ -572,6 +576,65 @@ for (const [label, ids] of [
   if (maxErrRounded === 0 && volsOk && nameOk) {
     ok(`${label} 往返：取整后误差 0（1 字节/维的量化误差上限 0.5），卷数与昵称一致`);
   }
+}
+
+/* ---------- 4b. Phase 3/4 新模块的自我校验 ---------- */
+{
+  const chk = (name, cond, detail = '') => {
+    if (cond) ok(`${name}${detail ? ` · ${detail}` : ''}`);
+    else fail(`${name}${detail ? ` · ${detail}` : ''}`);
+  };
+
+  // 沙盒：能量两端反向且不越界
+  const probe = {};
+  for (const d of DIM_ORDER) probe[d] = 55;
+  probe.sin_pride = 70; probe.mot_autonomy = 70;
+  const lo = pressureSandbox(probe, 0);
+  const hi = pressureSandbox(probe, 100);
+  chk('沙盒：耗竭时暗面上行、明面下行',
+    lo.scores.sin_pride > 70 && lo.scores.mot_autonomy < 70);
+  chk('沙盒：充沛时反向', hi.scores.sin_pride < 70 && hi.scores.mot_autonomy > 70);
+  chk('沙盒：不越界',
+    Object.values(lo.scores).every((v) => v >= 0 && v <= 100));
+
+  // 议会
+  const parl = innerParliament({ ...probe, mot_security: 68, att_anxiety: 66 }, 3);
+  chk('议会：能命中张力对', parl.length > 0, `${parl.length}`);
+  chk('议会：每对都有双声部', parl.every((x) => x.voiceA && x.voiceB && x.verdict));
+
+  // 时间胶囊
+  const diff = timelineDiff({ ...probe, sin_pride: 40 }, probe, DATA.dimMap);
+  chk('时间胶囊：能算出变化', diff.rows.length > 0 && diff.top5.length > 0);
+
+  // 乔哈里
+  const jc = encodeJohari(probe, '检测');
+  const jd = decodeJohari(jc);
+  chk('乔哈里：HA4J 往返', jd.ok && Object.keys(jd.scores).length === JOHARI_DIMS.length,
+    `${jc.length} 字符`);
+
+  // 群像
+  const mkM = (name, over) => ({
+    name,
+    state: { computedScores: { ...probe, ...over }, completedVolumes: ['vol1', 'vol2', 'vol3'], maskIndex: 50 },
+  });
+  const squad3 = [
+    mkM('一', { big5_order: 76, mot_security: 74 }),
+    mkM('二', { big5_social: 78, big5_assert: 72 }),
+    mkM('三', { covert_control: 76, dark_mach: 72 }),
+  ];
+  const roles = assignRoles(squad3, DATA);
+  chk('群像：三人三种角色', new Set(roles.map((r) => r.role)).size === 3);
+  const affM = affinityMatrix(squad3, DATA);
+  chk('群像：矩阵对称且对角为 100',
+    affM.matrix[0][0] === 100 && affM.matrix[0][1] === affM.matrix[1][0]);
+
+  // 云端适配器：默认不联网、未同意不写入
+  const silent = await LocalOnlyAdapter.saveAnonymousSample(
+    { computedScores: probe, maskIndex: 50, completedVolumes: [] },
+    DIM_ORDER,
+  );
+  chk('云端适配器：未同意时跳过', silent.skipped === true);
+  chk('云端适配器：默认本地实现', getAdapter().name === 'local-only');
 }
 
 /* ---------- 5a. 原型覆盖率闸门 ---------- */

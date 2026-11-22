@@ -9,6 +9,9 @@ import {
   mirrorFor, topGifts, topShadows, buildHolographicReport, reportDepth,
 } from '../core/synthesizer.js';
 import { buildVolumeTypology } from '../core/typology.js';
+import {
+  sandboxSection, parliamentSection, timelineSection,
+} from './LabView.js';
 import { tierOf, maskTierOf, layeredScores } from '../core/scoring.js';
 import { butterflySvg } from '../viz/butterflySvg.js';
 import { radarSvg, maskRadar } from '../viz/radarSvg.js';
@@ -346,6 +349,9 @@ export function renderReport(root, ctx) {
     { id: 'r-mirror', label: '双面镜' },
     { id: 'r-cross', label: '跨卷读心' },
     { id: 'r-dual', label: '双态推演' },
+    { id: 'r-sandbox', label: '压力沙盒' },
+    { id: 'r-parliament', label: '内在议会' },
+    { id: 'r-timeline', label: '时间胶囊' },
     { id: 'r-archives', label: '分卷档案' },
     { id: 'r-manual', label: '使用说明书' },
     { id: 'r-export', label: '导出' },
@@ -709,6 +715,35 @@ export function renderReport(root, ctx) {
     ]));
   }
   wrap.appendChild(dualSec);
+
+  /* ============ 实验室 · 压力沙盒 / 内在议会 / 时间胶囊 ============ */
+  const labColors = {
+    text: C.text,
+    muted: C.faint,
+    border: C.border,
+    card: C.card,
+    gold: C.gold,
+    sin: C.vol1,
+    virtue: C.vol2,
+    faint: C.faint,
+    dimName: (id) => DATA.dimMap[id]?.name || id,
+  };
+
+  const sandbox = sandboxSection({ scores: report.scores, colors: labColors });
+  if (sandbox) wrap.appendChild(sandbox);
+
+  const parliament = parliamentSection({ scores: report.scores });
+  if (parliament) wrap.appendChild(parliament);
+
+  // 时间胶囊需要 dimOrder 才能解码粘贴进来的存档码
+  state.__dimOrder = DATA.dimOrder;
+  const timeline = timelineSection({
+    state,
+    scores: report.scores,
+    colors: labColors,
+    dimMap: DATA.dimMap,
+  });
+  if (timeline) wrap.appendChild(timeline);
 
   /* ============ 模块 5 · 分卷档案 ============ */
   const archSec = el('section', { class: 'rsec', id: 'r-archives' });

@@ -15,6 +15,13 @@ import {
 import { compareStates } from '../src/core/comparator.js';
 import { buildVolumeTypology } from '../src/core/typology.js';
 import {
+  pressureSandbox, innerParliament, timelineDiff, stageOf, ENERGY_STAGES,
+} from '../src/core/lab.js';
+import {
+  JOHARI_DIMS, JOHARI_QUESTIONS, encodeJohari, decodeJohari, johariResult,
+} from '../src/core/johari.js';
+import { assignRoles, affinityMatrix, coverage, squadCharter } from '../src/core/squad.js';
+import {
   scoreAllEcologies, relationshipScript, subtextDecoder, chemistryBoard,
 } from '../src/core/ecology.js';
 
@@ -428,6 +435,163 @@ function tc6() {
 }
 
 /* ------------------------------------------------------------
+   TC6f · 社交实验室（乔哈里窗 / 群像星图）
+   ------------------------------------------------------------ */
+
+function tc6f() {
+  console.log('\n[TC6f] 社交拓展实验室');
+
+  /* ---- 乔哈里 ---- */
+  check('乔哈里 12 题', JOHARI_QUESTIONS.length === 12, `${JOHARI_QUESTIONS.length}`);
+  check('乔哈里 12 维', JOHARI_DIMS.length === 12, `${JOHARI_DIMS.length}`);
+  check('每题都对应一个合法维度',
+    JOHARI_QUESTIONS.every((q) => DIM_ORDER.includes(q.dim)));
+  check('每题恰好 4 个选项',
+    JOHARI_QUESTIONS.every((q) => (q.opts || []).length === 4));
+
+  const self = {};
+  JOHARI_DIMS.forEach((d, i) => { self[d] = 40 + i * 4; });
+
+  const code = encodeJohari(self, '青禾');
+  check('HA4J- 前缀正确', code.startsWith('HA4J-'), code.slice(0, 8));
+  const dec = decodeJohari(code);
+  check('印象码可解码', dec.ok, dec.ok ? '' : dec.error);
+  check('昵称保留', dec.nickname === '青禾', dec.nickname);
+  check('12 维全部保留',
+    JOHARI_DIMS.every((d) => Math.abs(dec.scores[d] - self[d]) <= 1),
+    Object.keys(dec.scores).length + '');
+
+  check('错误前缀被拒绝', decodeJohari('HA4-xxx').ok === false);
+  check('篡改的印象码被拒绝',
+    decodeJohari(`${code.slice(0, -2)}AA`).ok === false);
+
+  const guesses = JOHARI_DIMS.map((d, i) => ({ dim: d, pick: i % 4 }));
+  const res = johariResult(self, guesses);
+  const total = res.open.length + res.blind.length + res.facade.length + res.unknown.length;
+  check('四象限覆盖全部维度', total === JOHARI_DIMS.length, `${total}`);
+  check('一致度已计算', Number.isFinite(res.agreement), `${res.agreement}`);
+  check('一致度在 0–100', res.agreement >= 0 && res.agreement <= 100);
+
+  /* ---- 群像 ---- */
+  const mk = (name, over) => {
+    const sc = {};
+    for (const d of DIM_ORDER) sc[d] = 50;
+    Object.assign(sc, over);
+    return {
+      name,
+      state: {
+        nickname: name,
+        computedScores: sc,
+        completedVolumes: ['vol1', 'vol2', 'vol3', 'vol4', 'vol5', 'vol6', 'vol7'],
+        maskIndex: 50,
+        topValues: [],
+      },
+    };
+  };
+
+  const squad = [
+    mk('甲', { big5_order: 76, mot_security: 74, def_detach: 66, att_anxiety: 32 }),
+    mk('乙', { big5_social: 78, big5_assert: 72, hss_novelty: 70, big5_compliance: 30 }),
+    mk('丙', { covert_control: 76, dark_mach: 72, cog_global: 70, big5_assert: 34 }),
+    mk('丁', { big5_compassion: 78, jung_fe: 74, def_fawn: 70 }),
+  ];
+
+  const roles = assignRoles(squad, DATA);
+  check('每人都有生态位', roles.every((r) => r.role));
+  check('角色不重复', new Set(roles.map((r) => r.role)).size === roles.length,
+    roles.map((r) => r.role).join(','));
+  check('定海神针落在高秩序的人身上',
+    roles.find((r) => r.name === '甲')?.role === 'anchor',
+    roles.find((r) => r.name === '甲')?.role);
+
+  const aff = affinityMatrix(squad, DATA);
+  check('矩阵尺寸正确', aff.matrix.length === 4 && aff.matrix[0].length === 4);
+  check('对角线为 100', aff.matrix[0][0] === 100 && aff.matrix[3][3] === 100);
+  check('矩阵对称', aff.matrix[0][1] === aff.matrix[1][0]);
+  check('能找出最合拍的一对', !!aff.best && Number.isFinite(aff.best.score));
+
+  const cov = coverage(squad, DATA);
+  check('覆盖表非空', cov.rows.length > 0, `${cov.rows.length}`);
+  check('缺口已识别', Array.isArray(cov.gaps));
+
+  const charter = squadCharter(squad, roles, cov.gaps);
+  check('公约至少 2 条', charter.length >= 2, `${charter.length}`);
+}
+
+/* ------------------------------------------------------------
+   TC6e · 个人实验室（沙盒 / 议会 / 时间胶囊）
+   ------------------------------------------------------------ */
+
+function tc6e() {
+  console.log('\n[TC6e] 个人深度实验室');
+
+  const base = {};
+  for (const d of DIM_ORDER) base[d] = 55;
+  const spicy = {
+    ...base,
+    mot_autonomy: 72, mot_security: 68,
+    hsp_sensory: 70, hss_novelty: 66,
+    sin_pride: 70, att_anxiety: 66,
+    light_kant: 68, dark_mach: 62,
+  };
+
+  /* ---- 沙盒 ---- */
+  const mid = pressureSandbox(spicy, 50);
+  check('能量 50 时等于原值', spicy.sin_pride === mid.scores.sin_pride,
+    `${mid.scores.sin_pride}`);
+
+  const low = pressureSandbox(spicy, 0);
+  const high = pressureSandbox(spicy, 100);
+  check('耗竭时暗面维度上升', low.scores.sin_pride > spicy.sin_pride,
+    `${spicy.sin_pride} → ${low.scores.sin_pride}`);
+  check('充沛时暗面维度下降', high.scores.sin_pride < spicy.sin_pride,
+    `${spicy.sin_pride} → ${high.scores.sin_pride}`);
+  check('耗竭时明面维度下降', low.scores.mot_autonomy < spicy.mot_autonomy,
+    `${spicy.mot_autonomy} → ${low.scores.mot_autonomy}`);
+  check('充沛时明面维度上升', high.scores.mot_autonomy > spicy.mot_autonomy,
+    `${spicy.mot_autonomy} → ${high.scores.mot_autonomy}`);
+  check('偏移不超过 16 分', Math.abs(low.delta.sin_pride) <= 16.1,
+    `${low.delta.sin_pride}`);
+
+  const allInRange = Object.values(low.scores).every((v) => v >= 0 && v <= 100);
+  check('沙盒分数不越界', allInRange);
+
+  check('四档能量阶段齐全', ENERGY_STAGES.length === 4);
+  check('能量 0 落在极度耗竭', stageOf(0).key === 'depleted');
+  check('能量 100 落在充沛顺境', stageOf(100).key === 'zone');
+
+  /* ---- 议会 ---- */
+  const pairs = innerParliament(spicy, 3);
+  check('议会能命中张力对', pairs.length > 0, `${pairs.length}`);
+  check('议会对数不超过 limit', pairs.length <= 3, `${pairs.length}`);
+  check('每对都有双声部与调解',
+    pairs.every((p) => p.voiceA && p.voiceB && p.verdict && p.tip));
+
+  const autoSec = innerParliament(spicy, 3).find((p) => p.title.includes('自由'));
+  check('自由 × 安全被识别', !!autoSec, autoSec?.title || '');
+
+  // 全部压低时不该命中
+  const flat = {};
+  for (const d of DIM_ORDER) flat[d] = 30;
+  check('低分画像不触发议会', innerParliament(flat, 3).length === 0);
+
+  /* ---- 时间胶囊 ---- */
+  const past = { ...spicy, mot_autonomy: 56, hsp_sensory: 58, sin_pride: 78 };
+  const now = { ...spicy };
+  const diff = timelineDiff(past, now, DATA.dimMap);
+  check('时间胶囊有重叠维度', diff.rows.length > 0, `${diff.rows.length}`);
+  check('Top5 不超过 5 条', diff.top5.length <= 5, `${diff.top5.length}`);
+  check('Top5 按绝对变化降序',
+    diff.top5.every((r, i) => i === 0 || Math.abs(diff.top5[i - 1].delta) >= Math.abs(r.delta)));
+  check('能识别上升最多的维度', diff.top5[0].delta > 0, diff.top5[0]?.name);
+  check('meanShift 已计算', Number.isFinite(diff.meanShift), `${diff.meanShift}`);
+  check('结语非空', typeof diff.verdict === 'string' && diff.verdict.length > 10);
+
+  const noOverlap = timelineDiff({ unknown_dim: 50 }, now, DATA.dimMap);
+  check('无重叠时优雅降级', noOverlap.rows.length === 0 && /无法对照/.test(noOverlap.verdict));
+}
+
+/* ------------------------------------------------------------
    TC6d · 单卷分型与跨卷原型分家
    ------------------------------------------------------------ */
 
@@ -672,6 +836,8 @@ function main() {
   tc6b();
   tc6c();
   tc6d();
+  tc6e();
+  tc6f();
   tc7();
 
   console.log('\n' + '─'.repeat(64));

@@ -451,8 +451,22 @@ export function renderHub(root, ctx) {
   tools.appendChild(tool(
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8.5" cy="12" r="4.5"/><circle cx="15.5" cy="12" r="4.5"/></svg>',
     '双人对比室',
-    '两人共同完成卷宗的交集，计算共振与阴影碰撞。',
+    '两人共同完成卷宗的交集，六大关系生态位合盘。',
     () => go('#/compare'),
+  ));
+
+  tools.appendChild(tool(
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>',
+    '印象盲盒',
+    '12 题让好友盲猜你，生成乔哈里窗四象限。',
+    () => go('#/johari'),
+  ));
+
+  tools.appendChild(tool(
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="8" r="2.6"/><circle cx="17" cy="8" r="2.6"/><circle cx="12" cy="17" r="2.6"/><path d="M9 9.6l2 5M15 9.6l-2 5M9.6 8h4.8"/></svg>',
+    '群像星图',
+    '3–6 人小队生态位、缘分矩阵与共同短板。',
+    () => go('#/squad'),
   ));
 
   root.appendChild(tools);

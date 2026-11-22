@@ -19,6 +19,7 @@ import { renderQuiz } from './components/QuizRunner.js';
 import { renderReport } from './components/ReportView.js';
 import { renderCompare } from './components/CompareView.js';
 import { renderExpressIntro, renderExpressResult } from './components/ExpressView.js';
+import { renderJohari, renderSquad } from './components/SocialView.js';
 import { buildExpressVolume, seedFromVolumes } from './core/express.js';
 
 /* ------------------------------------------------------------
@@ -232,6 +233,19 @@ function render(route) {
     setActiveNav('hub');
     root.className = 'page page--narrow';
     renderQuiz(root, { App, DATA, volId: parts[1], mode: 'intro', recompute, go });
+    return;
+  }
+
+  // 乔哈里窗 / 群像星图
+  if (head === 'johari') {
+    root.className = 'page';
+    renderJohari(root, { App, DATA, go });
+    return;
+  }
+
+  if (head === 'squad') {
+    root.className = 'page';
+    renderSquad(root, { App, DATA, go });
     return;
   }
 

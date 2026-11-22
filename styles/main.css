@@ -3750,3 +3750,676 @@ body.is-immersive .quiz__back {
   letter-spacing: 0.12em;
   color: var(--text-tertiary);
 }
+
+/* ============================================================
+   v5.0 Phase 3 · 压力变形沙盒
+   ============================================================ */
+.sandbox__lead {
+  margin: 0 0 20px;
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--text-secondary);
+  max-width: 62ch;
+}
+
+.sandbox {
+  padding: 26px 26px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.sandbox__control { margin-bottom: 22px; }
+
+.sandbox__value {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sandbox__value b {
+  font-family: var(--font-serif);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sandbox__value i {
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+}
+
+.sandbox__slider { position: relative; }
+
+/* 彩色填充轨：耗竭红 → 常态金 → 充沛绿 */
+.sandbox__range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--vol1) 62%, transparent) 0%,
+    color-mix(in srgb, var(--gold) 55%, transparent) 50%,
+    color-mix(in srgb, var(--vol2) 62%, transparent) 100%);
+  outline: none;
+  cursor: pointer;
+}
+
+.sandbox__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--gold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  cursor: grab;
+}
+
+.sandbox__range::-webkit-slider-thumb:active { cursor: grabbing; }
+
+.sandbox__range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--gold);
+  cursor: grab;
+}
+
+.sandbox__ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+}
+
+.sandbox__stage {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: var(--bg-inset);
+  border-left: 2px solid var(--gold);
+}
+
+.sandbox__stage h4 {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.sandbox__stage p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.95;
+  color: var(--text-secondary);
+}
+
+.sandbox__canvas {
+  display: grid;
+  place-items: center;
+  margin: 6px 0 14px;
+}
+
+.sandbox__delta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.sandbox__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  border: 1px solid var(--border);
+}
+
+.sandbox__chip b {
+  font-family: var(--font-serif);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sandbox__chip.is-up {
+  border-color: color-mix(in srgb, var(--vol2) 40%, transparent);
+  color: var(--vol2);
+  background: color-mix(in srgb, var(--vol2) 6%, transparent);
+}
+
+.sandbox__chip.is-down {
+  border-color: color-mix(in srgb, var(--vol1) 40%, transparent);
+  color: var(--vol1);
+  background: color-mix(in srgb, var(--vol1) 6%, transparent);
+}
+
+.sandbox__warn {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--vol1) 34%, transparent);
+  background: color-mix(in srgb, var(--vol1) 6%, transparent);
+}
+
+.sandbox__warn b {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--vol1);
+  margin-bottom: 8px;
+}
+
+.sandbox__warn p {
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.sandbox__presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.sandbox__hint {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--text-tertiary);
+}
+
+/* ============================================================
+   内在议会
+   ============================================================ */
+.parliament {
+  padding: 24px 26px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  margin-bottom: 16px;
+}
+
+.parliament__top {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.parliament__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+
+.parliament__top h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  flex: 1;
+}
+
+.parliament__intensity {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.parliament__voices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.voice {
+  padding: 16px 18px;
+  border-radius: var(--radius);
+}
+
+.voice--a {
+  background: color-mix(in srgb, var(--vol2) 5%, var(--bg-inset));
+  border-left: 2px solid color-mix(in srgb, var(--vol2) 55%, transparent);
+}
+
+.voice--b {
+  background: color-mix(in srgb, var(--vol1) 5%, var(--bg-inset));
+  border-left: 2px solid color-mix(in srgb, var(--vol1) 55%, transparent);
+}
+
+.voice__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.voice__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.voice--a .voice__dot { background: var(--vol2); }
+.voice--b .voice__dot { background: var(--vol1); }
+
+.voice__score {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+.voice__text {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  line-height: 1.95;
+  color: var(--text-primary);
+}
+
+.parliament__verdict,
+.parliament__tip {
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.parliament__tip { margin-top: 12px; }
+
+.parliament__verdict b,
+.parliament__tip b {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.parliament__verdict p,
+.parliament__tip p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.95;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   时间胶囊
+   ============================================================ */
+.timeline {
+  padding: 24px 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.timeline__input {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.timeline__input textarea { flex: 1; }
+
+.timeline__chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.timeline__result { margin-top: 18px; }
+
+.timeline__radar {
+  display: grid;
+  place-items: center;
+  margin: 8px 0 18px;
+}
+
+.timeline__list {
+  display: grid;
+  gap: 2px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.timeline__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px 18px 34px 56px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 2px;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border-hair);
+}
+
+.timeline__row:last-child { border-bottom: none; }
+
+.timeline__name {
+  font-family: var(--font-serif);
+  color: var(--text-primary);
+  letter-spacing: 0.03em;
+}
+
+.timeline__past { text-align: right; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.timeline__arrow { text-align: center; color: var(--text-tertiary); opacity: 0.6; }
+.timeline__now { text-align: right; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+.timeline__delta {
+  text-align: right;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline__delta.is-up { color: var(--vol2); }
+.timeline__delta.is-down { color: var(--vol1); }
+.timeline__delta.is-flat { color: var(--text-tertiary); }
+
+.timeline__verdict {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--bg-inset);
+  border-left: 2px solid var(--gold);
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+  .sandbox,
+  .parliament,
+  .timeline { padding: 20px 18px; }
+  .timeline__input { flex-direction: column; }
+  .timeline__row { grid-template-columns: minmax(0,1fr) 28px 14px 28px 48px; gap: 5px; }
+}
+
+/* ============================================================
+   Phase 4 · 乔哈里窗
+   ============================================================ */
+.johari-form { display: grid; gap: 14px; margin-top: 8px; }
+
+.johari-q {
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  transition: border-color 260ms var(--ease);
+}
+
+.johari-q.is-done {
+  border-color: color-mix(in srgb, var(--gold) 42%, transparent);
+  background: color-mix(in srgb, var(--gold) 3%, var(--bg-card));
+}
+
+.johari-q__no {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.johari-q__prom {
+  margin: 0 0 14px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.johari-q__opts { display: grid; gap: 8px; }
+
+.johari-opt {
+  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  transition: all 240ms var(--ease);
+}
+
+.johari-opt:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-card-raise);
+  transform: translateX(2px);
+}
+
+.johari-opt.is-sel {
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  background: color-mix(in srgb, var(--gold) 8%, var(--bg-card));
+  color: var(--text-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.johari-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.johari-cell {
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.johari-cell.is-open { border-top: 2px solid var(--vol2); }
+.johari-cell.is-blind { border-top: 2px solid var(--gold); }
+.johari-cell.is-facade { border-top: 2px solid var(--vol7); }
+.johari-cell.is-unknown { border-top: 2px solid var(--border-strong); }
+
+.johari-cell__top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.johari-cell__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-tertiary);
+}
+
+.johari-cell h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+}
+
+.johari-cell__sub {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: var(--text-tertiary);
+}
+
+.johari-cell__list { display: grid; gap: 6px; }
+
+.johari-cell__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  padding: 5px 0;
+  border-top: 1px solid var(--border-hair);
+  color: var(--text-secondary);
+}
+
+.johari-cell__row b {
+  font-family: var(--font-serif);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Phase 4 · 群像星图
+   ============================================================ */
+.squad-input { margin: 22px 0; }
+
+.squad-slot {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 150px;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.squad-slot__no {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding-top: 14px;
+}
+
+.squad-result { margin-top: 10px; }
+
+.squad-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.squad-role {
+  position: relative;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.squad-role__name {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.squad-role__tag {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.squad-role__desc {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.85;
+  color: var(--text-secondary);
+}
+
+.squad-role__fit {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.affinity {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.affinity th,
+.affinity td {
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid var(--border-hair);
+  font-variant-numeric: tabular-nums;
+}
+
+.affinity th {
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+  font-size: 11px;
+}
+
+.affinity tbody th { text-align: left; padding-left: 12px; }
+
+.squad-cov { display: grid; gap: 2px; margin-bottom: 8px; }
+
+.squad-cov__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px 62px 52px;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 2px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-hair);
+  color: var(--text-secondary);
+}
+
+.squad-cov__name { font-family: var(--font-serif); color: var(--text-primary); }
+.squad-cov__avg, .squad-cov__max { text-align: right; font-variant-numeric: tabular-nums; }
+.squad-cov__tag { text-align: right; font-size: 10.5px; letter-spacing: 0.08em; color: var(--text-tertiary); }
+
+.squad-cov__row.is-gap .squad-cov__tag { color: var(--vol1); }
+.squad-cov__row.is-gap { background: color-mix(in srgb, var(--vol1) 4%, transparent); }
+
+.squad-charter { display: grid; gap: 12px; }
+
+.squad-charter__item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.squad-charter__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  padding-top: 2px;
+}
+
+.squad-charter__item p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+  .squad-slot { grid-template-columns: 22px minmax(0, 1fr); }
+  .squad-slot input { grid-column: 2; }
+  .squad-cov__row { grid-template-columns: minmax(0,1fr) 44px 52px 44px; gap: 6px; }
+}

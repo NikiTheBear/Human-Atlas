@@ -3972,6 +3972,679 @@ body.is-immersive .quiz__back {
   color: var(--text-tertiary);
 }
 
+/* ============================================================
+   v5.0 Phase 3 · 压力变形沙盒
+   ============================================================ */
+.sandbox__lead {
+  margin: 0 0 20px;
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--text-secondary);
+  max-width: 62ch;
+}
+
+.sandbox {
+  padding: 26px 26px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.sandbox__control { margin-bottom: 22px; }
+
+.sandbox__value {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sandbox__value b {
+  font-family: var(--font-serif);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sandbox__value i {
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+}
+
+.sandbox__slider { position: relative; }
+
+/* 彩色填充轨：耗竭红 → 常态金 → 充沛绿 */
+.sandbox__range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--vol1) 62%, transparent) 0%,
+    color-mix(in srgb, var(--gold) 55%, transparent) 50%,
+    color-mix(in srgb, var(--vol2) 62%, transparent) 100%);
+  outline: none;
+  cursor: pointer;
+}
+
+.sandbox__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--gold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  cursor: grab;
+}
+
+.sandbox__range::-webkit-slider-thumb:active { cursor: grabbing; }
+
+.sandbox__range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--gold);
+  cursor: grab;
+}
+
+.sandbox__ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+}
+
+.sandbox__stage {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: var(--bg-inset);
+  border-left: 2px solid var(--gold);
+}
+
+.sandbox__stage h4 {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.sandbox__stage p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.95;
+  color: var(--text-secondary);
+}
+
+.sandbox__canvas {
+  display: grid;
+  place-items: center;
+  margin: 6px 0 14px;
+}
+
+.sandbox__delta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.sandbox__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  border: 1px solid var(--border);
+}
+
+.sandbox__chip b {
+  font-family: var(--font-serif);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sandbox__chip.is-up {
+  border-color: color-mix(in srgb, var(--vol2) 40%, transparent);
+  color: var(--vol2);
+  background: color-mix(in srgb, var(--vol2) 6%, transparent);
+}
+
+.sandbox__chip.is-down {
+  border-color: color-mix(in srgb, var(--vol1) 40%, transparent);
+  color: var(--vol1);
+  background: color-mix(in srgb, var(--vol1) 6%, transparent);
+}
+
+.sandbox__warn {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--vol1) 34%, transparent);
+  background: color-mix(in srgb, var(--vol1) 6%, transparent);
+}
+
+.sandbox__warn b {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--vol1);
+  margin-bottom: 8px;
+}
+
+.sandbox__warn p {
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.sandbox__presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.sandbox__hint {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--text-tertiary);
+}
+
+/* ============================================================
+   内在议会
+   ============================================================ */
+.parliament {
+  padding: 24px 26px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  margin-bottom: 16px;
+}
+
+.parliament__top {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.parliament__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+
+.parliament__top h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  flex: 1;
+}
+
+.parliament__intensity {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.parliament__voices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.voice {
+  padding: 16px 18px;
+  border-radius: var(--radius);
+}
+
+.voice--a {
+  background: color-mix(in srgb, var(--vol2) 5%, var(--bg-inset));
+  border-left: 2px solid color-mix(in srgb, var(--vol2) 55%, transparent);
+}
+
+.voice--b {
+  background: color-mix(in srgb, var(--vol1) 5%, var(--bg-inset));
+  border-left: 2px solid color-mix(in srgb, var(--vol1) 55%, transparent);
+}
+
+.voice__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.voice__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.voice--a .voice__dot { background: var(--vol2); }
+.voice--b .voice__dot { background: var(--vol1); }
+
+.voice__score {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+.voice__text {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  line-height: 1.95;
+  color: var(--text-primary);
+}
+
+.parliament__verdict,
+.parliament__tip {
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.parliament__tip { margin-top: 12px; }
+
+.parliament__verdict b,
+.parliament__tip b {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.parliament__verdict p,
+.parliament__tip p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.95;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   时间胶囊
+   ============================================================ */
+.timeline {
+  padding: 24px 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.timeline__input {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.timeline__input textarea { flex: 1; }
+
+.timeline__chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.timeline__result { margin-top: 18px; }
+
+.timeline__radar {
+  display: grid;
+  place-items: center;
+  margin: 8px 0 18px;
+}
+
+.timeline__list {
+  display: grid;
+  gap: 2px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.timeline__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px 18px 34px 56px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 2px;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border-hair);
+}
+
+.timeline__row:last-child { border-bottom: none; }
+
+.timeline__name {
+  font-family: var(--font-serif);
+  color: var(--text-primary);
+  letter-spacing: 0.03em;
+}
+
+.timeline__past { text-align: right; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.timeline__arrow { text-align: center; color: var(--text-tertiary); opacity: 0.6; }
+.timeline__now { text-align: right; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+.timeline__delta {
+  text-align: right;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline__delta.is-up { color: var(--vol2); }
+.timeline__delta.is-down { color: var(--vol1); }
+.timeline__delta.is-flat { color: var(--text-tertiary); }
+
+.timeline__verdict {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--bg-inset);
+  border-left: 2px solid var(--gold);
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+  .sandbox,
+  .parliament,
+  .timeline { padding: 20px 18px; }
+  .timeline__input { flex-direction: column; }
+  .timeline__row { grid-template-columns: minmax(0,1fr) 28px 14px 28px 48px; gap: 5px; }
+}
+
+/* ============================================================
+   Phase 4 · 乔哈里窗
+   ============================================================ */
+.johari-form { display: grid; gap: 14px; margin-top: 8px; }
+
+.johari-q {
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  transition: border-color 260ms var(--ease);
+}
+
+.johari-q.is-done {
+  border-color: color-mix(in srgb, var(--gold) 42%, transparent);
+  background: color-mix(in srgb, var(--gold) 3%, var(--bg-card));
+}
+
+.johari-q__no {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.johari-q__prom {
+  margin: 0 0 14px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.johari-q__opts { display: grid; gap: 8px; }
+
+.johari-opt {
+  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  transition: all 240ms var(--ease);
+}
+
+.johari-opt:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-card-raise);
+  transform: translateX(2px);
+}
+
+.johari-opt.is-sel {
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  background: color-mix(in srgb, var(--gold) 8%, var(--bg-card));
+  color: var(--text-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.johari-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.johari-cell {
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.johari-cell.is-open { border-top: 2px solid var(--vol2); }
+.johari-cell.is-blind { border-top: 2px solid var(--gold); }
+.johari-cell.is-facade { border-top: 2px solid var(--vol7); }
+.johari-cell.is-unknown { border-top: 2px solid var(--border-strong); }
+
+.johari-cell__top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.johari-cell__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-tertiary);
+}
+
+.johari-cell h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+}
+
+.johari-cell__sub {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: var(--text-tertiary);
+}
+
+.johari-cell__list { display: grid; gap: 6px; }
+
+.johari-cell__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  padding: 5px 0;
+  border-top: 1px solid var(--border-hair);
+  color: var(--text-secondary);
+}
+
+.johari-cell__row b {
+  font-family: var(--font-serif);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Phase 4 · 群像星图
+   ============================================================ */
+.squad-input { margin: 22px 0; }
+
+.squad-slot {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 150px;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.squad-slot__no {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding-top: 14px;
+}
+
+.squad-result { margin-top: 10px; }
+
+.squad-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.squad-role {
+  position: relative;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.squad-role__name {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.squad-role__tag {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.squad-role__desc {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.85;
+  color: var(--text-secondary);
+}
+
+.squad-role__fit {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.affinity {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.affinity th,
+.affinity td {
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid var(--border-hair);
+  font-variant-numeric: tabular-nums;
+}
+
+.affinity th {
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+  font-size: 11px;
+}
+
+.affinity tbody th { text-align: left; padding-left: 12px; }
+
+.squad-cov { display: grid; gap: 2px; margin-bottom: 8px; }
+
+.squad-cov__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px 62px 52px;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 2px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-hair);
+  color: var(--text-secondary);
+}
+
+.squad-cov__name { font-family: var(--font-serif); color: var(--text-primary); }
+.squad-cov__avg, .squad-cov__max { text-align: right; font-variant-numeric: tabular-nums; }
+.squad-cov__tag { text-align: right; font-size: 10.5px; letter-spacing: 0.08em; color: var(--text-tertiary); }
+
+.squad-cov__row.is-gap .squad-cov__tag { color: var(--vol1); }
+.squad-cov__row.is-gap { background: color-mix(in srgb, var(--vol1) 4%, transparent); }
+
+.squad-charter { display: grid; gap: 12px; }
+
+.squad-charter__item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.squad-charter__no {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  padding-top: 2px;
+}
+
+.squad-charter__item p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+  .squad-slot { grid-template-columns: 22px minmax(0, 1fr); }
+  .squad-slot input { grid-column: 2; }
+  .squad-cov__row { grid-template-columns: minmax(0,1fr) 44px 52px 44px; gap: 6px; }
+}
+
 </style>
 <style>/* print.css（内部已自带 @media print 作用域） */
 /* ============================================================
@@ -6913,8 +7586,22 @@ function renderHub(root, ctx) {
   tools.appendChild(tool(
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8.5" cy="12" r="4.5"/><circle cx="15.5" cy="12" r="4.5"/></svg>',
     '双人对比室',
-    '两人共同完成卷宗的交集，计算共振与阴影碰撞。',
+    '两人共同完成卷宗的交集，六大关系生态位合盘。',
     () => go('#/compare'),
+  ));
+
+  tools.appendChild(tool(
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>',
+    '印象盲盒',
+    '12 题让好友盲猜你，生成乔哈里窗四象限。',
+    () => go('#/johari'),
+  ));
+
+  tools.appendChild(tool(
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="8" r="2.6"/><circle cx="17" cy="8" r="2.6"/><circle cx="12" cy="17" r="2.6"/><path d="M9 9.6l2 5M15 9.6l-2 5M9.6 8h4.8"/></svg>',
+    '群像星图',
+    '3–6 人小队生态位、缘分矩阵与共同短板。',
+    () => go('#/squad'),
   ));
 
   root.appendChild(tools);
@@ -8792,6 +9479,997 @@ function buildVolumeTypology(volId, scores, zScores, dimMap, ctx = {}) {
 
 const TYPOLOGY_VOLUMES = Object.keys(BUILDERS);
 
+/* ───────── src/viz/radarSvg.js ───────── */
+/* ============================================================
+   radarSvg.js — 通用雷达图
+   支持：单层 / 面具虚实叠层 / 双人叠加
+   ============================================================ */
+
+
+
+/**
+ * @param {Array<{id,label,value,color?}>} axes
+ * @param {Object} opts
+ *   width, series: [{ name, values: number[], color, dashed, fill, width }]
+ *   colorText, colorMuted, colorBorder, bg
+ */
+function radarSvg(axes, opts = {}) {
+  const n = axes.length;
+  if (n < 3) return svg('svg', { viewBox: '0 0 10 10' });
+
+  const W = opts.width || 560;
+  const H = opts.height || Math.round(W * 0.92);
+  const endPadTop = 30;
+  const cx = W / 2;
+  const cy = H / 2 + (opts.offsetY || 0);
+  const R = Math.min(W, H) * (opts.radiusRatio || 0.32);
+
+  const cText = opts.colorText || '#1E2220';
+  const cMuted = opts.colorMuted || '#8B8F89';
+  const cBorder = opts.colorBorder || '#E4DFD4';
+  const bg = opts.bg || '#FCFBF8';
+
+  const root = svg('svg', {
+    viewBox: `${-34} ${-endPadTop} ${W + 68} ${H + endPadTop + 34}`,
+    width: '100%',
+    role: 'img',
+    'aria-label': opts.ariaLabel || '多维雷达图',
+  });
+
+  const g = svg('g', {});
+  root.appendChild(g);
+
+  const angle = (i) => (Math.PI * 2 * i) / n - Math.PI / 2;
+  const pt = (i, f) => [cx + Math.cos(angle(i)) * R * f, cy + Math.sin(angle(i)) * R * f];
+
+  // ---- 网格 ----
+  const rings = opts.rings || [0.25, 0.5, 0.75, 1];
+  rings.forEach((f, idx) => {
+    const poly = Array.from({ length: n }, (_, i) => pt(i, f).join(',')).join(' ');
+    g.appendChild(svg('polygon', {
+      points: poly,
+      fill: idx === rings.length - 1 ? opts.gridFill || 'none' : 'none',
+      stroke: cBorder,
+      'stroke-width': idx === rings.length - 1 ? 1 : 0.7,
+      opacity: idx === rings.length - 1 ? 0.95 : 0.55,
+    }));
+  });
+
+  // ---- 轴线 ----
+  for (let i = 0; i < n; i += 1) {
+    const [x, y] = pt(i, 1);
+    g.appendChild(svg('line', {
+      x1: cx, y1: cy, x2: x, y2: y,
+      stroke: cBorder, 'stroke-width': 0.7, opacity: 0.7,
+    }));
+  }
+
+  // ---- 数据层 ----
+  const series = opts.series || [];
+  series.forEach((s, si) => {
+    const color = s.color || '#8C4A32';
+    const pts = axes.map((a, i) => {
+      const v = clamp(Number(s.values?.[i]) || 0, 0, 100);
+      return pt(i, v / 100);
+    });
+    const poly = pts.map((p) => p.join(',')).join(' ');
+
+    if (s.fill !== false) {
+      g.appendChild(svg('polygon', {
+        points: poly,
+        fill: color,
+        'fill-opacity': s.fillOpacity ?? (si === 0 ? 0.12 : 0.08),
+        stroke: 'none',
+      }));
+    }
+
+    g.appendChild(svg('polygon', {
+      points: poly,
+      fill: 'none',
+      stroke: color,
+      'stroke-width': s.width || 1.6,
+      'stroke-dasharray': s.dashed ? '4 4' : 'none',
+      'stroke-linejoin': 'round',
+    }));
+
+    pts.forEach((p, i) => {
+      const dot = svg('circle', {
+        cx: p[0], cy: p[1], r: s.dashed ? 2.2 : 2.8,
+        fill: bg, stroke: color, 'stroke-width': 1.4,
+      });
+      // 悬浮 / 轻触提示：维度名 + 精确分数 + 档位
+      dot.setAttribute('class', 'radar-dot');
+      const ax = axes[i] || {};
+      const val = Number(s.values?.[i]);
+      if (Number.isFinite(val)) {
+        const title = svg('title', {});
+        title.textContent = `${ax.label || ax.id || ''} · ${round(val, 1)}${
+          s.name && series.length > 1 ? `（${s.name}）` : ''
+        }`;
+        dot.appendChild(title);
+      }
+      g.appendChild(dot);
+    });
+  });
+
+  // ---- 轴标签 ----
+  const fs = opts.labelSize || (n > 10 ? 9 : 10.5);
+  axes.forEach((a, i) => {
+    const f = 1.13;
+    const [x, y] = pt(i, f);
+    const cos = Math.cos(angle(i));
+    const sin = Math.sin(angle(i));
+    const anchor = Math.abs(cos) < 0.22 ? 'middle' : cos > 0 ? 'start' : 'end';
+    const dy = sin > 0.6 ? 10 : sin < -0.6 ? -2 : 4;
+
+    const label = a.short || a.label;
+    const labelNode = svgText(label, {
+      x, y: y + dy,
+      'text-anchor': anchor,
+      'font-size': fs,
+      'font-family': "'Noto Sans SC','PingFang SC',sans-serif",
+      fill: a.color || cMuted,
+      'letter-spacing': '0.04em',
+    });
+    if (Number.isFinite(a.value)) {
+      const t = svg('title', {});
+      t.textContent = `${a.label || a.id || ''} · ${round(a.value, 1)}`;
+      labelNode.appendChild(t);
+    }
+    g.appendChild(labelNode);
+
+    if (opts.showValues && Number.isFinite(a.value)) {
+      g.appendChild(svgText(`${round(a.value, 0)}`, {
+        x, y: y + dy + (sin < -0.6 ? -12 : 12),
+        'text-anchor': anchor,
+        'font-size': fs - 1.5,
+        'font-family': "'Noto Serif SC',Georgia,serif",
+        fill: cText,
+        'font-variant-numeric': 'tabular-nums',
+        opacity: 0.7,
+      }));
+    }
+  });
+
+  return root;
+}
+
+/* ------------------------------------------------------------
+   面具虚实叠层雷达：外显自评（虚）vs 暗线底色（实）
+   ------------------------------------------------------------ */
+function maskRadar(axes, opts = {}) {
+  return radarSvg(axes, {
+    ...opts,
+    series: [
+      {
+        name: opts.surfaceName || '表层面具',
+        values: axes.map((a) => a.masked ?? a.value),
+        color: opts.surfaceColor || '#A8894F',
+        dashed: true,
+        fill: false,
+        width: 1.4,
+      },
+      {
+        name: opts.depthName || '潜意识底色',
+        values: axes.map((a) => a.value),
+        color: opts.depthColor || '#8C4A32',
+        fill: true,
+        fillOpacity: 0.1,
+        width: 1.8,
+      },
+    ],
+  });
+}
+
+/* ------------------------------------------------------------
+   双人叠加雷达
+   ------------------------------------------------------------ */
+function dualRadar(axesA, valuesB, opts = {}) {
+  return radarSvg(axesA, {
+    ...opts,
+    series: [
+      {
+        name: opts.nameA || 'A',
+        values: axesA.map((a) => a.value),
+        color: opts.colorA || '#8C4A32',
+        fillOpacity: 0.1,
+        width: 1.7,
+      },
+      {
+        name: opts.nameB || 'B',
+        values: valuesB,
+        color: opts.colorB || '#3B4D70',
+        fillOpacity: 0.1,
+        width: 1.7,
+      },
+    ],
+  });
+}
+
+/* ───────── src/core/lab.js ───────── */
+/* ============================================================
+   lab.js — 个人深度实验室（Phase 3）
+
+   三个模块：
+     1. pressureSandbox()  压力变形沙盒：能量 0–100 时各维度如何偏移
+     2. innerParliament()  内在议会：16 组高张力维度对的双声部对话
+     3. timelineDiff()     时间胶囊：两份存档的双层对照与变化 Top 5
+
+   全部只读已有得分，不写任何数据、不改计分。
+   ============================================================ */
+
+
+
+/* ============================================================
+   1 · 压力变形沙盒
+   ============================================================ */
+
+/**
+ * 压力偏移模型。
+ *
+ * 直觉上「能量充沛」时人会稍微更接近自己的明线表显层，
+ * 「极度耗竭」时则向暗线高压层滑落。这里不重跑题库，
+ * 而是用一套可解释的线性偏移：
+ *
+ *   energy 0（极度耗竭） → 每个维度向「暗面方向」偏移
+ *   energy 50（日常常态） → 原样
+ *   energy 100（充沛顺境）→ 向「明面方向」偏移
+ *
+ * 「暗面方向」不是随意的：它由维度自身的极性决定——
+ * 原罪 / 暗黑三角 / 防御 / 依恋不安 这类越耗竭越强，
+ * 美德 / 光明三角 / 自主 / 掌控 这类越耗竭越弱。
+ */
+const DARKWARD = new Set([
+  'sin_pride', 'sin_greed', 'sin_lust', 'sin_envy', 'sin_gluttony', 'sin_wrath', 'sin_sloth',
+  'dark_mach', 'dark_narc', 'dark_psycho', 'covert_control',
+  'att_anxiety', 'att_avoidance',
+  'def_intellectual', 'def_detach', 'def_attack', 'def_fawn', 'def_project',
+  'big5_alert', 'big5_rumination',
+  'schema_abandonment', 'schema_deprivation', 'schema_defect', 'schema_mistrust',
+  'schema_isolation', 'schema_std', 'schema_sacrifice', 'schema_approval',
+  'schema_entitlement', 'schema_negativity',
+  'hsp_sensory', 'hsp_emotional',
+  'money_avoid', 'money_worship', 'money_status',
+  'tki_avoiding', 'tki_competing', 'pac_child',
+  'enn_4', 'enn_6', 'enn_9',
+  'phil_cynic', 'phil_nihilism',
+]);
+
+const AMPLITUDE = 16;   // 满偏移时每个维度最多移动 16 分
+
+/**
+ * @param {Object} scores  当前得分
+ * @param {number} energy  0–100
+ * @returns {{ scores, delta, dominant, warnings, highlight }}
+ */
+function pressureSandbox(scores, energy = 50) {
+  const e = clamp(Number.isFinite(energy) ? energy : 50, 0, 100);
+  // t ∈ [-1, +1]：负数=耗竭，正数=充沛
+  const t = (e - 50) / 50;
+
+  const out = {};
+  const delta = {};
+
+  for (const [dim, raw] of Object.entries(scores || {})) {
+    if (!Number.isFinite(raw)) continue;
+    const darkward = DARKWARD.has(dim);
+    // 充沛时明面维度上行、暗面维度下行；耗竭时反过来
+    const dir = darkward ? -1 : 1;
+    const shift = t * AMPLITUDE * dir;
+    const next = clamp(raw + shift, 0, 100);
+    out[dim] = round(next, 1);
+    delta[dim] = round(next - raw, 1);
+  }
+
+  /* 变动最大的几项，用于文案 */
+  const moved = Object.entries(delta)
+    .filter(([, d]) => Math.abs(d) >= 1)
+    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+
+  const rising = moved.filter(([, d]) => d > 0).slice(0, 3);
+  const falling = moved.filter(([, d]) => d < 0).slice(0, 3);
+
+  /* 预警：耗竭态下被推到危险高位的暗面维度 */
+  const warnings = [];
+  if (e < 40) {
+    const hot = Object.entries(out)
+      .filter(([dim, v]) => DARKWARD.has(dim) && v >= 68 && (scores[dim] ?? 0) < 62)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+    for (const [dim, v] of hot) warnings.push({ dim, value: round(v, 1), kind: 'ember' });
+  }
+
+  const stage = e >= 78 ? 'zone' : e >= 55 ? 'steady' : e >= 32 ? 'tired' : 'depleted';
+
+  return {
+    energy: e,
+    stage,
+    scores: out,
+    delta,
+    rising,
+    falling,
+    warnings,
+    mean: round(mean(Object.values(out)), 1),
+  };
+}
+
+const ENERGY_STAGES = [
+  {
+    key: 'depleted',
+    name: '极度耗竭',
+    range: '< 32',
+    headline: '此刻最需要的是刹车，不是意志力',
+    body: '这个状态下你的判断会变窄：所有事都显得更严重，所有人都显得更不体谅。这不是你的真实判断，是你的电量在说话。',
+  },
+  {
+    key: 'tired',
+    name: '低电量',
+    range: '32 – 55',
+    headline: '还能运转，但容错率很低',
+    body: '你仍然能把事情做完，只是每件小事都要多花一份力气去按住情绪。这时候做的重大决定，事后往往需要重做一次。',
+  },
+  {
+    key: 'steady',
+    name: '日常常态',
+    range: '55 – 78',
+    headline: '你的默认形态',
+    body: '这是报告里那套分数的来源状态。不特别高光，也不特别失控——大多数人一生绝大部分时间都在这里。',
+  },
+  {
+    key: 'zone',
+    name: '充沛顺境',
+    range: '≥ 78',
+    headline: '这是你最好的生态位',
+    body: '有空间、有值得的事、有少数懂你的人。同样的特质在这个状态下是天赋，在耗竭状态下就成了刺。',
+  },
+];
+
+function stageOf(energy) {
+  const e = clamp(Number.isFinite(energy) ? energy : 50, 0, 100);
+  if (e >= 78) return ENERGY_STAGES[3];
+  if (e >= 55) return ENERGY_STAGES[2];
+  if (e >= 32) return ENERGY_STAGES[1];
+  return ENERGY_STAGES[0];
+}
+
+/* ============================================================
+   2 · 内在议会
+   ============================================================ */
+
+/**
+ * 16 组高张力维度对。
+ * 每组：两侧都偏高（≥ threshold）时，说明这个人身上同时住着两个方向。
+ */
+const PARLIAMENT_PAIRS = [
+  {
+    a: 'mot_autonomy', b: 'mot_security', threshold: 58,
+    title: '自由 × 安全',
+    voiceA: '我需要能自己说了算的空间。被安排的人生，哪怕安逸，也不是我的。',
+    voiceB: '但我怕的正是没有退路。一步踏空就全盘皆输，我不能不给自己留后手。',
+    verdict: '你不是优柔寡断，你在同时保护两样真东西。真正的解法不是二选一，而是先建一个足够稳的底盘，再在底盘上放开手脚。',
+    tip: '把「要不要辞职」换成「先存到能撑 12 个月的钱，再决定辞不辞」。让安全成为自由的地基，而不是它的对手。',
+  },
+  {
+    a: 'hsp_sensory', b: 'hss_novelty', threshold: 56,
+    title: '高敏 × 求新',
+    voiceA: '一点噪音、一点气味、一点光的偏移，都会直接进到我的神经里。我需要安静才能恢复。',
+    voiceB: '但重复和熟悉会让我发闷。我需要新的东西，哪怕是混乱的新。',
+    verdict: '高敏与高寻求并不矛盾，它们只是同一个高增益系统的两面。你能接收到别人收不到的细节，也因此更容易被过量灌满。',
+    tip: '给任何高强度体验预留恢复日。不是事后补救，是出发前就写进计划。',
+  },
+  {
+    a: 'sin_pride', b: 'att_anxiety', threshold: 58,
+    title: '高自尊 × 依恋焦虑',
+    voiceA: '我不需要向谁证明什么。我的价值由我自己判定。',
+    voiceB: '可他一冷淡，我就开始怀疑是不是自己哪里不够好。',
+    verdict: '外层是硬的，内层是软的。这种结构让你在远处显得很有骨气，在近处却反复确认。',
+    tip: '把「他是不是不喜欢我了」翻译成「我需要一次具体的回应」。要证据，不要情绪。',
+  },
+  {
+    a: 'light_kant', b: 'dark_mach', threshold: 58,
+    title: '高原则 × 高谋略',
+    voiceA: '有些线不能踩。踩了就不是我了。',
+    voiceB: '但这个世界不讲原则。不懂规则的人只会被规则碾过去。',
+    verdict: '你既相信原则，又清楚规则的真实运作方式。这让你既能做成事，又常在心里给自己记账。',
+    tip: '给每一次「技术性操作」设一条内部红线，写下来。只要没越线，就不必自责。',
+  },
+  {
+    a: 'big5_industry', b: 'sin_sloth', threshold: 56,
+    title: '高勤勉 × 高逃避',
+    voiceA: '事情必须做完。停下来我就难受。',
+    voiceB: '但我总在最后一刻才动手，前面那段时间像被什么按住了。',
+    verdict: '这是典型的「高压启动型」：不是懒，是启动成本太高。你在用拖延换取一点点自主感。',
+    tip: '把任务拆到「两分钟能做完」的粒度，只做那两分钟。启动比坚持更难，也更要紧。',
+  },
+  {
+    a: 'def_fawn', b: 'sin_wrath', threshold: 58,
+    title: '讨好 × 愤怒',
+    voiceA: '我不想让任何人不舒服。让步是成本最低的做法。',
+    voiceB: '但我心里其实在骂。每一次让步，我都在心里记了一笔。',
+    verdict: '表面上你从不生气，实际上你的怒气在攒利息。攒到某一天，会因为一件极小的事全部倒出来。',
+    tip: '在还能心平气和的时候说一次「这个我不太想」，不必解释理由。小剂量的拒绝能防止大剂量的爆发。',
+  },
+  {
+    a: 'cog_global', b: 'cog_logic', threshold: 58,
+    title: '抽象 × 严密',
+    voiceA: '我要先看到整张地图，否则细节没有意义。',
+    voiceB: '但推演错一步，整张地图就是错的。我必须每一步都站得住。',
+    verdict: '你既想飞得高，又要求每一步都有证据。这让你思考质量很高，也让你在需要快速决定时卡住。',
+    tip: '给自己设一个「足够好就出发」的时间盒。到点无论推到哪一步，先用现有的走一段。',
+  },
+  {
+    a: 'att_avoidance', b: 'mot_belonging', threshold: 58,
+    title: '回避 × 归属渴求',
+    voiceA: '靠太近我会窒息。我需要随时能退出去的门。',
+    voiceB: '但我又真的很想有一个人，是那种无论怎样都在的人。',
+    verdict: '你想要深度连接，同时要求它不能约束你。这两件事可以共存，但需要对方明确同意这个协议。',
+    tip: '把「我需要空间」提前说出来，而不是等被逼近才消失。提前说，是协商；事后消失，是伤害。',
+  },
+  {
+    a: 'big5_open', b: 'big5_order', threshold: 58,
+    title: '开放 × 秩序',
+    voiceA: '我想试试没做过的方式。重复让我觉得活着没意思。',
+    voiceB: '但没有结构我什么都做不成。混乱会让我焦虑到无法思考。',
+    verdict: '你需要新鲜感，也需要容器。最好的状态是「在稳定的框架里做不稳定的实验」。',
+    tip: '把生活切成两块：一块严格按流程，一块完全放开。不要试图让同一件事同时满足两种需求。',
+  },
+  {
+    a: 'light_faith', b: 'schema_mistrust', threshold: 56,
+    title: '信任倾向 × 不信任图式',
+    voiceA: '我愿意先给出信任。人大多是好的。',
+    voiceB: '可我被辜负过。先信任的人，往往伤得最重。',
+    verdict: '你天生愿意相信，但被教过一次要小心。所以你常常先伸出手，同时随时准备收回。',
+    tip: '分层信任：先给小事，观察，再给大事。不必一次性交出全部，也不必一开始就把门锁死。',
+  },
+  {
+    a: 'enn_3', b: 'enn_4', threshold: 56,
+    title: '成就 × 独特',
+    voiceA: '我要拿到结果。被认可的成绩是最硬的通货。',
+    voiceB: '但我不想成为那种「很成功但很通用」的人。我要有辨识度。',
+    verdict: '你既要赢，又要赢得不像别人。这让你的驱动力极强，也让满足感很难持久。',
+    tip: '把「被谁认可」写具体。模糊的「被认可」永远不会满足，具体的名字可以。',
+  },
+  {
+    a: 'phil_stoic', b: 'lv_suffering', threshold: 58,
+    title: '斯多葛 × 苦难敏感',
+    voiceA: '不可控的事不归我管，我只负责自己的姿态。',
+    voiceB: '但我确实会痛。装作不痛，只是把痛挪到了看不见的地方。',
+    verdict: '你的克制是真的，痛也是真的。问题在于这套系统让你很难开口说「我需要帮忙」。',
+    tip: '练习一次不体面的求助：明确告诉某个人「我今天撑不住，你能不能陪我一会儿」。不带理由。',
+  },
+  {
+    a: 'covert_control', b: 'big5_compassion', threshold: 56,
+    title: '隐性掌控 × 高共情',
+    voiceA: '我知道怎么让事情按我的方向走。这不叫操控，叫懂人。',
+    voiceB: '但我又真的在意对方的感受。让他不舒服，我自己也难受。',
+    verdict: '你能同时读懂一个人的需求和弱点。这让你的影响力很强，也让你常在「用不用」之间犹豫。',
+    tip: '每次想推动别人之前，先问自己一句：如果他知道我在推动，他会怎么想？答案就是边界。',
+  },
+  {
+    a: 'money_vigilance', b: 'time_present_hed', threshold: 56,
+    title: '金钱警觉 × 享乐当下',
+    voiceA: '钱是退路。多一点，选择就多一点。',
+    voiceB: '但人生就这一次。存到死也没花，那些体验过期不补发。',
+    verdict: '你既怕不够，又怕白活。这个拉扯在很多人身上都有，只是你的两端都比较响。',
+    tip: '给储蓄设一个明确的「够了」阈值，写下来。达到以后，把增量专门花在让自己开心的东西上。',
+  },
+  {
+    a: 'tki_competing', b: 'tki_accommodating', threshold: 56,
+    title: '竞争 × 迁就',
+    voiceA: '该争的必须争。退一步，别人就会再进一步。',
+    voiceB: '但撕破脸太累了。能让一步就让一步，关系比输赢重要。',
+    verdict: '你会在不同的对象面前切换成完全不同的人。判断依据往往不是事情本身，而是「这个人值不值得我争」。',
+    tip: '把标准写出来：哪些事我一定争，哪些事我永远让。有了名单，临场就不必重算。',
+  },
+  {
+    a: 'jung_ni', b: 'jung_ne', threshold: 58,
+    title: '收束直觉 × 发散直觉',
+    voiceA: '所有线索最后会收成一个答案，我能感觉到它正在成形。',
+    voiceB: '但我脑子里同时有七八条支线，每条都想去看看。',
+    verdict: '这是罕见配置：你既会被「终将收束成一条主线」的预感驱动，又忍不住同时向多个方向发散。',
+    tip: '给每次直觉冲动贴标签：这是收束型还是发散型。发散型只允许记录，不许立刻行动。',
+  },
+];
+
+/**
+ * @param {Object} scores
+ * @returns {Array} 命中的张力对，按两端平均分降序
+ */
+function innerParliament(scores, limit = 3) {
+  const s = scores || {};
+  const out = [];
+
+  for (const p of PARLIAMENT_PAIRS) {
+    const av = s[p.a];
+    const bv = s[p.b];
+    if (!Number.isFinite(av) || !Number.isFinite(bv)) continue;
+    if (av < p.threshold || bv < p.threshold) continue;
+
+    const intensity = round((av + bv) / 2, 1);
+    out.push({
+      ...p,
+      aScore: round(av, 0),
+      bScore: round(bv, 0),
+      intensity,
+      /* 两端越接近，张力越大 */
+      balance: round(100 - Math.abs(av - bv), 1),
+    });
+  }
+
+  return out
+    .sort((x, y) => (y.intensity + y.balance * 0.4) - (x.intensity + x.balance * 0.4))
+    .slice(0, limit);
+}
+
+/* ============================================================
+   3 · 时间胶囊
+   ============================================================ */
+
+/**
+ * 对照两份得分，找出变化最大的维度。
+ * @param {Object} past    过往快照的 scores
+ * @param {Object} now     当前 scores
+ * @param {Object} dimMap
+ * @returns {{ rows, top5, meanShift, pastMean, nowMean, verdict }}
+ */
+function timelineDiff(past, now, dimMap = {}) {
+  const rows = [];
+
+  for (const [dim, nowV] of Object.entries(now || {})) {
+    const pastV = past?.[dim];
+    if (!Number.isFinite(nowV) || !Number.isFinite(pastV)) continue;
+    rows.push({
+      id: dim,
+      name: dimMap[dim]?.name || dim,
+      past: round(pastV, 1),
+      now: round(nowV, 1),
+      delta: round(nowV - pastV, 1),
+    });
+  }
+
+  const top5 = [...rows]
+    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+    .slice(0, 5);
+
+  const pastMean = rows.length ? round(mean(rows.map((r) => r.past)), 1) : null;
+  const nowMean = rows.length ? round(mean(rows.map((r) => r.now)), 1) : null;
+  const meanShift = rows.length ? round(nowMean - pastMean, 1) : null;
+
+  const up = top5.filter((r) => r.delta > 0);
+  const down = top5.filter((r) => r.delta < 0);
+
+  let verdict = '';
+  if (!rows.length) {
+    verdict = '两份存档没有重叠维度，无法对照。';
+  } else if (Math.abs(meanShift) < 2 && top5.every((r) => Math.abs(r.delta) < 6)) {
+    verdict = '这段时间你的整体结构基本没动。稳定本身就是一种信息——要么环境没变，要么你的应对方式很稳。';
+  } else if (meanShift > 5) {
+    verdict = `整体上调了 ${meanShift} 分：${up[0]?.name || '多个维度'}明显走高。留意这是真的变了，还是这次作答比上次更愿意说自己好。`;
+  } else if (meanShift < -5) {
+    verdict = `整体下调了 ${Math.abs(meanShift)} 分：${down[0]?.name || '多个维度'}明显走低。如果这段时间确实不顺，这组数字更像一份记录，不是一份判决。`;
+  } else {
+    verdict = `整体只动了 ${meanShift} 分，但个别维度变化不小。这种「局部漂移」通常说明某一件具体的事改变了你的一部分，而不是整个人。`;
+  }
+
+  return { rows, top5, pastMean, nowMean, meanShift, verdict };
+}
+
+/* ───────── src/components/LabView.js ───────── */
+/* ============================================================
+   LabView.js — 个人深度实验室（Phase 3 的三个模块）
+   · sandboxSection   压力变形沙盒（交互滑杆 + 实时形变雷达）
+   · parliamentSection 内在议会（双声部对话）
+   · timelineSection   时间胶囊（双层对照 + 变化 Top 5）
+   ============================================================ */
+
+
+
+
+
+
+/* ------------------------------------------------------------
+   小工具
+   ------------------------------------------------------------ */
+
+const labHead = (no, title, hint) => el('div', { class: 'rsec__head' }, [
+  el('span', { class: 'rsec__no', text: no }),
+  el('h2', { text: title }),
+  hint ? el('p', { text: hint }) : null,
+]);
+
+/* ------------------------------------------------------------
+   雷达共用：挑一组有信息量的维度
+   ------------------------------------------------------------ */
+
+const RADAR_PICKS = [
+  ['sin_pride', '自尊'],
+  ['virtue_humility', '谦逊'],
+  ['mot_autonomy', '自主'],
+  ['mot_security', '安全'],
+  ['big5_order', '秩序'],
+  ['hsp_sensory', '敏惑'],
+  ['big5_assert', '表达'],
+  ['light_kant', '原则'],
+  ['dark_mach', '谋略'],
+  ['att_anxiety', '焦虑'],
+];
+
+function pickAxes(scores, max = 8) {
+  const out = [];
+  for (const [id, label] of RADAR_PICKS) {
+    if (Number.isFinite(scores?.[id])) out.push({ id, label, value: scores[id] });
+    if (out.length >= max) break;
+  }
+  if (out.length < 3) return [];
+  return out;
+}
+
+/* ============================================================
+   1 · 压力变形沙盒
+   ============================================================ */
+
+function sandboxSection({ scores, colors }) {
+  const axes = pickAxes(scores);
+  if (axes.length < 3) return null;
+
+  const sec = el('section', { class: 'rsec', id: 'r-sandbox' });
+
+  sec.appendChild(labHead('05', '压力变形沙盒', '拖动滑杆，看同一套特质在不同电量下会长成什么形状'));
+
+  /* ---- 说明 ---- */
+  sec.appendChild(el('p', {
+    class: 'sandbox__lead',
+    text: '下面这张雷达会随滑杆实时变形。往左是耗竭，暗面维度会涨、明面维度会退；往右是充沛，反过来。'
+      + '它不是预测，是一个可解释的线性模型：满偏移最多移动 16 分。',
+  }));
+
+  /* ---- 滑杆 + 舞台 ---- */
+  const stageBox = el('div', { class: 'sandbox' });
+  sec.appendChild(stageBox);
+
+  const control = el('div', { class: 'sandbox__control' });
+
+  const valueTag = el('div', { class: 'sandbox__value' });
+  const sliderWrap = el('div', { class: 'sandbox__slider' });
+
+  const input = el('input', {
+    type: 'range',
+    min: '0',
+    max: '100',
+    step: '1',
+    value: '50',
+    class: 'sandbox__range',
+    'aria-label': '内在能量模拟',
+  });
+  sliderWrap.appendChild(input);
+
+  const ticks = el('div', { class: 'sandbox__ticks' });
+  ENERGY_STAGES.slice().reverse().forEach((st) => {
+    ticks.appendChild(el('span', { text: st.name }));
+  });
+  sliderWrap.appendChild(ticks);
+
+  control.appendChild(valueTag);
+  control.appendChild(sliderWrap);
+
+  const stageCard = el('div', { class: 'sandbox__stage' });
+  control.appendChild(stageCard);
+
+  stageBox.appendChild(control);
+
+  const canvas = el('div', { class: 'sandbox__canvas' });
+  stageBox.appendChild(canvas);
+
+  const deltaList = el('div', { class: 'sandbox__delta' });
+  stageBox.appendChild(deltaList);
+
+  /* ---- 渲染 ---- */
+  function render(energy) {
+    const sim = pressureSandbox(scores, energy);
+    const stage = stageOf(energy);
+
+    valueTag.innerHTML = '';
+    valueTag.appendChild(el('b', { text: String(Math.round(energy)) }));
+    valueTag.appendChild(el('i', { text: stage.name }));
+
+    stageCard.innerHTML = '';
+    stageCard.appendChild(el('h4', { text: stage.headline }));
+    stageCard.appendChild(el('p', { text: stage.body }));
+
+    canvas.innerHTML = '';
+    const simAxes = axes.map((a) => ({
+      ...a,
+      value: Number.isFinite(sim.scores[a.id]) ? sim.scores[a.id] : a.value,
+    }));
+
+    canvas.appendChild(radarSvg(simAxes, {
+      width: 480,
+      colorText: colors.text,
+      colorMuted: colors.muted,
+      colorBorder: colors.border,
+      bg: colors.card,
+      series: [
+        {
+          name: '日常常态',
+          values: axes.map((a) => a.value),
+          color: colors.faint,
+          dashed: true,
+          fillOpacity: 0.03,
+          width: 1.1,
+        },
+        {
+          name: stage.name,
+          values: simAxes.map((a) => a.value),
+          color: energy < 45 ? colors.sin : energy > 60 ? colors.virtue : colors.gold,
+          fillOpacity: 0.14,
+        },
+      ],
+      showValues: false,
+      labelSize: 10.5,
+      ariaLabel: '压力变形沙盒雷达',
+    }));
+
+    deltaList.innerHTML = '';
+    const moved = [...sim.rising, ...sim.falling]
+      .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+      .slice(0, 6);
+
+    if (!moved.length) {
+      deltaList.appendChild(el('p', {
+        class: 'sandbox__hint',
+        text: '这就是你的日常常态，没有偏移。',
+      }));
+    } else {
+      moved.forEach(([dim, d]) => {
+        deltaList.appendChild(el('div', {
+          class: `sandbox__chip is-${d > 0 ? 'up' : 'down'}`,
+        }, [
+          el('span', { text: colors.dimName(dim) }),
+          el('b', { text: `${d > 0 ? '+' : ''}${round(d, 1)}` }),
+        ]));
+      });
+    }
+
+    /* 耗竭态的红色警示 */
+    const warnBox = sec.querySelector('.sandbox__warn');
+    if (warnBox) warnBox.remove();
+
+    if (sim.warnings.length && energy < 42) {
+      const w = el('div', { class: 'sandbox__warn' });
+      w.appendChild(el('b', { text: '此刻最需要拉响的刹车' }));
+      sim.warnings.forEach((x) => {
+        w.appendChild(el('p', {
+          text: `${colors.dimName(x.dim)} 被推到 ${x.value}——这个高度通常是耗竭带来的，不是你本来的样子。`,
+        }));
+      });
+      stageBox.appendChild(w);
+    }
+  }
+
+  input.addEventListener('input', () => render(Number(input.value)));
+
+  /* 三档快捷按钮 */
+  const presets = el('div', { class: 'sandbox__presets' });
+  [
+    ['充沛顺境', 88],
+    ['日常常态', 50],
+    ['极度耗竭', 12],
+  ].forEach(([label, v]) => {
+    presets.appendChild(el('button', {
+      class: 'btn btn--sm',
+      type: 'button',
+      text: label,
+      onclick: () => {
+        input.value = String(v);
+        render(v);
+      },
+    }));
+  });
+  stageBox.appendChild(presets);
+
+  render(Number(input.value));
+  return sec;
+}
+
+/* ============================================================
+   2 · 内在议会
+   ============================================================ */
+
+function parliamentSection({ scores }) {
+  const pairs = innerParliament(scores, 3);
+  if (!pairs.length) return null;
+
+  const sec = el('section', { class: 'rsec', id: 'r-parliament' });
+
+  sec.appendChild(labHead('06', '内在议会', '同时偏高、却在互相拉扯的那几组驱动力'));
+
+  sec.appendChild(el('p', {
+    class: 'sandbox__lead',
+    text: '下面每一组，都是你身上两股同时为真的力量。它们不是你不够坚定，是两件事对你都很重要。',
+  }));
+
+  pairs.forEach((p, idx) => {
+    const card = el('div', { class: 'parliament' });
+
+    card.appendChild(el('div', { class: 'parliament__top' }, [
+      el('span', { class: 'parliament__no', text: `0${idx + 1}` }),
+      el('h3', { text: p.title }),
+      el('span', { class: 'parliament__intensity', text: `张力 ${p.intensity}` }),
+    ]));
+
+    const voices = el('div', { class: 'parliament__voices' });
+
+    voices.appendChild(el('div', { class: 'voice voice--a' }, [
+      el('div', { class: 'voice__head' }, [
+        el('span', { class: 'voice__dot' }),
+        el('span', { class: 'voice__score', text: String(p.aScore) }),
+      ]),
+      el('p', { class: 'voice__text', text: p.voiceA }),
+    ]));
+
+    voices.appendChild(el('div', { class: 'voice voice--b' }, [
+      el('div', { class: 'voice__head' }, [
+        el('span', { class: 'voice__dot' }),
+        el('span', { class: 'voice__score', text: String(p.bScore) }),
+      ]),
+      el('p', { class: 'voice__text', text: p.voiceB }),
+    ]));
+
+    card.appendChild(voices);
+
+    card.appendChild(el('div', { class: 'parliament__verdict' }, [
+      el('b', { text: '议会调解' }),
+      el('p', { text: p.verdict }),
+    ]));
+
+    card.appendChild(el('div', { class: 'parliament__tip' }, [
+      el('b', { text: '可执行' }),
+      el('p', { text: p.tip }),
+    ]));
+
+    sec.appendChild(card);
+  });
+
+  return sec;
+}
+
+/* ============================================================
+   3 · 时间胶囊
+   ============================================================ */
+
+function timelineSection({ state, scores, colors, dimMap }) {
+  const sec = el('section', { class: 'rsec', id: 'r-timeline' });
+
+  sec.appendChild(labHead('07', '时间胶囊', '把过去的自己调出来，放在同一张图上'));
+
+  /* 候选来源：1) 各卷的初印象快照 2) 手动粘贴的历史存档码 */
+  const snaps = [];
+  const initial = state.initialSnapshot || {};
+  for (const [volId, snap] of Object.entries(initial)) {
+    if (!snap?.scores) continue;
+    snaps.push({
+      key: `snap:${volId}`,
+      label: `${volId.toUpperCase()} 初印象 · ${new Date(snap.sealedAt).toISOString().slice(0, 10)}`,
+      scores: snap.scores,
+      at: snap.sealedAt,
+    });
+  }
+
+  const body = el('div', { class: 'timeline' });
+
+  const status = el('p', { class: 'sandbox__hint', text: '' });
+  const resultBox = el('div', { class: 'timeline__result' });
+
+  const inputRow = el('div', { class: 'timeline__input' });
+  const ta = el('textarea', {
+    class: 'field field--code',
+    rows: '3',
+    placeholder: '粘贴一份历史 HA4- 存档码（可选）',
+  });
+  inputRow.appendChild(ta);
+  inputRow.appendChild(el('button', {
+    class: 'btn btn--sm btn--solid',
+    type: 'button',
+    text: '对照',
+    onclick: () => {
+      const raw = ta.value.trim();
+      if (!raw) { toast('先粘贴一份存档码'); return; }
+      const res = decodeSoulCode(raw, state.__dimOrder || []);
+      if (!res.ok) { toast(res.error || '解码失败'); return; }
+      renderDiff(res.state.computedScores, res.state.stamp || '历史存档');
+    },
+  }));
+  body.appendChild(inputRow);
+
+  /* 初印象快捷按钮 */
+  if (snaps.length) {
+    const chips = el('div', { class: 'timeline__chips' });
+    snaps.slice(0, 4).forEach((s) => {
+      chips.appendChild(el('button', {
+        class: 'btn btn--sm btn--ghost',
+        type: 'button',
+        text: s.label,
+        onclick: () => renderDiff(s.scores, s.label),
+      }));
+    });
+    body.appendChild(chips);
+  } else {
+    body.appendChild(el('p', {
+      class: 'sandbox__hint',
+      text: '还没有初印象快照。每卷第一次完成时会自动封存一份，重测之后就能在这里对照。',
+    }));
+  }
+
+  body.appendChild(status);
+  body.appendChild(resultBox);
+
+  function renderDiff(pastScores, label) {
+    const diff = timelineDiff(pastScores, scores, dimMap);
+    resultBox.innerHTML = '';
+
+    if (!diff.rows.length) {
+      resultBox.appendChild(el('p', { class: 'sandbox__hint', text: '两份数据没有重叠维度，无法对照。' }));
+      return;
+    }
+
+    status.textContent = `对照：${label} · ${diff.rows.length} 个重叠维度`;
+
+    /* 双层雷达 */
+    const axes = pickAxes(scores, 8).filter((a) => Number.isFinite(pastScores[a.id]));
+    if (axes.length >= 3) {
+      const radarBox = el('div', { class: 'timeline__radar' });
+      radarBox.appendChild(radarSvg(
+        axes.map((a) => ({ ...a, value: pastScores[a.id] })),
+        {
+          width: 480,
+          colorText: colors.text,
+          colorMuted: colors.muted,
+          colorBorder: colors.border,
+          bg: colors.card,
+          series: [
+            {
+              name: '过去',
+              values: axes.map((a) => pastScores[a.id]),
+              color: colors.faint,
+              dashed: true,
+              fillOpacity: 0.03,
+              width: 1.1,
+            },
+            {
+              name: '此刻',
+              values: axes.map((a) => scores[a.id]),
+              color: colors.gold,
+              fillOpacity: 0.13,
+            },
+          ],
+          labelSize: 10.5,
+          ariaLabel: '时间胶囊双层雷达',
+        },
+      ));
+      resultBox.appendChild(radarBox);
+    }
+
+    /* 变化 Top 5 */
+    const list = el('div', { class: 'timeline__list' });
+    diff.top5.forEach((r) => {
+      const dir = r.delta > 0 ? 'up' : r.delta < 0 ? 'down' : 'flat';
+      list.appendChild(el('div', { class: 'timeline__row' }, [
+        el('span', { class: 'timeline__name', text: r.name }),
+        el('span', { class: 'timeline__past', text: String(Math.round(r.past)) }),
+        el('span', { class: 'timeline__arrow', text: '→' }),
+        el('span', { class: 'timeline__now', text: String(Math.round(r.now)) }),
+        el('span', { class: `timeline__delta is-${dir}`, text: `${r.delta > 0 ? '+' : ''}${r.delta}` }),
+      ]));
+    });
+    resultBox.appendChild(list);
+
+    resultBox.appendChild(el('p', { class: 'timeline__verdict', text: diff.verdict }));
+  }
+
+  sec.appendChild(body);
+  return sec;
+}
+
 /* ───────── src/viz/butterflySvg.js ───────── */
 /* ============================================================
    butterflySvg.js — 七美德 × 七原罪 双翼蝶形图
@@ -9027,213 +10705,6 @@ function butterflySvg(dims, opts = {}) {
 }
 
 const BUTTERFLY_PAIRS = PAIRS;
-
-/* ───────── src/viz/radarSvg.js ───────── */
-/* ============================================================
-   radarSvg.js — 通用雷达图
-   支持：单层 / 面具虚实叠层 / 双人叠加
-   ============================================================ */
-
-
-
-/**
- * @param {Array<{id,label,value,color?}>} axes
- * @param {Object} opts
- *   width, series: [{ name, values: number[], color, dashed, fill, width }]
- *   colorText, colorMuted, colorBorder, bg
- */
-function radarSvg(axes, opts = {}) {
-  const n = axes.length;
-  if (n < 3) return svg('svg', { viewBox: '0 0 10 10' });
-
-  const W = opts.width || 560;
-  const H = opts.height || Math.round(W * 0.92);
-  const endPadTop = 30;
-  const cx = W / 2;
-  const cy = H / 2 + (opts.offsetY || 0);
-  const R = Math.min(W, H) * (opts.radiusRatio || 0.32);
-
-  const cText = opts.colorText || '#1E2220';
-  const cMuted = opts.colorMuted || '#8B8F89';
-  const cBorder = opts.colorBorder || '#E4DFD4';
-  const bg = opts.bg || '#FCFBF8';
-
-  const root = svg('svg', {
-    viewBox: `${-34} ${-endPadTop} ${W + 68} ${H + endPadTop + 34}`,
-    width: '100%',
-    role: 'img',
-    'aria-label': opts.ariaLabel || '多维雷达图',
-  });
-
-  const g = svg('g', {});
-  root.appendChild(g);
-
-  const angle = (i) => (Math.PI * 2 * i) / n - Math.PI / 2;
-  const pt = (i, f) => [cx + Math.cos(angle(i)) * R * f, cy + Math.sin(angle(i)) * R * f];
-
-  // ---- 网格 ----
-  const rings = opts.rings || [0.25, 0.5, 0.75, 1];
-  rings.forEach((f, idx) => {
-    const poly = Array.from({ length: n }, (_, i) => pt(i, f).join(',')).join(' ');
-    g.appendChild(svg('polygon', {
-      points: poly,
-      fill: idx === rings.length - 1 ? opts.gridFill || 'none' : 'none',
-      stroke: cBorder,
-      'stroke-width': idx === rings.length - 1 ? 1 : 0.7,
-      opacity: idx === rings.length - 1 ? 0.95 : 0.55,
-    }));
-  });
-
-  // ---- 轴线 ----
-  for (let i = 0; i < n; i += 1) {
-    const [x, y] = pt(i, 1);
-    g.appendChild(svg('line', {
-      x1: cx, y1: cy, x2: x, y2: y,
-      stroke: cBorder, 'stroke-width': 0.7, opacity: 0.7,
-    }));
-  }
-
-  // ---- 数据层 ----
-  const series = opts.series || [];
-  series.forEach((s, si) => {
-    const color = s.color || '#8C4A32';
-    const pts = axes.map((a, i) => {
-      const v = clamp(Number(s.values?.[i]) || 0, 0, 100);
-      return pt(i, v / 100);
-    });
-    const poly = pts.map((p) => p.join(',')).join(' ');
-
-    if (s.fill !== false) {
-      g.appendChild(svg('polygon', {
-        points: poly,
-        fill: color,
-        'fill-opacity': s.fillOpacity ?? (si === 0 ? 0.12 : 0.08),
-        stroke: 'none',
-      }));
-    }
-
-    g.appendChild(svg('polygon', {
-      points: poly,
-      fill: 'none',
-      stroke: color,
-      'stroke-width': s.width || 1.6,
-      'stroke-dasharray': s.dashed ? '4 4' : 'none',
-      'stroke-linejoin': 'round',
-    }));
-
-    pts.forEach((p, i) => {
-      const dot = svg('circle', {
-        cx: p[0], cy: p[1], r: s.dashed ? 2.2 : 2.8,
-        fill: bg, stroke: color, 'stroke-width': 1.4,
-      });
-      // 悬浮 / 轻触提示：维度名 + 精确分数 + 档位
-      dot.setAttribute('class', 'radar-dot');
-      const ax = axes[i] || {};
-      const val = Number(s.values?.[i]);
-      if (Number.isFinite(val)) {
-        const title = svg('title', {});
-        title.textContent = `${ax.label || ax.id || ''} · ${round(val, 1)}${
-          s.name && series.length > 1 ? `（${s.name}）` : ''
-        }`;
-        dot.appendChild(title);
-      }
-      g.appendChild(dot);
-    });
-  });
-
-  // ---- 轴标签 ----
-  const fs = opts.labelSize || (n > 10 ? 9 : 10.5);
-  axes.forEach((a, i) => {
-    const f = 1.13;
-    const [x, y] = pt(i, f);
-    const cos = Math.cos(angle(i));
-    const sin = Math.sin(angle(i));
-    const anchor = Math.abs(cos) < 0.22 ? 'middle' : cos > 0 ? 'start' : 'end';
-    const dy = sin > 0.6 ? 10 : sin < -0.6 ? -2 : 4;
-
-    const label = a.short || a.label;
-    const labelNode = svgText(label, {
-      x, y: y + dy,
-      'text-anchor': anchor,
-      'font-size': fs,
-      'font-family': "'Noto Sans SC','PingFang SC',sans-serif",
-      fill: a.color || cMuted,
-      'letter-spacing': '0.04em',
-    });
-    if (Number.isFinite(a.value)) {
-      const t = svg('title', {});
-      t.textContent = `${a.label || a.id || ''} · ${round(a.value, 1)}`;
-      labelNode.appendChild(t);
-    }
-    g.appendChild(labelNode);
-
-    if (opts.showValues && Number.isFinite(a.value)) {
-      g.appendChild(svgText(`${round(a.value, 0)}`, {
-        x, y: y + dy + (sin < -0.6 ? -12 : 12),
-        'text-anchor': anchor,
-        'font-size': fs - 1.5,
-        'font-family': "'Noto Serif SC',Georgia,serif",
-        fill: cText,
-        'font-variant-numeric': 'tabular-nums',
-        opacity: 0.7,
-      }));
-    }
-  });
-
-  return root;
-}
-
-/* ------------------------------------------------------------
-   面具虚实叠层雷达：外显自评（虚）vs 暗线底色（实）
-   ------------------------------------------------------------ */
-function maskRadar(axes, opts = {}) {
-  return radarSvg(axes, {
-    ...opts,
-    series: [
-      {
-        name: opts.surfaceName || '表层面具',
-        values: axes.map((a) => a.masked ?? a.value),
-        color: opts.surfaceColor || '#A8894F',
-        dashed: true,
-        fill: false,
-        width: 1.4,
-      },
-      {
-        name: opts.depthName || '潜意识底色',
-        values: axes.map((a) => a.value),
-        color: opts.depthColor || '#8C4A32',
-        fill: true,
-        fillOpacity: 0.1,
-        width: 1.8,
-      },
-    ],
-  });
-}
-
-/* ------------------------------------------------------------
-   双人叠加雷达
-   ------------------------------------------------------------ */
-function dualRadar(axesA, valuesB, opts = {}) {
-  return radarSvg(axesA, {
-    ...opts,
-    series: [
-      {
-        name: opts.nameA || 'A',
-        values: axesA.map((a) => a.value),
-        color: opts.colorA || '#8C4A32',
-        fillOpacity: 0.1,
-        width: 1.7,
-      },
-      {
-        name: opts.nameB || 'B',
-        values: valuesB,
-        color: opts.colorB || '#3B4D70',
-        fillOpacity: 0.1,
-        width: 1.7,
-      },
-    ],
-  });
-}
 
 /* ───────── src/viz/spectrumSvg.js ───────── */
 /* ============================================================
@@ -11089,6 +12560,7 @@ async function copyAIPrompt(report, opt = {}) {
 
 
 
+
 const meanOf = (ids, map) => {
   const vals = ids.map((i) => map[i]).filter((v) => Number.isFinite(v));
   return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
@@ -11409,6 +12881,9 @@ function renderReport(root, ctx) {
     { id: 'r-mirror', label: '双面镜' },
     { id: 'r-cross', label: '跨卷读心' },
     { id: 'r-dual', label: '双态推演' },
+    { id: 'r-sandbox', label: '压力沙盒' },
+    { id: 'r-parliament', label: '内在议会' },
+    { id: 'r-timeline', label: '时间胶囊' },
     { id: 'r-archives', label: '分卷档案' },
     { id: 'r-manual', label: '使用说明书' },
     { id: 'r-export', label: '导出' },
@@ -11772,6 +13247,35 @@ function renderReport(root, ctx) {
     ]));
   }
   wrap.appendChild(dualSec);
+
+  /* ============ 实验室 · 压力沙盒 / 内在议会 / 时间胶囊 ============ */
+  const labColors = {
+    text: C.text,
+    muted: C.faint,
+    border: C.border,
+    card: C.card,
+    gold: C.gold,
+    sin: C.vol1,
+    virtue: C.vol2,
+    faint: C.faint,
+    dimName: (id) => DATA.dimMap[id]?.name || id,
+  };
+
+  const sandbox = sandboxSection({ scores: report.scores, colors: labColors });
+  if (sandbox) wrap.appendChild(sandbox);
+
+  const parliament = parliamentSection({ scores: report.scores });
+  if (parliament) wrap.appendChild(parliament);
+
+  // 时间胶囊需要 dimOrder 才能解码粘贴进来的存档码
+  state.__dimOrder = DATA.dimOrder;
+  const timeline = timelineSection({
+    state,
+    scores: report.scores,
+    colors: labColors,
+    dimMap: DATA.dimMap,
+  });
+  if (timeline) wrap.appendChild(timeline);
 
   /* ============ 模块 5 · 分卷档案 ============ */
   const archSec = el('section', { class: 'rsec', id: 'r-archives' });
@@ -14954,10 +16458,943 @@ function renderExpressResult(root, ctx) {
   }));
 }
 
+/* ───────── src/core/johari.js ───────── */
+/* ============================================================
+   johari.js — 乔哈里窗「印象盲盒」
+
+   玩法：生成一条 12 题邀请，好友不测自己，而是凭直觉猜「你」。
+   提交后立刻给出四象限：公开区 / 盲区 / 隐藏区 / 未知区。
+
+   短码 HA4J- 只装 12 个维度分数，够算四象限，不装任何答题原文。
+   ============================================================ */
+
+
+
+/** 12 项核心显性维度 —— 必须覆盖公开/盲/隐三个区 */
+const JOHARI_DIMS = [
+  'big5_assert', 'big5_compassion', 'big5_order',
+  'sin_pride', 'virtue_humility',
+  'light_kant', 'dark_mach',
+  'att_anxiety', 'att_avoidance',
+  'mot_autonomy', 'mot_belonging',
+  'hsp_sensory',
+];
+
+/** 12 道盲猜题：每题对应一个维度，选项从低到高 4 档 */
+const JOHARI_QUESTIONS = [
+  {
+    dim: 'big5_assert', prom: '如果聚餐时有人把他的话打断了三次',
+    opts: ['他多半不吭声，回头也不提', '他会等个空隙把话接回去', '他会当场说「我还没说完」', '他会直接把话题主导过去'],
+  },
+  {
+    dim: 'big5_compassion', prom: '你难过时给他发一条很长的语音',
+    opts: ['他会先回一句「怎么了」再听', '他会认真听完，然后问你想要什么', '他会陪你很久，也会跟着难受', '他大概会替你把事情解决掉'],
+  },
+  {
+    dim: 'big5_order', prom: '去他住的地方，你最先会注意到',
+    opts: ['东西位置有规律，连角度都对', '整体整齐，但抽屉可能很乱', '乱得有个性，他自己找得到', '基本没有秩序可言，但他不介意'],
+  },
+  {
+    dim: 'sin_pride', prom: '有人当面指出他一个明显的错误',
+    opts: ['他会立刻承认，还会感谢你', '他嘴上接受，心里会过一遍', '他会先辩解两句再改', '他大概不会当场认'],
+  },
+  {
+    dim: 'virtue_humility', prom: '他做成了一件很难的事，别人夸他',
+    opts: ['他会把功劳分给别人', '他会说「运气好」', '他会接受，也会讲点过程', '他会坦率承认这确实是他的本事'],
+  },
+  {
+    dim: 'light_kant', prom: '一件事对朋友有利，但违反了规则',
+    opts: ['规则就是规则，他多半不做', '他会很为难，最后大概率不做', '他会先做，之后自己补救', '他会做，且不觉得需要解释'],
+  },
+  {
+    dim: 'dark_mach', prom: '在一个需要争的场合，你觉得他最可能',
+    opts: ['按道理讲，讲到对方认', '先摸清谁说了算', '会让别人替他出头', '不争，直接退出这个场'],
+  },
+  {
+    dim: 'att_anxiety', prom: '他发出去一条消息，对方四小时没回',
+    opts: ['他根本没注意', '他注意到了，但没多想', '他会反复看自己上一条', '他会开始想是不是哪里不对'],
+  },
+  {
+    dim: 'att_avoidance', prom: '有人开始对他很主动、很黏',
+    opts: ['他会很受用，甚至更主动', '他会高兴，也需要一点自己的时间', '他会有点想退', '他会明显冷下来'],
+  },
+  {
+    dim: 'mot_autonomy', prom: '一份收入更高但要听安排的工作',
+    opts: ['他会毫不犹豫接受', '他会接受，但心里会不适', '他会犹豫很久', '他大概会拒绝'],
+  },
+  {
+    dim: 'mot_belonging', prom: '他更在意哪一种',
+    opts: ['自己说了算', '身边有几个人是真的懂他', '有明确的上升空间', '生活稳、不出事'],
+  },
+  {
+    dim: 'hsp_sensory', prom: '在一个很吵、灯很亮的房间里待两小时',
+    opts: ['他完全没问题', '他会有点累，但能撑', '他会明显不适', '他会找借口先走'],
+  },
+];
+
+/* ------------------------------------------------------------
+   HA4J- 短码：12 个维度分数（0–100，1 字节一个）
+   ------------------------------------------------------------ */
+
+const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+function toB64(bytes) {
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 3) {
+    const b0 = bytes[i];
+    const b1 = bytes[i + 1];
+    const b2 = bytes[i + 2];
+    out += B64[b0 >> 2];
+    out += B64[((b0 & 3) << 4) | ((b1 ?? 0) >> 4)];
+    if (b1 === undefined) break;
+    out += B64[((b1 & 15) << 2) | ((b2 ?? 0) >> 6)];
+    if (b2 === undefined) break;
+    out += B64[b2 & 63];
+  }
+  return out;
+}
+
+function fromB64(str) {
+  const clean = String(str || '').replace(/[^A-Za-z0-9\-_]/g, '');
+  const bytes = [];
+  let buf = 0;
+  let bits = 0;
+  for (const ch of clean) {
+    const idx = B64.indexOf(ch);
+    if (idx < 0) continue;
+    buf = (buf << 6) | idx;
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      bytes.push((buf >> bits) & 0xff);
+    }
+  }
+  return new Uint8Array(bytes);
+}
+
+function sum8(bytes) {
+  let h = 0x2b;
+  for (const b of bytes) h = (h * 31 + b) & 0xff;
+  return h;
+}
+
+/** 编码：version(1) + 12 维 + 昵称 UTF8 + 校验(1) */
+function encodeJohari(scores, nickname = '') {
+  const body = [1];
+  for (const d of JOHARI_DIMS) {
+    const v = scores?.[d];
+    body.push(Number.isFinite(v) ? clamp(Math.round(v), 0, 100) : 255);
+  }
+  const nameBytes = [...new TextEncoder().encode(String(nickname).slice(0, 12))];
+  body.push(...nameBytes);
+
+  const bytes = new Uint8Array(body.length + 1);
+  bytes.set(body, 0);
+  bytes[body.length] = sum8(Uint8Array.from(body));
+  return `HA4J-${toB64(bytes)}`;
+}
+
+function decodeJohari(code) {
+  const raw = String(code || '').trim();
+  if (!/^HA4J-/i.test(raw)) return { ok: false, error: '不是 HA4J- 开头的印象码' };
+  const bytes = fromB64(raw.slice(5));
+  if (bytes.length < 14) return { ok: false, error: '印象码长度异常' };
+  if (sum8(bytes.subarray(0, bytes.length - 1)) !== bytes[bytes.length - 1]) {
+    return { ok: false, error: '校验失败' };
+  }
+  if (bytes[0] !== 1) return { ok: false, error: '不支持的印象码版本' };
+
+  const scores = {};
+  JOHARI_DIMS.forEach((d, i) => {
+    const b = bytes[1 + i];
+    if (b !== 255) scores[d] = b;
+  });
+  const nickname = new TextDecoder().decode(bytes.subarray(13, bytes.length - 1)).replace(/\u0000/g, '').trim();
+  return { ok: true, scores, nickname };
+}
+
+/* ------------------------------------------------------------
+   四象限
+   ------------------------------------------------------------ */
+
+/**
+ * @param {Object} selfScores  本人 12 维真实分
+ * @param {Array}  guesses     好友作答：[{ dim, pick(0–3) }]
+ * @returns {{ quadrants, open, blind, facade, unknown, agreement }}
+ */
+function johariResult(selfScores, guesses) {
+  const open = [];
+  const blind = [];
+  const facade = [];
+  const unknown = [];
+
+  const selfMean = (() => {
+    const v = JOHARI_DIMS.map((d) => selfScores?.[d]).filter(Number.isFinite);
+    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 50;
+  })();
+
+  const guessMap = new Map();
+  for (const g of guesses || []) guessMap.set(g.dim, g.pick);
+
+  for (const d of JOHARI_DIMS) {
+    const sv = selfScores?.[d];
+    const pick = guessMap.get(d);
+    if (!Number.isFinite(sv) || pick === undefined) continue;
+
+    /* 把 4 档折算成 0–100 的估计分 */
+    const gv = clamp((Number(pick) / 3) * 100, 0, 100);
+    const selfHigh = sv >= selfMean;
+    const friendHigh = gv >= 50;
+
+    const row = { dim: d, self: round(sv, 0), friend: round(gv, 0) };
+
+    if (selfHigh && friendHigh) open.push(row);          // 公开区
+    else if (!selfHigh && friendHigh) blind.push(row);   // 盲区：他人看见，你没看见
+    else if (selfHigh && !friendHigh) facade.push(row);  // 隐藏区
+    else unknown.push(row);                              // 未知区
+  }
+
+  /* 一致度：|self − friend| 的均值反推 */
+  const all = [...open, ...blind, ...facade, ...unknown];
+  const agreement = all.length
+    ? round(100 - all.reduce((s, r) => s + Math.abs(r.self - r.friend), 0) / all.length, 1)
+    : null;
+
+  return { open, blind, facade, unknown, agreement };
+}
+
+/** 按维度名取中文，供 UI 用 */
+function labelOf(dim, dimMap) {
+  return dimMap?.[dim]?.name || dim;
+}
+
+/* ───────── src/core/squad.js ───────── */
+/* ============================================================
+   squad.js — 3–6 人小队群像星图
+
+   · 生态位角色分配（定海神针 / 破冰点火器 / 隐形操盘手 /
+     气氛调温师 / 冷静风控官 / 长期主义者）
+   · N × N 缘分热力矩阵
+   · 群体雷达覆盖与共同短板预警
+   ============================================================ */
+
+
+
+
+/* ------------------------------------------------------------
+   1. 生态位角色
+   ------------------------------------------------------------ */
+
+const SQUAD_ROLES = [
+  {
+    id: 'anchor',
+    name: '定海神针',
+    latin: 'The Anchor',
+    desc: '情绪最稳、最不容易被带动的那一个。事情一乱，所有人会先看他的表情。',
+    weights: { big5_order: 1.4, mot_security: 1.4, def_detach: 1.0, att_anxiety: -1.2 },
+  },
+  {
+    id: 'igniter',
+    name: '破冰点火器',
+    latin: 'The Igniter',
+    desc: '沉默一旦超过三秒，他一定开口。他不在乎话题是否完美，只在乎没人尴尬。',
+    weights: { big5_social: 1.5, big5_assert: 1.2, hss_novelty: 1.0, big5_compliance: -0.8 },
+  },
+  {
+    id: 'operator',
+    name: '隐形操盘手',
+    latin: 'The Operator',
+    desc: '他很少在群里说话，但真正推动事情的那几条线都在他手上。',
+    weights: { covert_control: 1.6, dark_mach: 1.3, cog_global: 1.0, big5_assert: -0.6 },
+  },
+  {
+    id: 'warmer',
+    name: '气氛调温师',
+    latin: 'The Warmer',
+    desc: '谁被冷落了他第一个发现，谁不高兴了他第一个递台阶。整屋的温度由他调。',
+    weights: { big5_compassion: 1.5, jung_fe: 1.3, def_fawn: 0.9, big5_assert: -0.4 },
+  },
+  {
+    id: 'risk',
+    name: '冷静风控官',
+    latin: 'The Risk Officer',
+    desc: '所有人都在兴奋时，他是那个说「等一下，这里有问题」的人。',
+    weights: { big5_alert: 1.5, cog_logic: 1.3, light_kant: 1.0, big5_open: -0.5 },
+  },
+  {
+    id: 'longhaul',
+    name: '长期主义者',
+    latin: 'The Long Hauler',
+    desc: '他不参与当下的争论，他在算三年后的事。小组里最不显眼也最不可缺的那个。',
+    weights: { time_future: 1.4, big5_industry: 1.3, mot_purpose: 1.0, time_present_hed: -0.8 },
+  },
+];
+
+/**
+ * 为每个成员分配生态位。
+ * 用加权契合度，同一角色不给两个人（贪心 + 分数降序）。
+ */
+function assignRoles(members, DATA) {
+  if (!members.length) return [];
+
+  const scored = [];
+  for (let i = 0; i < members.length; i += 1) {
+    const s = members[i].state.computedScores || {};
+    for (const role of SQUAD_ROLES) {
+      let acc = 0;
+      let wSum = 0;
+      for (const [dim, w] of Object.entries(role.weights)) {
+        const v = s[dim];
+        if (!Number.isFinite(v)) continue;
+        const mag = Math.abs(w);
+        acc += (w < 0 ? 100 - v : v) * mag;
+        wSum += mag;
+      }
+      if (wSum <= 0) continue;
+      scored.push({ idx: i, role: role.id, fit: round(acc / wSum, 1) });
+    }
+  }
+
+  scored.sort((a, b) => b.fit - a.fit);
+
+  const usedMember = new Set();
+  const usedRole = new Set();
+  const out = members.map((m, i) => ({
+    idx: i,
+    name: m.name,
+    state: m.state,
+    role: null,
+    roleFit: 0,
+  }));
+
+  for (const s of scored) {
+    if (usedMember.has(s.idx) || usedRole.has(s.role)) continue;
+    usedMember.add(s.idx);
+    usedRole.add(s.role);
+    out[s.idx].role = s.role;
+    out[s.idx].roleFit = s.fit;
+    if (usedMember.size === members.length) break;
+  }
+
+  /* 剩下的人（角色数少于人数时）按最高分补 */
+  for (const m of out) {
+    if (m.role) continue;
+    const best = scored.filter((s) => s.idx === m.idx).sort((a, b) => b.fit - a.fit)[0];
+    if (best) { m.role = best.role; m.roleFit = best.fit; }
+  }
+
+  void DATA;
+  return out;
+}
+
+function roleMeta(id) {
+  return SQUAD_ROLES.find((r) => r.id === id) || null;
+}
+
+/* ------------------------------------------------------------
+   2. 缘分热力矩阵
+   ------------------------------------------------------------ */
+
+/**
+ * @returns {{ matrix: number[][], best: {i,j,score}, worst: {i,j,score} }}
+ */
+function affinityMatrix(members, DATA) {
+  const n = members.length;
+  const matrix = Array.from({ length: n }, () => Array(n).fill(null));
+
+  for (let i = 0; i < n; i += 1) {
+    matrix[i][i] = 100;
+    for (let j = i + 1; j < n; j += 1) {
+      let score = null;
+      try {
+        const res = compareStates(members[i].state, members[j].state, DATA);
+        if (res?.ok && Number.isFinite(res.overall)) score = round(res.overall, 1);
+      } catch {
+        score = null;
+      }
+      matrix[i][j] = score;
+      matrix[j][i] = score;
+    }
+  }
+
+  const pairs = [];
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 1; j < n; j += 1) {
+      if (Number.isFinite(matrix[i][j])) pairs.push({ i, j, score: matrix[i][j] });
+    }
+  }
+  pairs.sort((a, b) => b.score - a.score);
+
+  return {
+    matrix,
+    best: pairs[0] || null,
+    worst: pairs[pairs.length - 1] || null,
+    pairs,
+  };
+}
+
+/* ------------------------------------------------------------
+   3. 群体覆盖与短板
+   ------------------------------------------------------------ */
+
+/** 常用能力维度：整个小队在这些轴上的覆盖情况 */
+const COVER_DIMS = [
+  'big5_order', 'big5_open', 'big5_assert', 'big5_compassion',
+  'cog_global', 'cog_logic', 'mot_autonomy', 'mot_belonging',
+  'mot_mastery', 'mot_purpose', 'light_kant', 'dark_mach',
+  'tki_collaborating', 'time_future', 'hsp_sensory', 'att_advance_placeholder',
+];
+
+/**
+ * 每个人的强项是否被整个小队覆盖。
+ * 「共同短板」= 所有人在这条轴上都低于 55。
+ */
+function coverage(members, DATA) {
+  const dims = COVER_DIMS.filter((d) => d !== 'att_advance_placeholder');
+  const rows = [];
+
+  for (const d of dims) {
+    const vals = members
+      .map((m) => m.state.computedScores?.[d])
+      .filter(Number.isFinite);
+    if (!vals.length) continue;
+    const max = Math.max(...vals);
+    const avg = mean(vals);
+    rows.push({
+      dim: d,
+      name: DATA.dimMap?.[d]?.name || d,
+      max: round(max, 0),
+      avg: round(avg, 0),
+      covered: max >= 60,
+    });
+  }
+
+  const gaps = rows.filter((r) => !r.covered);
+  const strong = rows.filter((r) => r.covered).sort((a, b) => b.max - a.max);
+
+  return { rows, gaps, strong };
+}
+
+/* ------------------------------------------------------------
+   4. 小队公约
+   ------------------------------------------------------------ */
+
+function squadCharter(members, roles, gaps) {
+  const lines = [];
+
+  const r = (id) => roles.find((x) => x.role === id);
+
+  if (r('operator')) {
+    lines.push(`${r('operator').name} 大概率是真正推动事情的人，但他的动作不一定让所有人看见。定期问一句「现在是谁在推」，能省掉很多误会。`);
+  }
+  if (r('igniter') && r('risk')) {
+    lines.push(`${r('igniter').name} 会先冲，${r('risk').name} 会先拦。这不是矛盾，是这支队伍最值钱的一组刹车与油门——只要两个人互相知道对方在做什么。`);
+  }
+  if (r('warmer')) {
+    lines.push(`${r('warmer').name} 承担的调温工作通常不会被记功。把「谁在照顾气氛」明确说出来，能防止这种劳动长期隐形。`);
+  }
+  if (r('anchor')) {
+    lines.push(`${r('anchor').name} 一沉默，全队会本能地紧张。他的稳定是公共资源，也需要被回充——别只在出事时才找他。`);
+  }
+  if (r('longhaul')) {
+    lines.push(`${r('longhaul').name} 说的是三年后的事，容易被当下的紧迫感压过去。每次决策留五分钟专门听这一段。`);
+  }
+
+  if (gaps.length) {
+    lines.push(`整支队伍在「${gaps.slice(0, 3).map((g) => g.name).join('、')}」上都没有人明显强——这不是谁的错，是结构缺口。要么外请一个补位，要么明确承认这块没人负责。`);
+  } else {
+    lines.push('这支队伍在常见的能力轴上都有人覆盖，真正的风险不在能力，而在分工是否被说清楚过。');
+  }
+
+  return lines;
+}
+
+/* ───────── src/components/SocialView.js ───────── */
+/* ============================================================
+   SocialView.js — Phase 4 社交拓展实验室
+   · JohariView：12 题印象盲盒（他评）+ 四象限
+   · SquadView：3–6 人群像星图
+   ============================================================ */
+
+
+
+
+
+
+
+const socialHead = (no, title, hint) => el('div', { class: 'rsec__head' }, [
+  el('span', { class: 'rsec__no', text: no }),
+  el('h2', { text: title }),
+  hint ? el('p', { text: hint }) : null,
+]);
+
+/* ============================================================
+   1 · 乔哈里窗
+   ============================================================ */
+
+function renderJohari(root, ctx) {
+  const { App, DATA, go } = ctx;
+  const state = App.state;
+
+  const parts = (location.hash || '').replace(/^#\//, '').split('/').filter(Boolean);
+  // #/johari            → 发起（生成邀请链接）
+  // #/johari/<HA4J码>    → 好友作答
+  const code = parts[1] && /^HA4J-/i.test(parts[1]) ? decodeURIComponent(parts[1]) : null;
+
+  root.classList.add('view');
+  const wrap = el('div', { class: 'express-result' });
+  root.appendChild(wrap);
+
+  /* ---------- 好友作答模式 ---------- */
+  if (code) {
+    const dec = decodeJohari(code);
+    if (!dec.ok) {
+      wrap.appendChild(el('div', { class: 'empty' }, [
+        el('h3', { text: '印象码无法解析' }),
+        el('p', { text: dec.error }),
+        el('a', { class: 'btn', href: '#/', text: '返回大厅' }),
+      ]));
+      return;
+    }
+    renderJohariGuest(wrap, dec, DATA);
+    return;
+  }
+
+  /* ---------- 发起模式 ---------- */
+  const hero = el('div', { class: 'express-hero' });
+  hero.appendChild(el('div', { class: 'express-hero__kicker', text: 'Johari · 印象盲盒' }));
+  hero.appendChild(el('h1', { text: '别人眼中的你' }));
+  hero.appendChild(el('p', {
+    text: '生成一条邀请链接，让朋友凭直觉回答 12 道关于你的短题。'
+      + '他不需要自己测，90 秒就能答完。提交后会立刻画出一张「乔哈里窗」：'
+      + '你和好友都看见的、只有他看见的、只有你知道的，以及谁都没触及的。',
+  }));
+  wrap.appendChild(hero);
+
+  const dims = JOHARI_DIMS.filter((d) => Number.isFinite(state.computedScores?.[d]));
+  const stats = el('dl', { class: 'express-stats' });
+  [
+    ['题目', '12'],
+    ['好友耗时', '约 90 秒'],
+    ['可测维度', `${dims.length}`],
+    ['需要你的数据', dims.length >= 8 ? '已就绪' : '不足'],
+  ].forEach(([k, v]) => {
+    stats.appendChild(el('div', { class: 'express-stat' }, [
+      el('dt', { text: k }),
+      el('dd', { text: v }),
+    ]));
+  });
+  wrap.appendChild(stats);
+
+  if (dims.length < 8) {
+    wrap.appendChild(el('p', {
+      class: 'sandbox__hint',
+      style: { marginTop: '16px' },
+      text: '你的核心显性维度还不够（至少需要 8 个）。先完成 2–3 卷再来生成印象盲盒。',
+    }));
+    wrap.appendChild(el('div', { class: 'express-actions' }, [
+      el('a', { class: 'btn btn--solid', href: '#/', text: '去作答' }),
+    ]));
+    return;
+  }
+
+  const jCode = encodeJohari(state.computedScores, state.nickname || '');
+  const url = `${location.origin}${location.pathname}#/johari/${jCode}`;
+
+  const linkBox = el('div', { class: 'code-box', text: url });
+  wrap.appendChild(linkBox);
+
+  wrap.appendChild(el('div', { class: 'express-actions' }, [
+    el('button', {
+      class: 'btn btn--solid',
+      type: 'button',
+      text: '复制邀请链接',
+      onclick: async () => {
+        const ok = await copyText(url);
+        toast(ok ? '已复制，发给朋友即可' : '复制失败，请手动选择');
+      },
+    }),
+    el('button', {
+      class: 'btn',
+      type: 'button',
+      text: '复制印象码',
+      onclick: async () => {
+        const ok = await copyText(jCode);
+        toast(ok ? '已复制 HA4J- 短码' : '复制失败');
+      },
+    }),
+    el('a', { class: 'btn btn--ghost', href: '#/', text: '返回大厅' }),
+  ]));
+
+  wrap.appendChild(el('p', {
+    class: 'notice',
+    style: { marginTop: '22px' },
+    html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M12 11v5"/></svg><span>印象码只包含你的 12 个维度分数与昵称，不含任何答题原文。好友提交后得到的回传码同样是纯本地的，不需要联网。</span>',
+  }));
+}
+
+function renderJohariGuest(wrap, dec, DATA) {
+  const name = dec.nickname || '这位朋友';
+  const picks = {};
+  let submitted = false;
+
+  const hero = el('div', { class: 'express-hero' });
+  hero.appendChild(el('div', { class: 'express-hero__kicker', text: 'Johari · 印象盲盒' }));
+  hero.appendChild(el('h1', { text: `${name} 想看看你眼中的他` }));
+  hero.appendChild(el('p', {
+    text: '下面 12 道题都不需要你想太多，凭第一印象选一个最像他的即可。'
+      + '你答的不是自己，是他。全部答完后会立刻画出一张四象限图。',
+  }));
+  wrap.appendChild(hero);
+
+  const form = el('div', { class: 'johari-form' });
+  wrap.appendChild(form);
+
+  const resultBox = el('div', { class: 'johari-result' });
+  wrap.appendChild(resultBox);
+
+  JOHARI_QUESTIONS.forEach((q, qi) => {
+    const card = el('div', { class: 'johari-q', dataset: { dim: q.dim } });
+    card.appendChild(el('div', { class: 'johari-q__no', text: `Q ${String(qi + 1).padStart(2, '0')}` }));
+    card.appendChild(el('p', { class: 'johari-q__prom', text: q.prom }));
+
+    const opts = el('div', { class: 'johari-q__opts' });
+    q.opts.forEach((text, oi) => {
+      const btn = el('button', {
+        class: 'johari-opt',
+        type: 'button',
+        text,
+        onclick: () => {
+          picks[q.dim] = oi;
+          opts.querySelectorAll('.johari-opt').forEach((b) => b.classList.remove('is-sel'));
+          btn.classList.add('is-sel');
+          card.classList.add('is-done');
+          checkReady();
+        },
+      });
+      opts.appendChild(btn);
+    });
+    card.appendChild(opts);
+    form.appendChild(card);
+  });
+
+  const submitBtn = el('button', {
+    class: 'btn btn--solid',
+    type: 'button',
+    text: '还没答完',
+    disabled: true,
+    onclick: () => {
+      if (submitted) return;
+      submitted = true;
+      const guesses = JOHARI_DIMS
+        .filter((d) => picks[d] !== undefined)
+        .map((d) => ({ dim: d, pick: picks[d] }));
+      showQuadrants(resultBox, dec, guesses, DATA, name);
+      submitBtn.disabled = true;
+      submitBtn.textContent = '已完成';
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  });
+
+  wrap.appendChild(el('div', { class: 'express-actions' }, [submitBtn]));
+
+  function checkReady() {
+    const n = Object.keys(picks).length;
+    if (n < JOHARI_DIMS.length) {
+      submitBtn.textContent = `还剩 ${JOHARI_DIMS.length - n} 题`;
+      submitBtn.disabled = true;
+    } else {
+      submitBtn.textContent = '揭晓四象限';
+      submitBtn.disabled = false;
+    }
+  }
+  checkReady();
+}
+
+function showQuadrants(box, dec, guesses, DATA, name) {
+  box.innerHTML = '';
+  const res = johariResult(dec.scores, guesses);
+
+  const head1 = el('div', { class: 'section-head' }, [
+    el('h2', { text: '乔哈里窗' }),
+    el('div', {
+      class: 'section-head__hint',
+      text: Number.isFinite(res.agreement) ? `你眼中的他 vs 他眼中的自己，一致度 ${res.agreement}%` : '',
+    }),
+  ]);
+  box.appendChild(head1);
+
+  const grid = el('div', { class: 'johari-grid' });
+  const cell = (key, title, sub, rows, color) => {
+    const c = el('div', { class: `johari-cell is-${key}` });
+    c.appendChild(el('div', { class: 'johari-cell__top' }, [
+      el('span', { class: 'johari-cell__no', text: color }),
+      el('h3', { text: title }),
+    ]));
+    c.appendChild(el('p', { class: 'johari-cell__sub', text: sub }));
+    if (!rows.length) {
+      c.appendChild(el('p', { class: 'sandbox__hint', text: '这一区目前是空的。' }));
+    } else {
+      const list = el('div', { class: 'johari-cell__list' });
+      rows.forEach((r) => {
+        list.appendChild(el('div', { class: 'johari-cell__row' }, [
+          el('span', { text: labelOfLocal(r.dim, DATA) }),
+          el('b', { text: `${r.self} / ${r.friend}` }),
+        ]));
+      });
+      c.appendChild(list);
+      c.appendChild(el('p', {
+        class: 'sandbox__hint',
+        style: { marginTop: '8px' },
+        text: '格式为：他自己的分 / 你猜的分',
+      }));
+    }
+    return c;
+  };
+
+  grid.appendChild(cell('open', '公开区', '你们看法一致的地方', res.open, '01'));
+  grid.appendChild(cell('blind', '盲区', '你一眼看见、他自己没注意到的', res.blind, '02'));
+  grid.appendChild(cell('facade', '隐藏区', '他心里很强、藏得滴水不漏的', res.facade, '03'));
+  grid.appendChild(cell('unknown', '未知潜能区', '谁都没触及的留白', res.unknown, '04'));
+  box.appendChild(grid);
+
+  box.appendChild(el('p', { class: 'sandbox__lead', text: summaryOf(res, name) }));
+
+  /* 回传码 */
+  const backCode = encodeJohari(
+    Object.fromEntries([...res.open, ...res.blind, ...res.facade, ...res.unknown].map((r) => [r.dim, r.friend])),
+    name,
+  );
+
+  box.appendChild(el('div', { class: 'express-actions' }, [
+    el('button', {
+      class: 'btn btn--solid',
+      type: 'button',
+      text: '复制回传码',
+      onclick: async () => {
+        const ok = await copyText(backCode);
+        toast(ok ? '已复制，把它发回给 TA' : '复制失败');
+      },
+    }),
+    el('button', {
+      class: 'btn',
+      type: 'button',
+      text: '下载结果',
+      onclick: () => {
+        downloadText(
+          `johari-${Date.now()}.txt`,
+          `乔哈里窗 · ${name}\n一致度 ${res.agreement}%\n\n公开区 ${res.open.length} · 盲区 ${res.blind.length} · 隐藏区 ${res.facade.length} · 未知 ${res.unknown.length}\n\n回传码：${backCode}`,
+          'text/plain;charset=utf-8',
+        );
+        toast('已下载');
+      },
+    }),
+  ]));
+}
+
+function labelOfLocal(dim, DATA) {
+  return DATA.dimMap?.[dim]?.name || dim;
+}
+
+function summaryOf(res, name) {
+  const parts = [];
+  if (res.blind.length) {
+    parts.push(`你看见了 ${res.blind.length} 处他自己没注意的地方——这通常是他在别人面前比在自己心里更清楚的部分。`);
+  }
+  if (res.facade.length) {
+    parts.push(`另有 ${res.facade.length} 处他很强，但藏得比较好，你这次没接住。`);
+  }
+  if (res.unknown.length > 4) {
+    parts.push('还有不少留白，说明这些题不足以覆盖他的全部。');
+  }
+  parts.unshift(`这是 ${name} 在一个人眼里的一个切面，不是结论。`);
+  return parts.join('');
+}
+
+/* ============================================================
+   2 · 群像星图
+   ============================================================ */
+
+function renderSquad(root, ctx) {
+  const { DATA } = ctx;
+
+  root.classList.add('view');
+  const wrap = el('div', { class: 'express-result' });
+  root.appendChild(wrap);
+
+  const hero = el('div', { class: 'express-hero' });
+  hero.appendChild(el('div', { class: 'express-hero__kicker', text: 'Squad · 群像星图' }));
+  hero.appendChild(el('h1', { text: '一支队伍的形状' }));
+  hero.appendChild(el('p', {
+    text: '把 3–6 份存档码放在一起。系统会给每个人分配一个隐形生态位，'
+      + '算出一张两两之间的缘分矩阵，并指出整支队伍共同缺的那块板。',
+  }));
+  wrap.appendChild(hero);
+
+  const box = el('div', { class: 'squad-input' });
+  wrap.appendChild(box);
+
+  const rows = [];
+  const resultBox = el('div', { class: 'squad-result' });
+  wrap.appendChild(resultBox);
+
+  function addSlot(idx) {
+    const ta = el('textarea', {
+      class: 'field field--code',
+      rows: '2',
+      placeholder: `第 ${idx + 1} 个人的 HA4- 存档码（或昵称）`,
+    });
+    const nameInput = el('input', {
+      class: 'field',
+      type: 'text',
+      maxlength: '8',
+      placeholder: '称呼（可空）',
+      style: { maxWidth: '140px' },
+    });
+    const row = el('div', { class: 'squad-slot' }, [
+      el('span', { class: 'squad-slot__no', text: String(idx + 1) }),
+      ta,
+      nameInput,
+    ]);
+    rows.push({ ta, nameInput, row });
+    box.appendChild(row);
+  }
+
+  for (let i = 0; i < 3; i += 1) addSlot(i);
+
+  box.appendChild(el('div', { class: 'express-actions' }, [
+    el('button', {
+      class: 'btn btn--sm',
+      type: 'button',
+      text: '+ 加一个人',
+      onclick: () => {
+        if (rows.length >= 6) { toast('最多 6 人'); return; }
+        addSlot(rows.length);
+      },
+    }),
+    el('button', {
+      class: 'btn btn--solid',
+      type: 'button',
+      text: '生成群像',
+      onclick: () => build(),
+    }),
+  ]));
+
+  function build() {
+    const members = [];
+    const dimOrder = DATA.dimOrder;
+
+    for (const r of rows) {
+      const raw = r.ta.value.trim();
+      if (!raw) continue;
+      const dec = decodeSoulCode(raw, dimOrder);
+      if (!dec.ok) { toast(`第 ${members.length + 1} 份解析失败：${dec.error}`); return; }
+      members.push({
+        name: r.nameInput.value.trim() || dec.state.nickname || `成员 ${members.length + 1}`,
+        state: dec.state,
+      });
+    }
+
+    if (members.length < 3) { toast('至少需要 3 份有效存档码'); return; }
+
+    resultBox.innerHTML = '';
+    renderSquadResult(resultBox, members, DATA);
+    resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function renderSquadResult(box, members, DATA) {
+  const roles = assignRoles(members, DATA);
+  const aff = affinityMatrix(members, DATA);
+  const cov = coverage(members, DATA);
+  const charter = squadCharter(members, roles, cov.gaps);
+
+  /* ---- 生态位 ---- */
+  box.appendChild(socialHead('01', '小队生态位', `${members.length} 人 · 六种角色自动分配`));
+  const roleGrid = el('div', { class: 'squad-roles' });
+  roles.forEach((m) => {
+    const meta = roleMeta(m.role);
+    roleGrid.appendChild(el('div', { class: 'squad-role' }, [
+      el('div', { class: 'squad-role__name', text: m.name }),
+      el('div', { class: 'squad-role__tag', text: meta?.name || '—' }),
+      el('p', { class: 'squad-role__desc', text: meta?.desc || '' }),
+      el('span', { class: 'squad-role__fit', text: `契合 ${Math.round(m.roleFit)}` }),
+    ]));
+  });
+  box.appendChild(roleGrid);
+
+  /* ---- 缘分矩阵 ---- */
+  if (aff.pairs.length) {
+    box.appendChild(socialHead('02', '缘分热力矩阵', '数值为双人契合度，深色代表更合拍'));
+    const table = el('table', { class: 'affinity' });
+    const thead = el('thead');
+    const hr = el('tr');
+    hr.appendChild(el('th', { text: '' }));
+    members.forEach((m) => hr.appendChild(el('th', { text: m.name })));
+    thead.appendChild(hr);
+    table.appendChild(thead);
+
+    const tbody = el('tbody');
+    members.forEach((m, i) => {
+      const tr = el('tr');
+      tr.appendChild(el('th', { text: m.name }));
+      members.forEach((_, j) => {
+        const v = aff.matrix[i][j];
+        const td = el('td');
+        if (Number.isFinite(v)) {
+          td.textContent = String(Math.round(v));
+          td.style.background = `color-mix(in srgb, var(--gold) ${Math.round((v - 30) * 0.9)}%, transparent)`;
+          if (i === j) td.style.opacity = '0.35';
+        } else {
+          td.textContent = '—';
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    box.appendChild(table);
+
+    if (aff.best) {
+      box.appendChild(el('p', {
+        class: 'sandbox__lead',
+        text: `最合拍的两人：${members[aff.best.i].name} × ${members[aff.best.j].name}（${aff.best.score}）；`
+          + `最需要留意的：${members[aff.worst.i].name} × ${members[aff.worst.j].name}（${aff.worst.score}）。`,
+      }));
+    }
+  }
+
+  /* ---- 覆盖与短板 ---- */
+  box.appendChild(socialHead('03', '群体覆盖与共同短板', '这条轴有没有人在 60 分以上'));
+
+  const covList = el('div', { class: 'squad-cov' });
+  cov.rows.forEach((r) => {
+    covList.appendChild(el('div', { class: `squad-cov__row${r.covered ? '' : ' is-gap'}` }, [
+      el('span', { class: 'squad-cov__name', text: r.name }),
+      el('span', { class: 'squad-cov__avg', text: `均 ${r.avg}` }),
+      el('span', { class: 'squad-cov__max', text: `最高 ${r.max}` }),
+      el('span', { class: 'squad-cov__tag', text: r.covered ? '已覆盖' : '缺口' }),
+    ]));
+  });
+  box.appendChild(covList);
+
+  /* ---- 公约 ---- */
+  box.appendChild(socialHead('04', '小队相处公约', '从角色与缺口自动提炼'));
+  const list = el('div', { class: 'squad-charter' });
+  charter.forEach((line, i) => {
+    list.appendChild(el('div', { class: 'squad-charter__item' }, [
+      el('span', { class: 'squad-charter__no', text: String(i + 1).padStart(2, '0') }),
+      el('p', { text: line }),
+    ]));
+  });
+  box.appendChild(list);
+}
+
 /* ───────── src/main.js ───────── */
 /* ============================================================
    main.js — 应用启动 / Hash 路由 / 全局状态
    ============================================================ */
+
 
 
 
@@ -15184,6 +17621,19 @@ function render(route) {
     setActiveNav('hub');
     root.className = 'page page--narrow';
     renderQuiz(root, { App, DATA, volId: parts[1], mode: 'intro', recompute, go });
+    return;
+  }
+
+  // 乔哈里窗 / 群像星图
+  if (head === 'johari') {
+    root.className = 'page';
+    renderJohari(root, { App, DATA, go });
+    return;
+  }
+
+  if (head === 'squad') {
+    root.className = 'page';
+    renderSquad(root, { App, DATA, go });
     return;
   }
 
