@@ -1,0 +1,801 @@
+{
+  "volume_id": "vol6",
+  "index": 6,
+  "title": "欲望引擎",
+  "subtitle": "六大深层生命驱动力",
+  "theme_color": "#B5653D",
+  "estimated_minutes": 5,
+  "intro": "这一卷要回答的问题是：什么能让你眼底发光。不要回答「应该」让你满足的东西，回答在凌晨三点还能把你叫醒的那一个。有两道题，你只有一百点燃料。",
+  "dimensions": [
+    "mot_autonomy",
+    "mot_mastery",
+    "mot_belonging",
+    "mot_security",
+    "mot_purpose",
+    "mot_hedonism"
+  ],
+  "questions": [
+    {
+      "id": "v6_q01",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "motors",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "prompt": "假设你手里有一百点「生命燃料」，只能分配给你此刻最想补给的东西。每一分都要有代价。",
+      "items": [
+        {
+          "key": "autonomy",
+          "label": "自己说了算的时间",
+          "dim": "mot_autonomy",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "mastery",
+          "label": "拿到更大的结果",
+          "dim": "mot_mastery",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "belonging",
+          "label": "被深深理解的连接",
+          "dim": "mot_belonging",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "security",
+          "label": "稳固的退路与秩序",
+          "dim": "mot_security",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "purpose",
+          "label": "做有回响的事",
+          "dim": "mot_purpose",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "hedonism",
+          "label": "鲜活的感官与松弛",
+          "dim": "mot_hedonism",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    },
+    {
+      "id": "v6_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_autonomy",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一条很稳、回报也很好、但需要你长期按别人节奏生活的路。你走在这条路上的实际状态是——",
+      "scale": {
+        "left": "挺好，节奏清楚我反而更专注",
+        "right": "赚到了也在耗，总有一种说不清的闷",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_autonomy": [
+          -2,
+          2
+        ],
+        "mot_security": [
+          1.6,
+          -1.2
+        ],
+        "val_boundary": [
+          -1.2,
+          1.6
+        ]
+      }
+    },
+    {
+      "id": "v6_q03",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "mot_mastery",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "两个项目，你更愿意接哪一个？",
+      "options": [
+        {
+          "key": "A",
+          "text": "难度极高、失败概率一半，但做成之后会彻底改写你的位置",
+          "effects": {
+            "mot_mastery": 2,
+            "mot_security": -1.4,
+            "dark_psycho": 1,
+            "cog_ambiguity": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "稳定推进、九成能成，做完没人会特别提起，但你的履历很干净",
+          "effects": {
+            "mot_mastery": -1.4,
+            "mot_security": 1.8,
+            "big5_order": 1.2,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v6_q04",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "mot_belonging",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "凌晨一点，你刚结束一段连轴的工作，手机里有很多新消息，但没有一条是你特别想点开的那个人发来的。",
+      "prompt": "那一瞬间你最真实的感觉是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "很想有一个人，此刻就知道我今天有多累，不需要我说",
+          "effects": {
+            "mot_belonging": 2,
+            "att_anxiety": 1.4,
+            "big5_compassion": 1,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "还好，安静挺好的，反正明天还有事要做，不必现在就想清楚",
+          "effects": {
+            "mot_belonging": -1.6,
+            "mot_autonomy": 1.4,
+            "att_avoidance": 1.2,
+            "def_detach": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "有点空，但这种空会很快被第二天的事情填满，也就过去了",
+          "effects": {
+            "mot_belonging": 0.4,
+            "mot_mastery": 1.4,
+            "def_intellectual": 1,
+            "mot_hedonism": -0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "干脆给自己找点事做，别让这种情绪有地方待着，也别多想",
+          "effects": {
+            "mot_belonging": -0.8,
+            "def_sublimate": 1.6,
+            "mot_purpose": 1.2,
+            "att_avoidance": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v6_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_security",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "关于「退路」，你的真实状态是——",
+      "scale": {
+        "left": "手上得有至少两条能立刻走的路，我才会安心",
+        "right": "留太多退路本身就是一种不信任，我更愿意把自己逼到没有退路",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_security": [
+          2,
+          -2
+        ],
+        "big5_alert": [
+          1.4,
+          -1.2
+        ],
+        "big5_rumination": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v6_q06",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "mot_purpose",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "你爸的老同事在一家单位做了十年，做到中层，收入不错。第八年的时候他曾经短暂地想过：这些事对我以外的人，真的有什么意义吗？",
+      "prompt": "你猜后来他最可能走上了哪一条路？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把那点念头收起来，日子照样过得很好，只是偶尔在夜里想起",
+          "effects": {
+            "mot_purpose": -1.6,
+            "mot_security": 1.6,
+            "def_sublimate": 0.4,
+            "big5_rumination": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "开始在下班后做一个很小的、只对自己有意义的项目",
+          "effects": {
+            "mot_purpose": 1.8,
+            "big5_industry": 1.2,
+            "mot_autonomy": 1,
+            "def_sublimate": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "用那点念头做筹码，换了一个更大、更能影响人的位置",
+          "effects": {
+            "mot_purpose": 1,
+            "mot_mastery": 1.6,
+            "dark_mach": 1.2,
+            "dark_narc": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "干脆辞职去做那件事，哪怕要重新从很低的地方开始",
+          "effects": {
+            "mot_purpose": 1.6,
+            "mot_autonomy": 1.8,
+            "mot_security": -1.6,
+            "dark_psycho": 1
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v6_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_hedonism",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一笔计划外的闲钱和一个完整的周末同时出现。你更想用它换——",
+      "scale": {
+        "left": "一次非常好的体验：好餐厅、好位置、好天气",
+        "right": "把它存起来，或者换成一个更长久的东西",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "mot_hedonism": [
+          2,
+          -2
+        ],
+        "mot_security": [
+          -1.4,
+          1.6
+        ],
+        "big5_aesthetic": [
+          1.2,
+          -0.4
+        ],
+        "virtue_temperance": [
+          -1,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v6_q08",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "mot_autonomy",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "两份工作摆在面前：一份给你极高的自由度，做什么、怎么做、什么时候做都由你定，但收入只有另一份的六成，而且没人给你兜底。",
+      "prompt": "你更可能选——",
+      "options": [
+        {
+          "key": "A",
+          "text": "自由度更高的那份，钱可以少赚，时间不能不给",
+          "effects": {
+            "mot_autonomy": 2,
+            "mot_security": -1.6,
+            "val_boundary": 1.4,
+            "big5_order": -0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "收入更稳的那份，自由是有了余裕之后才能谈的东西",
+          "effects": {
+            "mot_autonomy": -1.6,
+            "mot_security": 2,
+            "sin_greed": 0.6,
+            "lv_happiness": 0.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先选稳的，用三年时间攒够可以买断自由的那笔钱",
+          "effects": {
+            "mot_autonomy": 1.2,
+            "mot_security": 1.4,
+            "dark_mach": 0.8,
+            "cog_global": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "两份都不选，我会自己造一个能同时满足这两件事的位置",
+          "effects": {
+            "mot_autonomy": 1.6,
+            "mot_mastery": 1.4,
+            "sin_pride": 1,
+            "dark_psycho": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v6_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "mot_belonging",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个人如果拥有极高的成就，但没有一段真正亲密的关系，你更倾向于认为——",
+      "scale": {
+        "left": "那他大概在某个很深的夜里是空的",
+        "right": "成就本身就能填满一个人，亲密不是必需品",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_belonging": [
+          1.8,
+          -1.8
+        ],
+        "mot_mastery": [
+          -1,
+          1.4
+        ],
+        "att_avoidance": [
+          -1.2,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "v6_q10",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "motors",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "你已经被一件事困了三年：它体面、稳定、无可指摘，但每天早上醒来，你都要花一点力气说服自己去。",
+      "prompt": "现在把一百点「离开它的勇气」分配下去——你究竟在怕失去什么？分值越高，说明你越舍不得。",
+      "items": [
+        {
+          "key": "autonomy",
+          "label": "怕变成没人管的野人",
+          "dim": "mot_autonomy",
+          "base": 0,
+          "gain": 1,
+          "reverse": true
+        },
+        {
+          "key": "mastery",
+          "label": "怕前功尽弃、从头再来",
+          "dim": "mot_mastery",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "belonging",
+          "label": "怕失去这群熟悉的人",
+          "dim": "mot_belonging",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "security",
+          "label": "怕断了收入与体面",
+          "dim": "mot_security",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "purpose",
+          "label": "怕这三年其实毫无意义",
+          "dim": "mot_purpose",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "hedonism",
+          "label": "怕丢掉现在这份舒服",
+          "dim": "mot_hedonism",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    },
+    {
+      "id": "v6_q11",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_hedonism",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "你会为了哪一种「浪费」而心甘情愿？",
+      "options": [
+        {
+          "key": "A",
+          "text": "一个下午什么都没做，只是坐在窗边看光移动",
+          "effects": {
+            "mot_hedonism": 1.8,
+            "big5_aesthetic": 1.4,
+            "virtue_temperance": -0.4,
+            "big5_industry": -1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "为了一顿很好的饭，跨半个城市排两个小时",
+          "effects": {
+            "mot_hedonism": 1.6,
+            "sin_gluttony": 1.2,
+            "big5_open": 0.8,
+            "virtue_temperance": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "把整个周末给一个人，什么都不产出",
+          "effects": {
+            "mot_hedonism": 0.6,
+            "mot_belonging": 1.8,
+            "att_anxiety": 0.6,
+            "mot_mastery": -0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "我不太会浪费，那些时间我都会换成别的东西",
+          "effects": {
+            "mot_hedonism": -1.6,
+            "mot_mastery": 1.4,
+            "big5_industry": 1.6,
+            "cog_global": 0.4
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v6_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_mastery",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "看到同龄人拿到了你也在追的东西，你心里那股力的方向通常是——",
+      "scale": {
+        "left": "立刻回到自己的清单上，把今天该做的先做完",
+        "right": "先在心里反复比较，甚至有点不想打开手机",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_mastery": [
+          1.8,
+          -1.2
+        ],
+        "sin_envy": [
+          -1.4,
+          1.6
+        ],
+        "def_sublimate": [
+          1.2,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v6_q13",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "mot_purpose",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "两种「留下点什么」，你更想要哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "做出一个会被很多人长期使用、但没人记得是谁做的东西",
+          "effects": {
+            "mot_purpose": 1.8,
+            "light_humanism": 1.4,
+            "dark_narc": -1.4,
+            "virtue_humility": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "做出一个被少数极懂的人高度认可、并且明确署你名号的东西",
+          "effects": {
+            "mot_purpose": 1,
+            "dark_narc": 1.6,
+            "mot_mastery": 1.4,
+            "sin_pride": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "不做东西，把身边几个人真正照顾好，这就够了",
+          "effects": {
+            "mot_purpose": -0.6,
+            "mot_belonging": 1.8,
+            "light_humanism": 1,
+            "mot_mastery": -1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v6_q14",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "mot_security",
+      "is_sensitive": false,
+      "weight": 1.2,
+      "context": "一个你很信任的人突然告诉你，你父母正在考虑把这套住了二十年的房子卖掉，手续还没定，但已经在找人问了。",
+      "prompt": "听到这个消息的第一秒，你先想到的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "卖了以后他们住哪儿，先把这个问清楚，别的事往后放",
+          "effects": {
+            "mot_security": 2,
+            "big5_alert": 1.6,
+            "cog_logic": 1,
+            "mot_autonomy": -0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "反而有点松了口气，也许这是个推所有人往前走的理由",
+          "effects": {
+            "mot_security": -1.6,
+            "mot_autonomy": 1.6,
+            "cog_ambiguity": 1,
+            "big5_open": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "立刻开始在脑子里筛选哪些事要保住、哪些人要先去说",
+          "effects": {
+            "mot_security": 0.8,
+            "dark_mach": 1.8,
+            "covert_control": 1.2,
+            "big5_assert": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "先愣一下，脑子里出现的第一个画面是这间屋子里的那些年",
+          "effects": {
+            "mot_security": -0.4,
+            "mot_purpose": 1.4,
+            "big5_rumination": 1.4,
+            "mot_belonging": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v6_q15",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_autonomy",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "关于「被需要」，你更接近——",
+      "scale": {
+        "left": "被很多人需要让我觉得这一天是满的",
+        "right": "被太多人需要会让我想关掉手机，独自待一会儿",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_autonomy": [
+          -1.6,
+          2
+        ],
+        "mot_belonging": [
+          1.8,
+          -1.4
+        ],
+        "big5_social": [
+          1.2,
+          -1.2
+        ]
+      }
+    },
+    {
+      "id": "v6_q16",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "mot_security",
+      "is_sensitive": false,
+      "weight": 1.35,
+      "context": "你姐夫有个习惯：不管收入多少，账上永远留着相当于十八个月生活的现金，宁可让它躺在那里贬值。",
+      "prompt": "你觉得他真正在守的是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "一种随时可以说不的权利，钱买的其实是这个，别的都是附带",
+          "effects": {
+            "mot_security": 0.8,
+            "mot_autonomy": 1.8,
+            "val_boundary": 1.2,
+            "big5_alert": 0.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "一种从很早以前就留下来的匮乏感，钱只是暂时压住了它",
+          "effects": {
+            "mot_security": 2,
+            "big5_alert": 1.8,
+            "big5_rumination": 1.2,
+            "def_fawn": 0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "一次还没发生的风险，他只是在为那个不确定买单",
+          "effects": {
+            "mot_security": 1.6,
+            "cog_logic": 1.2,
+            "big5_order": 1,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v6_q17",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_purpose",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "如果没人知道是你做的，你还会不会做那件事？",
+      "scale": {
+        "left": "会，意义本身不依赖署名",
+        "right": "说实话会打折扣，被看见也是我做它的一部分",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_purpose": [
+          1.8,
+          -1.2
+        ],
+        "dark_narc": [
+          -1.6,
+          1.6
+        ],
+        "light_humanism": [
+          1.2,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v6_q18",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mot_belonging",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "你和一个人关系很近，但对方最近明显把你排在了他的优先级后面。你的实际反应更接近——",
+      "options": [
+        {
+          "key": "A",
+          "text": "会反复想是哪里出了变化，忍不住先去确认",
+          "effects": {
+            "mot_belonging": 1.6,
+            "att_anxiety": 2,
+            "big5_rumination": 1.6,
+            "def_fawn": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "把距离默默拉远一点，不问了，也不等了",
+          "effects": {
+            "mot_belonging": -1.4,
+            "att_avoidance": 1.8,
+            "def_detach": 1.4,
+            "big5_compliance": -0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "直接问一次，把话说清楚，然后看他的回答决定去留",
+          "effects": {
+            "mot_belonging": 1.2,
+            "big5_assert": 1.6,
+            "light_kant": 1,
+            "att_anxiety": -0.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "自己去找点别的事做，人和人的距离本来就有季节性",
+          "effects": {
+            "mot_belonging": -0.4,
+            "mot_autonomy": 1.4,
+            "cog_ambiguity": 1,
+            "att_avoidance": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    }
+  ]
+}

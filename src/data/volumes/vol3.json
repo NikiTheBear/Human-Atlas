@@ -1,0 +1,820 @@
+{
+  "volume_id": "vol3",
+  "index": 3,
+  "title": "博弈暗面",
+  "subtitle": "光明三角、黑暗三角与隐性掌控",
+  "theme_color": "#9C7A3C",
+  "estimated_minutes": 5,
+  "intro": "这一卷关于利益与善意撞在一起的那一刻。请不必急着做那个「更好的人」——成人世界的每一次配合、每一次让步、每一次出手，都有它真实的算法。",
+  "dimensions": [
+    "dark_mach",
+    "dark_narc",
+    "dark_psycho",
+    "light_humanism",
+    "light_kant",
+    "light_faith",
+    "covert_control"
+  ],
+  "questions": [
+    {
+      "id": "v3_q01",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "dark_mach",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "在开始一段重要的合作之前，你会花多少精力先摸清对方真正在意的东西？",
+      "scale": {
+        "left": "几乎不刻意做，边走边了解就够了",
+        "right": "基本都会先摸清楚，才敢先把自己的底交出去",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dark_mach": [
+          -2,
+          2
+        ],
+        "covert_control": [
+          -1.4,
+          1.8
+        ],
+        "light_faith": [
+          1.2,
+          -1.2
+        ],
+        "cog_global": [
+          0.6,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "v3_q02",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "dark_mach",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "三个朋友合伙开的小店开了半年。今晚算账，其中一个人说「我出的力最多」，另一个人说「我垫的钱最多」。桌上的账本摊开，谁都没先说话。",
+      "prompt": "那段安静里，你脑子里转的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "这两个人谁在真出力、谁在搭便车，还有谁不能被得罪",
+          "effects": {
+            "dark_mach": 2,
+            "covert_control": 1.4,
+            "cog_global": 1,
+            "light_faith": -1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "这几个人里有没有真的值得长期并肩的，先看谁说话算数",
+          "effects": {
+            "dark_mach": 1,
+            "light_faith": 1.2,
+            "cog_global": 0.8,
+            "mot_belonging": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "怎么把我那份做得足够清楚，让别人主动认下这块",
+          "effects": {
+            "dark_mach": 0.4,
+            "mot_mastery": 1.8,
+            "light_humanism": 0.6,
+            "big5_industry": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "有点累，这种场面里每句客气话都要花力气接住",
+          "effects": {
+            "dark_mach": -0.8,
+            "big5_social": -1.4,
+            "att_avoidance": 1.2,
+            "def_detach": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v3_q03",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "dark_psycho",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "你介绍一位朋友进了你所在的圈子接一个活儿，算是一份人情。他连着三次交的东西都不能用，今天这一次，直接让你在中间人面前失了分寸。",
+      "prompt": "你知道这件事之后的第一秒，脑子里最清晰的那个念头是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "这个人不能再往这类事情里带了，得尽快把关系理清",
+          "effects": {
+            "dark_psycho": 2,
+            "dark_mach": 1,
+            "big5_compassion": -1.2,
+            "mot_mastery": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "先弄清他到底怎么了，认识这么多年不该被一次低谷判死",
+          "effects": {
+            "dark_psycho": -1.6,
+            "light_humanism": 1.8,
+            "big5_compassion": 1.6,
+            "big5_compliance": 0.6
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先把损失补回来，情绪和责任的事情之后再算",
+          "effects": {
+            "dark_psycho": 1.2,
+            "cog_logic": 1.6,
+            "def_intellectual": 1,
+            "light_kant": 0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "一股火直冲上来，想当场把话说得他抬不起头",
+          "effects": {
+            "dark_psycho": 0.6,
+            "sin_wrath": 1.8,
+            "def_attack": 1.6,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v3_q04",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "dark_narc",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "你做了一件确实很漂亮的事，但它被安静地归档了，没有掌声也没有人被惊动。你心里——",
+      "scale": {
+        "left": "几乎不需要外部确认，我自己知道它有多好",
+        "right": "会有明显的失落，我需要有人看见它才算数",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dark_narc": [
+          -2,
+          2
+        ],
+        "mot_mastery": [
+          -0.6,
+          1.2
+        ],
+        "light_humanism": [
+          0.8,
+          -0.6
+        ],
+        "big5_assert": [
+          -1,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "v3_q05",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "light_kant",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "一个极其关键的谈判桌上，你发现对方有一个信息盲区。只要你保持沉默，这份合同会以对你更有利的条件签下；说出来，你会损失一大笔。",
+      "prompt": "你更可能的选择是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "保持沉默，商业谈判本就各凭本事，没人有义务替对方补课",
+          "effects": {
+            "light_kant": -2,
+            "dark_mach": 1.8,
+            "val_moral": -1.4,
+            "light_humanism": -0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "把这一点说出来，生意可以少赚，但不能建立在一段隐瞒上",
+          "effects": {
+            "light_kant": 2,
+            "val_moral": 1.6,
+            "dark_mach": -1.4,
+            "light_humanism": 1.2
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v3_q06",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "light_faith",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个刚认识不久、对你很客气周到的人，你默认他背后的动机更接近——",
+      "scale": {
+        "left": "他大概本身就是这样的人，先按善意接住",
+        "right": "这份周到里有它的来处，先看清楚再决定给多少",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "light_faith": [
+          2,
+          -2
+        ],
+        "big5_alert": [
+          -1.2,
+          1.6
+        ],
+        "dark_mach": [
+          -1.4,
+          1.6
+        ],
+        "light_humanism": [
+          1,
+          -0.4
+        ]
+      }
+    },
+    {
+      "id": "v3_q07",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "covert_control",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "一个十几人的朋友群要张罗一次长线旅行。群主名义上是组织者，但路线、预算、住宿、谁跟谁住，最后都是你在定。",
+      "prompt": "关于这个局面，你内心更接近哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "名分不重要，只要事情按我的节奏推进，我就舒服",
+          "effects": {
+            "covert_control": 2,
+            "dark_mach": 1.4,
+            "mot_autonomy": 1.2,
+            "big5_assert": -0.6
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "这种状态让我不舒服，我要么拿到名分要么退出来",
+          "effects": {
+            "covert_control": -1.2,
+            "big5_assert": 1.8,
+            "val_moral": 1.2,
+            "mot_autonomy": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "顺着这个局面往前走，反正功劳最终会算在做事的人身上",
+          "effects": {
+            "covert_control": 1,
+            "big5_industry": 1.4,
+            "light_faith": 1,
+            "dark_narc": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "我会把这些推动都留痕，让它们在未来某个时刻可以被证明",
+          "effects": {
+            "covert_control": 1.4,
+            "dark_mach": 1.6,
+            "cog_logic": 1,
+            "big5_order": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v3_q08",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "dark_mach",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "小区维权这件事上，一个你平时并不喜欢、见面只点头的邻居，私下帮你补齐了最关键的一份材料，还在群里替你说了话，事后没提。",
+      "prompt": "知道这件事的第一秒，你心里最先冒出来的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "他为什么帮我，这件事他打算怎么用",
+          "effects": {
+            "dark_mach": 2,
+            "light_faith": -1.6,
+            "big5_alert": 1.2,
+            "covert_control": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "有点惭愧，我之前对他的判断可能太潦草了",
+          "effects": {
+            "dark_mach": -1.4,
+            "light_faith": 1.8,
+            "light_humanism": 1.4,
+            "big5_compassion": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "记住了，这份我之后会还回去，账要清",
+          "effects": {
+            "dark_mach": 0.6,
+            "light_kant": 1.2,
+            "val_moral": 1,
+            "big5_order": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "松了口气，终于有人接住了，先不想那么多",
+          "effects": {
+            "dark_mach": -0.8,
+            "big5_rumination": -1,
+            "def_detach": 0.8,
+            "att_anxiety": -0.6
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v3_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "dark_psycho",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "当你必须做一个会让某个人很难受、但对整体更好的决定时，你的实际状态是——",
+      "scale": {
+        "left": "会犹豫很久，很难按下那个键",
+        "right": "能按下去，事后也许会难受，但当时不会有太多阻力",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dark_psycho": [
+          -1.8,
+          2
+        ],
+        "big5_compassion": [
+          1.6,
+          -1.6
+        ],
+        "def_detach": [
+          -1,
+          1.4
+        ],
+        "big5_compliance": [
+          1.2,
+          -1.2
+        ]
+      }
+    },
+    {
+      "id": "v3_q10",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "light_humanism",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "家里只够支撑一个人的长期照护：一位是身体更差、需要人盯着的长辈，一位是刚出状况、孩子还小的表亲。两个都开口了，都很难。",
+      "prompt": "你更可能给出的意见是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "按实际紧急程度和可恢复性来，人情不该进入这类判断",
+          "effects": {
+            "light_humanism": -1.2,
+            "cog_logic": 1.6,
+            "dark_psycho": 1.4,
+            "val_moral": -0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "先顾身体更差的那位。另一位我坦白说清：这次只能靠你们自己了",
+          "effects": {
+            "light_humanism": 1.4,
+            "big5_compassion": 1.2,
+            "light_kant": 0.6,
+            "val_moral": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "把两个人的真实处境完整摆到台面上，让家里长辈自己承担选择",
+          "effects": {
+            "light_humanism": 1.2,
+            "light_kant": 1.4,
+            "big5_compliance": -0.8,
+            "covert_control": -0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "先顾情况更急的那位，另一位我私下想办法帮他找出路",
+          "effects": {
+            "light_humanism": 0.6,
+            "dark_mach": 1.2,
+            "big5_compassion": 1,
+            "covert_control": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v3_q11",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "dark_narc",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "在一场你并不擅长的活动里，你被安排成了一个不重要的角色。这种感觉对你来说——",
+      "scale": {
+        "left": "无所谓，换个场合我照样有我的位置",
+        "right": "会一直不太舒服，我很需要处在被看见的位置",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dark_narc": [
+          -1.8,
+          2
+        ],
+        "big5_assert": [
+          -1,
+          1.4
+        ],
+        "mot_mastery": [
+          -0.4,
+          1
+        ],
+        "cog_logic": [
+          0.6,
+          -0.4
+        ]
+      }
+    },
+    {
+      "id": "v3_q12",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "light_faith",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "两个曾经帮过你的人，如今在同一件事上立场完全相反，都希望站到你这边。",
+      "prompt": "你更可能怎么处理？",
+      "options": [
+        {
+          "key": "A",
+          "text": "按事情本来的对错站，谁帮过我都是另一本账",
+          "effects": {
+            "light_faith": 0.6,
+            "light_kant": 1.8,
+            "val_moral": 1.6,
+            "big5_compliance": -1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先拖着不表态，让两边都觉得我还站在他这边",
+          "effects": {
+            "light_faith": -1.2,
+            "dark_mach": 1.8,
+            "covert_control": 1.4,
+            "val_moral": -1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "谁在我最难的时候真的在场，我心里有数",
+          "effects": {
+            "light_faith": 1.2,
+            "mot_belonging": 1.6,
+            "val_moral": -0.6,
+            "att_anxiety": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v3_q13",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "covert_control",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "关于「知道所有细节」，你的真实感受是——",
+      "scale": {
+        "left": "不必全都知道，交给别人我也会比较放心",
+        "right": "关键环节我不掌握，就会睡不踏实",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "covert_control": [
+          -1.8,
+          2
+        ],
+        "big5_order": [
+          -1,
+          1.6
+        ],
+        "big5_rumination": [
+          -0.8,
+          1.2
+        ],
+        "att_anxiety": [
+          -0.6,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v3_q14",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "dark_narc",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "一个聚会上，有人讲了一个你早就知道、而且知道得比他更透的话题，全场都在点头。",
+      "prompt": "那一刻你身体里最先的反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "忍不住想在他讲完之前，把一个更精确的点插进去",
+          "effects": {
+            "dark_narc": 1.8,
+            "sin_pride": 1.4,
+            "big5_assert": 1.6,
+            "big5_compliance": -1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "听得挺开心，他讲得不错，补不补充都无所谓",
+          "effects": {
+            "dark_narc": -1.6,
+            "virtue_humility": 1.6,
+            "light_humanism": 1.2,
+            "big5_compliance": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "在心里把他讲的和我理解的过了一遍，找出了几处偏差",
+          "effects": {
+            "dark_narc": 0.4,
+            "cog_logic": 1.4,
+            "cog_independent": 1,
+            "big5_assert": 0.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "这个话题我比他熟，等他讲完我接一下场就行",
+          "effects": {
+            "dark_narc": 1,
+            "covert_control": 1.4,
+            "big5_assert": 0.8,
+            "dark_mach": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v3_q15",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "light_humanism",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "你需要一个人替你完成一件不太体面、但不会被追责的小事。你会怎么找人？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把真实情况和风险完全讲清楚，让他自己决定要不要接",
+          "effects": {
+            "light_humanism": 2,
+            "light_kant": 1.8,
+            "val_moral": 1.2,
+            "dark_mach": -1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "找一个最不容易拒绝我的，把话说得轻一些",
+          "effects": {
+            "light_humanism": -1.6,
+            "light_kant": -1.4,
+            "dark_mach": 1.2,
+            "covert_control": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "干脆自己一个人做完，不把任何无关的人卷进来",
+          "effects": {
+            "light_humanism": 1.4,
+            "light_kant": 1,
+            "mot_autonomy": 1.2,
+            "big5_compliance": -0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "找一个正好需要这份人情的人，彼此都心知肚明",
+          "effects": {
+            "light_humanism": -0.8,
+            "dark_mach": 1.4,
+            "dark_psycho": 0.6,
+            "light_kant": -0.4
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v3_q16",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "light_kant",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "你曾经为了一个更好的结果，说过一次不完整的真话。事后回想，你更接近——",
+      "scale": {
+        "left": "后悔，那件事到现在还硌在我心里",
+        "right": "不太后悔，那个场合里完整说出来只会伤到更多人",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "light_kant": [
+          2,
+          -2
+        ],
+        "val_moral": [
+          1.6,
+          -1.4
+        ],
+        "dark_mach": [
+          -1,
+          1.6
+        ],
+        "cog_ambiguity": [
+          -0.6,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v3_q17",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "dark_psycho",
+      "is_sensitive": true,
+      "weight": 1.35,
+      "context": "合作了三年的伙伴被发现私下把核心资源往自己那边挪，数额不大，但性质很明确。",
+      "prompt": "你猜大多数清醒的人最终会怎么处理？",
+      "options": [
+        {
+          "key": "A",
+          "text": "彻底切断，不留余地，也不给他再解释第二次的机会",
+          "effects": {
+            "dark_psycho": 1.8,
+            "covert_control": 1,
+            "big5_compliance": -1.4,
+            "att_avoidance": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "先谈一次，把规则重新划清，之后按新规则继续合作",
+          "effects": {
+            "dark_psycho": -0.8,
+            "light_faith": 1.2,
+            "big5_compliance": 1,
+            "cog_logic": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "表面继续，慢慢把资源收回，让他自己意识到位置变了",
+          "effects": {
+            "dark_psycho": 1,
+            "dark_mach": 1.8,
+            "covert_control": 1.6,
+            "light_kant": -0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "先弄清他为什么会这么做，再决定要不要追究",
+          "effects": {
+            "dark_psycho": -1.2,
+            "big5_compassion": 1.6,
+            "light_humanism": 1.4,
+            "def_intellectual": 1
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v3_q18",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "dark_mach",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一段关系里，你更习惯的姿态是——",
+      "scale": {
+        "left": "有什么说什么，真实的粗糙好过漂亮的安排",
+        "right": "会下意识地安排节奏、把握分寸，让关系朝我舒服的方向走",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dark_mach": [
+          -1.8,
+          1.8
+        ],
+        "covert_control": [
+          -1.4,
+          2
+        ],
+        "light_kant": [
+          1.2,
+          -1
+        ],
+        "big5_compliance": [
+          -0.8,
+          0.4
+        ]
+      }
+    }
+  ]
+}

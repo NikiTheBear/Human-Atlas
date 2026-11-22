@@ -1,0 +1,666 @@
+{
+  "archetypes": [
+    {
+      "id": "AR01",
+      "name": "古典守门人",
+      "latin": "The Classical Gatekeeper",
+      "keywords": [
+        "原则一致",
+        "愤怒有据",
+        "体面刚硬"
+      ],
+      "verdict": "你的锋芒极少为了私利出鞘，几乎全部来自对双标与恃强凌弱的不可容忍。你相信世界至少应该讲道理，并且愿意为这句话付出代价。",
+      "weights": {
+        "light_kant": 1.4,
+        "val_moral": 1.3,
+        "sin_wrath": 1.1,
+        "wv_social": 1.0,
+        "light_humanism": 0.8
+      },
+      "negWeights": {
+        "dark_mach": -0.6
+      }
+    },
+    {
+      "id": "AR02",
+      "name": "丝绒棋手",
+      "latin": "The Velvet Strategist",
+      "keywords": [
+        "温和外壳",
+        "局势洞察",
+        "不动声色"
+      ],
+      "verdict": "你的善意是真的，你的计算也是真的。你懂得用体面降低摩擦，同时在没人注意的地方把局势推向自己需要的位置。",
+      "weights": {
+        "dark_mach": 1.4,
+        "covert_control": 1.3,
+        "big5_compliance": 1.0,
+        "light_faith": 0.6
+      },
+      "negWeights": {
+        "big5_assert": -0.3
+      }
+    },
+    {
+      "id": "AR03",
+      "name": "精密发条",
+      "latin": "The Precision Clockwork",
+      "keywords": [
+        "极高可靠",
+        "提前预演",
+        "长期绷紧"
+      ],
+      "verdict": "你是那种让人放心到忘记说谢谢的人。代价是你几乎从未真正松开过，连休息时都在核对有没有漏掉什么。",
+      "weights": {
+        "big5_order": 1.4,
+        "big5_industry": 1.3,
+        "big5_alert": 1.2,
+        "big5_rumination": 0.8
+      },
+      "negWeights": {
+        "sin_sloth": -0.5
+      }
+    },
+    {
+      "id": "AR04",
+      "name": "旷野旅人",
+      "latin": "The Open-Field Wanderer",
+      "keywords": [
+        "主权优先",
+        "留有余地",
+        "不被定义"
+      ],
+      "verdict": "你极度渴望不被安排，但绝不做毫无退路的裸奔。你会默默把底牌攒够，只为买断自己人生的选择权。",
+      "weights": {
+        "mot_autonomy": 1.5,
+        "val_boundary": 1.3,
+        "mot_security": 0.9,
+        "cog_ambiguity": 0.7
+      },
+      "negWeights": {
+        "big5_compliance": -0.6
+      }
+    },
+    {
+      "id": "AR05",
+      "name": "玻璃罩观察者",
+      "latin": "The Bell-Jar Observer",
+      "keywords": [
+        "滴水不漏",
+        "情绪自持",
+        "深处封锁"
+      ],
+      "verdict": "在绝大多数场合你都是最冷静体面的成年人。但越是滴水不漏的外壳，越说明你把真实的部分锁在了极深的地方。",
+      "weights": {
+        "def_intellectual": 1.4,
+        "def_detach": 1.3,
+        "big5_rumination": 0.6,
+        "att_avoidance": 1.0
+      },
+      "negWeights": {
+        "big5_compassion": -0.4
+      }
+    },
+    {
+      "id": "AR06",
+      "name": "深夜补偿者",
+      "latin": "The Nocturnal Compensator",
+      "keywords": [
+        "白昼顺从",
+        "夜间夺权",
+        "感官代偿"
+      ],
+      "verdict": "白天你在关系与工作里过度配合，到了深夜，大脑会通过熬夜、食物或消费，把你白天让出去的控制权抢回来一点。",
+      "weights": {
+        "sin_gluttony": 1.3,
+        "def_fawn": 1.4,
+        "mot_autonomy": 0.9,
+        "virtue_temperance": -1.0
+      }
+    },
+    {
+      "id": "AR07",
+      "name": "以酸为燃料的攀登者",
+      "latin": "The Ascetic Climber",
+      "keywords": [
+        "横向敏感",
+        "野心精准",
+        "转化力强"
+      ],
+      "verdict": "每次看到同龄人跃迁时泛起的不甘，其实是你潜能发出的警报。把视线从对方身上拉回自己的清单，这股能量会让你跑得很快。",
+      "weights": {
+        "sin_envy": 1.2,
+        "mot_mastery": 1.4,
+        "def_sublimate": 1.2,
+        "big5_industry": 0.9
+      }
+    },
+    {
+      "id": "AR08",
+      "name": "门廊上的深情观望者",
+      "latin": "The Porch Watcher",
+      "keywords": [
+        "珍视深度",
+        "畏惧束缚",
+        "留一盏灯"
+      ],
+      "verdict": "你内心无比珍视灵魂共振的关系，却又极度畏惧被束缚与受伤。你理想的爱人不是藤蔓，而是各具风骨、始终为你留灯的人。",
+      "weights": {
+        "att_avoidance": 1.4,
+        "mot_belonging": 1.2,
+        "def_detach": 0.9,
+        "light_faith": 0.5
+      }
+    },
+    {
+      "id": "AR09",
+      "name": "敏感刺猬",
+      "latin": "The Sensitive Hedgehog",
+      "keywords": [
+        "标准极高",
+        "渴望被看见",
+        "嘴硬心软"
+      ],
+      "verdict": "理性上你觉得多数人配不上你的标准，情感上却极度渴望被某个人毫无保留地偏爱。这份拉扯是你最高频的内耗源。",
+      "weights": {
+        "sin_pride": 1.4,
+        "att_anxiety": 1.3,
+        "dark_narc": 0.8,
+        "big5_rumination": 0.7
+      }
+    },
+    {
+      "id": "AR10",
+      "name": "优雅偷懒者",
+      "latin": "The Elegant Minimalist",
+      "keywords": [
+        "厌恶重复",
+        "抓核心",
+        "点燃即爆发"
+      ],
+      "verdict": "你并非能力不足，而是对低水平重复存在生理排斥。碰到真正点燃你好奇心的难题，你能爆发出常人难以企及的巧劲。",
+      "weights": {
+        "sin_sloth": 1.2,
+        "cog_global": 1.3,
+        "big5_open": 1.1,
+        "cog_diverge": 0.8
+      }
+    },
+    {
+      "id": "AR11",
+      "name": "冷静的现实手术刀",
+      "latin": "The Clinical Scalpel",
+      "keywords": [
+        "果断止损",
+        "外冷内热",
+        "长痛不如短痛"
+      ],
+      "verdict": "你做决定干脆冷峻，甚至显得不近人情。但你相信长痛不如短痛，用果断止损保护更大的善意。",
+      "weights": {
+        "dark_psycho": 1.4,
+        "light_humanism": 1.1,
+        "cog_logic": 1.2,
+        "def_detach": 0.8
+      }
+    },
+    {
+      "id": "AR12",
+      "name": "清醒的享乐务实家",
+      "latin": "The Lucid Hedonist",
+      "keywords": [
+        "坦荡谈钱",
+        "体验至上",
+        "用资源换自由"
+      ],
+      "verdict": "你毫不羞于谈论资源积累，但终极目的绝非守财。你要的是用厚实的物质底盘，把时间与审美自由赎回来。",
+      "weights": {
+        "sin_greed": 1.2,
+        "mot_hedonism": 1.4,
+        "mot_mastery": 0.9,
+        "big5_aesthetic": 0.8
+      }
+    },
+    {
+      "id": "AR13",
+      "name": "被未知召唤的探索者",
+      "latin": "The Summoned Explorer",
+      "keywords": [
+        "概念饥饿",
+        "跨界联想",
+        "广度优先"
+      ],
+      "verdict": "你被陌生事物持续吸引，因此总能在两个看似无关的领域之间找到可迁移的结构。问题是，你很少把其中一件做到能被别人看见。",
+      "weights": {
+        "big5_open": 1.5,
+        "cog_diverge": 1.2,
+        "cog_ambiguity": 1.0,
+        "big5_aesthetic": 0.7
+      }
+    },
+    {
+      "id": "AR14",
+      "name": "一手证据的匠人",
+      "latin": "The Evidence Artisan",
+      "keywords": [
+        "细节精度",
+        "交付可靠",
+        "不画空饼"
+      ],
+      "verdict": "你相信具体的数据与真实的细节，因此做出来的东西经得起检查。你唯一的风险是：世界有时会因为方向错了，而让完美的工艺白费。",
+      "weights": {
+        "cog_global": -1.2,
+        "big5_order": 1.3,
+        "big5_industry": 1.3,
+        "cog_logic": 1.0
+      }
+    },
+    {
+      "id": "AR15",
+      "name": "带刺的理想主义者",
+      "latin": "The Thorned Idealist",
+      "keywords": [
+        "对不公过敏",
+        "当场开口",
+        "不肯犬儒"
+      ],
+      "verdict": "你的怒火很少来自私利，几乎全被双标与虚伪瞬间点燃。你骨子里住着一个不肯向现实低头的古典侠客。",
+      "weights": {
+        "sin_wrath": 1.4,
+        "val_standard": 1.2,
+        "big5_assert": 1.1,
+        "light_kant": 1.0
+      }
+    },
+    {
+      "id": "AR16",
+      "name": "深海稳压器",
+      "latin": "The Deep Stabilizer",
+      "keywords": [
+        "情绪极稳",
+        "危机定盘",
+        "低戏剧性"
+      ],
+      "verdict": "你的情绪底盘极稳，是危机中最可靠的那根柱子。你的盲区在于：稳定有时会让别人不敢告诉你，他们其实已经很痛。",
+      "weights": {
+        "big5_rumination": -1.4,
+        "def_detach": 1.1,
+        "big5_alert": -0.9,
+        "mot_security": 0.8
+      }
+    },
+    {
+      "id": "AR17",
+      "name": "通晓灰度的务实者",
+      "latin": "The Grey Pragmatist",
+      "keywords": [
+        "灰度操作",
+        "结果优先",
+        "效率极高"
+      ],
+      "verdict": "你理解世界不是非黑即白，因此能在多方利益中找出可行路径。你唯一需要警惕的，是底线在一次次「这次特殊」里悄悄后退。",
+      "weights": {
+        "wv_social": -1.3,
+        "val_moral": -1.2,
+        "cog_speed": 1.1,
+        "val_standard": -1.0
+      }
+    },
+    {
+      "id": "AR18",
+      "name": "愿意先给出的信任者",
+      "latin": "The First-Giver",
+      "keywords": [
+        "善意默认",
+        "低防备",
+        "关系简单"
+      ],
+      "verdict": "你愿意先把人当成善的，因此别人在你这里不必先证明自己。你的代价是，在被真正伤害时会先怀疑是不是自己想多了。",
+      "weights": {
+        "light_faith": 1.5,
+        "wv_nature": 1.2,
+        "big5_compassion": 1.0,
+        "def_project": -1.0
+      }
+    },
+    {
+      "id": "AR19",
+      "name": "读空气的顺流者",
+      "latin": "The Air Reader",
+      "keywords": [
+        "情境敏锐",
+        "先安抚",
+        "自己最后"
+      ],
+      "verdict": "你能在别人开口前就知道他需要什么，这种能力让你被深深需要。代价是你自己的需求，被系统性地排在了最后一位。",
+      "weights": {
+        "def_fawn": 1.5,
+        "big5_compliance": 1.2,
+        "att_anxiety": 0.9,
+        "big5_assert": -0.8
+      }
+    },
+    {
+      "id": "AR20",
+      "name": "以自由为地基的人",
+      "latin": "The Self-Sovereign",
+      "keywords": [
+        "不依附",
+        "自我修复",
+        "随时能走"
+      ],
+      "verdict": "你不依附任何人也能活得体面，这种完整感极其稀有。你需要留意的是，独立有时会变成一面你不敢让人翻过来的墙。",
+      "weights": {
+        "mot_autonomy": 1.5,
+        "att_avoidance": 1.2,
+        "val_boundary": 1.2,
+        "big5_social": -0.6
+      }
+    },
+    {
+      "id": "AR21",
+      "name": "长期主义的苦行僧",
+      "latin": "The Long-Haul Ascetic",
+      "keywords": [
+        "延迟满足",
+        "耐受枯燥",
+        "复利信仰"
+      ],
+      "verdict": "你能穿过别人熬不过的枯燥期，因此复利会在你身上显现。风险在于，你可能把享受无限推迟到永远不会到来的那一天。",
+      "weights": {
+        "big5_industry": 1.5,
+        "mot_hedonism": -1.2,
+        "virtue_temperance": 1.1,
+        "lv_suffering": 0.9
+      }
+    },
+    {
+      "id": "AR22",
+      "name": "在废墟上重建的人",
+      "latin": "The Rebuilder",
+      "keywords": [
+        "创伤转化",
+        "意义炼金",
+        "厚度"
+      ],
+      "verdict": "苦难在你这里不会白发生，你从中提取出了别人拿不到的东西。你要小心的是，不要把痛苦误认成成长的唯一路径。",
+      "weights": {
+        "lv_suffering": 1.4,
+        "def_sublimate": 1.3,
+        "mot_purpose": 1.1,
+        "big5_rumination": 0.7
+      }
+    },
+    {
+      "id": "AR23",
+      "name": "安静的推进引擎",
+      "latin": "The Quiet Engine",
+      "keywords": [
+        "低噪音",
+        "持续交付",
+        "不争名"
+      ],
+      "verdict": "你不靠外放证明自己，只靠一次次真的做成。你需要练的只有一件事：在关键场合让自己被完整地听见。",
+      "weights": {
+        "big5_assert": -1.1,
+        "big5_industry": 1.4,
+        "virtue_diligence": 1.1,
+        "big5_social": -0.7
+      }
+    },
+    {
+      "id": "AR24",
+      "name": "棋盘上的野心家",
+      "latin": "The Ambitious Player",
+      "keywords": [
+        "向上驱动",
+        "结果导向",
+        "需要被看见"
+      ],
+      "verdict": "你对更高位置有真实的渴望，也愿意为此付出代价。你需要区分清楚：你想要的到底是那件事，还是那件事带来的注视。",
+      "weights": {
+        "mot_mastery": 1.5,
+        "dark_narc": 1.1,
+        "dark_psycho": 0.9,
+        "covert_control": 0.8
+      }
+    },
+    {
+      "id": "AR25",
+      "name": "把危机当坐标系的人",
+      "latin": "The Crisis Cartographer",
+      "keywords": [
+        "高压下最清醒",
+        "预演最坏",
+        "替人兜底"
+      ],
+      "verdict": "别人在压力里崩塌的时候，你的脑子反而第一次彻底安静下来。你不是喜欢危机，你只是在危机里才终于知道该做什么——这让你的日常显得有点松散，也让所有人在关键时刻第一个想到你。",
+      "weights": {
+        "jung_te": 1.2,
+        "dd_order": 1.1,
+        "hsp_emotional": 0.9,
+        "enn_6": 1.0
+      },
+      "negWeights": {
+        "time_present_fate": -0.7
+      }
+    },
+    {
+      "id": "AR26",
+      "name": "口头禅是「都行」的调停者",
+      "latin": "The Quiet Arbiter",
+      "keywords": [
+        "不站队",
+        "气氛优先",
+        "自己的立场最晚出现"
+      ],
+      "verdict": "你能同时听懂两边在气什么，于是两边都愿意跟你讲。你的代价是：在一屋子人里，你永远是最后一个被问到'你自己想怎样'的人——有时候你自己也想不起来了。",
+      "weights": {
+        "enn_9": 1.3,
+        "tki_accommodating": 1.1,
+        "pac_child": 0.8,
+        "jung_fe": 1.0
+      },
+      "negWeights": {
+        "big5_assert": -0.8
+      }
+    },
+    {
+      "id": "AR27",
+      "name": "用数字确认安全的人",
+      "latin": "The Ledger Keeper",
+      "keywords": [
+        "记账即安心",
+        "风险先算",
+        "不轻易欠人情"
+      ],
+      "verdict": "你把世界翻译成一张可以核对的表：余额、进度、还剩多少天。这不是贪，这是你唯一信得过的安慰剂。当数字健康时你几乎无所不能，当数字失控时你会整夜睡不着。",
+      "weights": {
+        "money_vigilance": 1.4,
+        "mot_security": 1.2,
+        "time_future": 1.0,
+        "enn_6": 0.9
+      },
+      "negWeights": {
+        "time_present_hed": -0.7
+      }
+    },
+    {
+      "id": "AR28",
+      "name": "先冲再说的引擎型",
+      "latin": "The Engine",
+      "keywords": [
+        "耐受极高",
+        "越闹越清醒",
+        "恢复期全靠硬扛"
+      ],
+      "verdict": "你几乎是靠肾上腺素运行的：陌生、嘈杂、高压的场景不会让你退，只会把你调到一个更快的档位。你唯一需要警惕的不是崩溃，而是你太擅长在崩溃前把事做完。",
+      "weights": {
+        "hss_intensity": 1.3,
+        "hss_novelty": 1.2,
+        "pac_child": 0.8,
+        "sin_gluttony": 0.8
+      },
+      "negWeights": {
+        "hsp_sensory": -0.9
+      }
+    },
+    {
+      "id": "AR29",
+      "name": "深海型的接收器",
+      "latin": "The Deep Receiver",
+      "keywords": [
+        "细节极清",
+        "需要安静",
+        "被说太敏感"
+      ],
+      "verdict": "你能接收到别人根本不知道存在的信号：一句语气里的偏移、房间里灯光的色温。这让你判断极准，也让你在普通的一天里就被消耗掉别人一周的量。",
+      "weights": {
+        "hsp_sensory": 1.4,
+        "hsp_emotional": 1.2,
+        "big5_aesthetic": 0.9,
+        "def_detach": 0.7
+      },
+      "negWeights": {
+        "hss_novelty": -0.6
+      }
+    },
+    {
+      "id": "AR30",
+      "name": "随身带着旧地图的人",
+      "latin": "The Map Keeper",
+      "keywords": [
+        "经验即锚",
+        "很少重复犯错",
+        "环境一变就慢半拍"
+      ],
+      "verdict": "你记得住所有先例：上次那件事是怎么成的、哪句话在哪个场合说错过。这套庞大的经验库让你稳，也让你在一个规则全换掉的地方显得过分谨慎。",
+      "weights": {
+        "jung_si": 1.4,
+        "enn_6": 1.1,
+        "money_vigilance": 0.8,
+        "big5_order": 0.9
+      },
+      "negWeights": {
+        "jung_ne": -0.7
+      }
+    },
+    {
+      "id": "AR31",
+      "name": "不肯接受现成剧本的人",
+      "latin": "The Self-Author",
+      "keywords": [
+        "自己定义意义",
+        "讨厌被安排",
+        "没有下班时间"
+      ],
+      "verdict": "任何别人递过来的活法，你都会先拆开看看是不是真的适合自己。这让你活得比多数人自由，也让你必须不停地为自己的选择重新找理由——包括已经做过一百次的选择。",
+      "weights": {
+        "phil_existential": 1.4,
+        "mot_autonomy": 1.2,
+        "enn_4": 1.0,
+        "mft_liberty": 0.9
+      },
+      "negWeights": {
+        "dd_order": -0.6
+      }
+    },
+    {
+      "id": "AR32",
+      "name": "在混乱里讲良心的少数派",
+      "latin": "The Unlicensed Saint",
+      "keywords": [
+        "不信流程",
+        "私下守得很严",
+        "自己扛"
+      ],
+      "verdict": "你不太相信制度会替你办好一件事，但你对自己的要求比任何制度都严。于是你常常在一堆人分工不清的烂摊子里，独自承担了那个没人认领的责任。",
+      "weights": {
+        "val_moral": 1.3,
+        "light_kant": 1.1,
+        "tki_competing": 0.7
+      },
+      "negWeights": {
+        "dark_mach": -1.0
+      }
+    },
+    {
+      "id": "AR33",
+      "name": "把冲突翻译成方案的人",
+      "latin": "The Translator",
+      "keywords": [
+        "先降噪",
+        "只谈事实",
+        "不喜欢情绪推拉"
+      ],
+      "verdict": "一屋子人在互相指责的时候，你已经把问题拆成了三件可执行的事。你救了很多人，也常常被误解成冷漠——因为你给出的从来不是安慰，是出口。",
+      "weights": {
+        "pac_adult": 1.4,
+        "tki_collaborating": 1.2,
+        "jung_te": 0.9,
+        "cog_logic": 0.9
+      },
+      "negWeights": {
+        "pac_child": -0.7
+      }
+    },
+    {
+      "id": "AR34",
+      "name": "被管一下就浑身难受的人",
+      "latin": "The Unruled",
+      "keywords": [
+        "反感被安排",
+        "反抗很快",
+        "把小事推成对立"
+      ],
+      "verdict": "你对'有人替你决定'的敏感度远超常人，哪怕那条指令本身完全合理。你不是难搞，你只是必须先确认这件事是'我选的'，才愿意去做。",
+      "weights": {
+        "mft_liberty": 1.3,
+        "mot_autonomy": 1.3,
+        "sin_wrath": 0.8
+      },
+      "negWeights": {
+        "big5_compliance": -1.1
+      }
+    },
+    {
+      "id": "AR35",
+      "name": "靠高强度确认自己还活着",
+      "latin": "The Voltage Seeker",
+      "keywords": [
+        "安静即失重",
+        "情绪浓度要高",
+        "长期透支"
+      ],
+      "verdict": "你需要很强的信号才能确定自己在线：激烈的对话、通宵的项目、让人心跳加速的决定。平静对你不是休息，是一种'我是不是不在了'的错觉。",
+      "weights": {
+        "hss_intensity": 1.3,
+        "sin_gluttony": 1.0,
+        "time_present_hed": 1.0,
+        "mot_hedonism": 0.9
+      },
+      "negWeights": {
+        "virtue_temperance": -0.9
+      }
+    },
+    {
+      "id": "AR36",
+      "name": "提前把最坏演完的人",
+      "latin": "The Rehearsal Room",
+      "keywords": [
+        "预演最坏",
+        "风险雷达永远开着",
+        "没事也紧绷"
+      ],
+      "verdict": "任何一件悬而未决的事，在你脑内都已经被推到最坏的结果，并且演练过三套应对。这份能力真的救过你，代价是你几乎没有'事情还没发生'的那段时间。",
+      "weights": {
+        "schema_negativity": 1.3,
+        "hsp_emotional": 1.0,
+        "big5_alert": 1.1,
+        "enn_6": 0.9
+      },
+      "negWeights": {
+        "phil_epicurean": -0.6
+      }
+    }
+  ]
+}

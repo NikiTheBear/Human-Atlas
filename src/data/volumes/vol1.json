@@ -1,0 +1,1053 @@
+{
+  "volume_id": "vol1",
+  "index": 1,
+  "title": "光影圣殿",
+  "subtitle": "七大美德与七宗原罪",
+  "theme_color": "#8C4A32",
+  "estimated_minutes": 5,
+  "intro": "这里不审判欲望。七宗原罪是失控的驱力，七大美德是清醒的秩序——同一种能量，只差一个阀门。请凭真实的第一感受作答，不必挑选「更好的自己」。",
+  "dimensions": [
+    "sin_pride",
+    "virtue_humility",
+    "sin_greed",
+    "virtue_charity",
+    "sin_lust",
+    "virtue_chastity",
+    "sin_envy",
+    "virtue_kindness",
+    "sin_gluttony",
+    "virtue_temperance",
+    "sin_wrath",
+    "virtue_patience",
+    "sin_sloth",
+    "virtue_diligence"
+  ],
+  "questions": [
+    {
+      "id": "v1_q01",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "pride_humility",
+      "is_sensitive": true,
+      "weight": 1.1,
+      "prompt": "一桌人已经第三次绕回同一个话题，谁也说服不了谁，而你早就看清分歧卡在哪里。此刻你更像——",
+      "scale": {
+        "left": "把话讲透，哪怕要重复三遍",
+        "right": "礼貌点头，把力气留给别处",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "sin_pride": [
+          -2,
+          2
+        ],
+        "virtue_humility": [
+          2,
+          -2
+        ],
+        "big5_assert": [
+          1.4,
+          -1
+        ],
+        "cog_independent": [
+          0.6,
+          1.2
+        ]
+      },
+      "context": ""
+    },
+    {
+      "id": "v1_q02",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "pride_humility",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "如果可以提前选定一种人生结局，你更愿意承受哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "被身边所有人真心喜欢，但在他们眼中你始终只是「一个很好的人」",
+          "effects": {
+            "sin_pride": -2,
+            "virtue_humility": 1.5,
+            "mot_belonging": 1.6,
+            "dark_narc": -1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "被少数真正懂行的人高度敬畏，但你常年独自待在无人打扰的高处",
+          "effects": {
+            "sin_pride": 2,
+            "virtue_humility": -1.5,
+            "mot_belonging": -1.6,
+            "dark_narc": 1.2
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v1_q03",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "wrath_patience",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "你们几个业余凑起来的乐队排了三个月，你把整首歌的编曲重做了一版。排练时主唱听完，只回了一句：「这个方向是不是有点太想当然了。」",
+      "prompt": "听到这句话的头三秒，你身体里最先冒出来的东西是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "一句已经到嘴边的话，措辞挑得很准，能让他在下次排练时不太好受",
+          "effects": {
+            "sin_wrath": 2,
+            "virtue_patience": -1.6,
+            "def_attack": 1.4,
+            "big5_rumination": 0.6
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "胸口一沉，先怀疑是不是自己确实没接住这首歌要的东西",
+          "effects": {
+            "sin_wrath": -1,
+            "virtue_patience": 1,
+            "big5_rumination": 1.8,
+            "def_fawn": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "一阵很凉的笑意，同时已经在心里把这个合作重新归了一次类",
+          "effects": {
+            "sin_wrath": 1.2,
+            "virtue_patience": 0.4,
+            "dark_psycho": 1.4,
+            "def_detach": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "想先把吉他放下，去阳台站一会儿，等这阵劲儿过去再回来看",
+          "effects": {
+            "sin_wrath": -1.8,
+            "virtue_patience": 1.8,
+            "def_sublimate": 1,
+            "big5_rumination": -0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v1_q04",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "greed_charity",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "手头的储备已经够体面地活上两年。此时有一笔额外的、并不影响生活的收入到账，你更接近哪种反应？",
+      "options": [
+        {
+          "key": "A",
+          "text": "心里那根弦先松了一下，随即开始盘算它还该变成什么别的形态",
+          "effects": {
+            "sin_greed": 2,
+            "virtue_charity": -1.2,
+            "mot_security": 1.6,
+            "mot_mastery": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "很自然地把其中一部分挪给最近正需要的人或事，不太需要下决心",
+          "effects": {
+            "sin_greed": -1.6,
+            "virtue_charity": 2,
+            "light_humanism": 1.2,
+            "mot_belonging": 0.6
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先不动它，让它在账上静静待着，看看自己会不会真的需要它",
+          "effects": {
+            "sin_greed": 0.6,
+            "virtue_charity": 0.4,
+            "mot_security": 1,
+            "cog_ambiguity": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "立刻想到一个一直想试却没舍得的花法，先犒赏一下这几个月的辛苦",
+          "effects": {
+            "sin_greed": -0.6,
+            "virtue_charity": 0,
+            "mot_hedonism": 1.8,
+            "virtue_temperance": -0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v1_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "lust_chastity",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "凌晨一点，你刷到一段极对胃口的内容，明天上午有一个不能迟到的会。你通常——",
+      "scale": {
+        "left": "给自己划一条线，看完这一段就关",
+        "right": "顺着那股劲儿滑下去，几点睡交给身体决定",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "sin_lust": [
+          -2,
+          2
+        ],
+        "virtue_chastity": [
+          2,
+          -2
+        ],
+        "virtue_temperance": [
+          1.4,
+          -1.4
+        ],
+        "mot_hedonism": [
+          -1,
+          1.6
+        ]
+      }
+    },
+    {
+      "id": "v1_q06",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "envy_kindness",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "一个和你同时入行、起点几乎一样的朋友突然拿到了你一直想要的那个机会。他在朋友圈发了张很克制的照片，配文只有两个字：谢谢。",
+      "prompt": "你刷到这条动态时，脑子里最先自动跑起来的判断是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "这波里运气的权重到底占了多少，换成我是不是也能接到",
+          "effects": {
+            "sin_envy": 1.8,
+            "virtue_kindness": -1,
+            "mot_mastery": 1.2,
+            "cog_logic": 0.6
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "他这一年确实在某些我看不见的地方下了苦功，值得",
+          "effects": {
+            "sin_envy": -1.6,
+            "virtue_kindness": 1.8,
+            "light_humanism": 1,
+            "big5_compassion": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先替他高兴三秒，然后立刻点开自己的待办清单找到该补的那块",
+          "effects": {
+            "sin_envy": 0.4,
+            "virtue_kindness": 1.2,
+            "mot_mastery": 1.6,
+            "def_sublimate": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "把手机扣过去，不太想让这条消息继续待在视线里",
+          "effects": {
+            "sin_envy": 1.2,
+            "virtue_kindness": -0.4,
+            "big5_rumination": 1.4,
+            "def_detach": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v1_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "gluttony_temperance",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个没什么特别原因的疲惫夜晚，你的手通常会伸向——",
+      "scale": {
+        "left": "一杯热水，然后早点把自己放倒",
+        "right": "外卖、购物车或者短视频，总要吃点什么才睡得着",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "sin_gluttony": [
+          -2,
+          2
+        ],
+        "virtue_temperance": [
+          2,
+          -2
+        ],
+        "mot_hedonism": [
+          -1.2,
+          1.6
+        ],
+        "big5_rumination": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v1_q08",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "wrath_patience",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "家族聚会上，你妈替你把最近两年的事讲了一遍——工作、房子、身体，讲得比你自己清楚，也比你自己乐观。亲戚们一边点头一边看你。",
+      "prompt": "那一瞬间，你脑子里最先闪过的念头是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "等她说完，我要用一句很轻的话把这件事的版本拿回来",
+          "effects": {
+            "sin_wrath": 1.6,
+            "virtue_patience": -1,
+            "def_attack": 1.6,
+            "big5_assert": 1.4
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "算了，她开心就行，为这个开口显得很小气，也扫兴",
+          "effects": {
+            "sin_wrath": -1.4,
+            "virtue_patience": 1.4,
+            "def_fawn": 1.4,
+            "big5_compliance": 1.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "记住这个场面，以后所有需要她出面的事，我都会多留一手",
+          "effects": {
+            "sin_wrath": 0.8,
+            "virtue_patience": 0.2,
+            "dark_mach": 1.8,
+            "covert_control": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "一阵发闷，想立刻借口下楼走走，离开这个客厅",
+          "effects": {
+            "sin_wrath": -0.4,
+            "virtue_patience": 0.6,
+            "def_detach": 1.6,
+            "big5_rumination": 1.4
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v1_q09",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "sloth_diligence",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "你决定用三个月时间把一件长期拖着的私事彻底办完——学一门语言、修好一段身体、整理完父母的老房子。第一周很顺，第二周开始就没有任何反馈了。你最真实的反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "把它拆成很小的日常动作，靠机制的稳定运转把自己带过去",
+          "effects": {
+            "sin_sloth": -2,
+            "virtue_diligence": 2,
+            "big5_order": 1.4,
+            "big5_industry": 1.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先想办法把那 20% 真正决定结果的部分挑出来，其余尽量简省",
+          "effects": {
+            "sin_sloth": 1,
+            "virtue_diligence": 0.6,
+            "cog_global": 1.4,
+            "dark_mach": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "进度开始频繁停滞，越拖越不想打开它，晚上又会为此睡不好",
+          "effects": {
+            "sin_sloth": 1.8,
+            "virtue_diligence": -1.8,
+            "big5_rumination": 1.4,
+            "big5_industry": -1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "先找一个人一起做，靠对外承诺和别人的节奏把自己拴住",
+          "effects": {
+            "sin_sloth": -0.4,
+            "virtue_diligence": 1,
+            "mot_belonging": 1.2,
+            "big5_social": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v1_q10",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "pride_humility",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "老周做了八年木工，是这一带公认手艺最好的师傅。上周他带的一个学徒在几个老主顾面前，指出他一张椅子上的榫眼打歪了，而且说得对。",
+      "prompt": "你猜老周接下来最可能的样子是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "当场认下这条，把榫眼重新开一遍，但那天之后话少了很多",
+          "effects": {
+            "sin_pride": -2,
+            "virtue_humility": 2,
+            "big5_open": 1,
+            "light_humanism": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "表面平静地接住，心里那一下很难受，会反复回放这个场面",
+          "effects": {
+            "sin_pride": 1,
+            "virtue_humility": 0,
+            "big5_rumination": 1.6,
+            "dark_narc": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "先接住，但很快用一句更全面的判断把话语权重新收回自己手里",
+          "effects": {
+            "sin_pride": 1.6,
+            "virtue_humility": -0.8,
+            "big5_assert": 1.4,
+            "covert_control": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "嘴上说没关系，之后下意识地减少和这个年轻人单独搭手的机会",
+          "effects": {
+            "sin_pride": 1.4,
+            "virtue_humility": -1.6,
+            "dark_mach": 1.2,
+            "def_project": 1
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v1_q11",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "greed_charity",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "以下两种「做得对」，哪一种更贴近你愿意付出的代价？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把一个只对自己有效的机会，分一半给更需要它的人",
+          "effects": {
+            "sin_greed": -1.6,
+            "virtue_charity": 1.8,
+            "light_humanism": 1.4,
+            "mot_belonging": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先把机会稳稳拿到手，等自己站住了再回头拉别人一把",
+          "effects": {
+            "sin_greed": 1.6,
+            "virtue_charity": -0.6,
+            "mot_mastery": 1.6,
+            "mot_security": 1.2
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v1_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "envy_kindness",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一位关系不错的朋友，拿到了你暗暗努力了很多年也没拿到的东西。你为他高兴的那部分，大概占多少？",
+      "scale": {
+        "left": "几乎全部，那点酸我一秒就压下去了",
+        "right": "有，但不多，剩下大部分是说不清的堵",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "sin_envy": [
+          -2,
+          2
+        ],
+        "virtue_kindness": [
+          2,
+          -2
+        ],
+        "big5_compassion": [
+          1.2,
+          -1
+        ],
+        "def_project": [
+          -0.8,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v1_q13",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "lust_chastity",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "凌晨十二点四十，一条本来只想看一眼的消息，把你带进了一个很容易上头的话题。手机屏幕的光落在天花板上。",
+      "prompt": "这一刻你身体里最诚实的反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "整个人被点着了，睡意瞬间消失，想继续往下走",
+          "effects": {
+            "sin_lust": 2,
+            "virtue_chastity": -1.6,
+            "mot_hedonism": 1.8,
+            "virtue_temperance": -1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "有一瞬间的冲动，然后把它当成一个信号记下来就睡了",
+          "effects": {
+            "sin_lust": 0.2,
+            "virtue_chastity": 1,
+            "virtue_temperance": 1.2,
+            "cog_logic": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "已经很累，但还是继续滑，像是在借这点刺激撑住自己",
+          "effects": {
+            "sin_lust": 1.4,
+            "virtue_chastity": -0.8,
+            "sin_gluttony": 1.2,
+            "big5_rumination": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "把手机翻过去，替自己按下一个明确的结束键",
+          "effects": {
+            "sin_lust": -1.6,
+            "virtue_chastity": 1.8,
+            "virtue_temperance": 1.6,
+            "big5_order": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v1_q14",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "gluttony_temperance",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "连续加班两周后的第一个完整休息日，你更可能怎么过？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把攒了两周的馋和懒一次性兑现，吃到撑，然后什么都不干",
+          "effects": {
+            "sin_gluttony": 1.8,
+            "virtue_temperance": -1.6,
+            "mot_hedonism": 1.8,
+            "big5_order": -1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "补觉、散步、做顿饭，把身体的节奏一点点调回来",
+          "effects": {
+            "sin_gluttony": -1.4,
+            "virtue_temperance": 1.8,
+            "big5_order": 1.2,
+            "big5_alert": 0.6
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "立刻安排一件新鲜的、没试过的事，不想让这天被浪费",
+          "effects": {
+            "sin_gluttony": 0.4,
+            "virtue_temperance": 0.2,
+            "mot_hedonism": 1.4,
+            "big5_open": 1.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "照常打开电脑，休息日和工作日在我这没什么本质区别",
+          "effects": {
+            "sin_gluttony": -1,
+            "virtue_temperance": 0.8,
+            "virtue_diligence": 1.6,
+            "big5_industry": 1.4
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v1_q15",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "wrath_patience",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个曾经让你很难堪的人，两年后在一次饭局上跟你笑着敬酒，像什么都没发生过。你心里的那条账——",
+      "scale": {
+        "left": "早就翻篇了，人是会变的",
+        "right": "还留着，只是不再需要他为它付什么",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "sin_wrath": [
+          -2,
+          2
+        ],
+        "virtue_patience": [
+          2,
+          -2
+        ],
+        "def_detach": [
+          -1,
+          1
+        ],
+        "big5_rumination": [
+          -1.2,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v1_q16",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "sloth_diligence",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "一个没有任何人期待你产出结果的周末，你更担心发生哪种情况？",
+      "options": [
+        {
+          "key": "A",
+          "text": "两天就这么过去了，回想起来一片空白，什么都没留下",
+          "effects": {
+            "sin_sloth": -1.2,
+            "virtue_diligence": 1.6,
+            "big5_industry": 1.4,
+            "big5_order": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "又把自己排满，连休息都变成一项需要交付的任务",
+          "effects": {
+            "sin_sloth": 0.8,
+            "virtue_diligence": 0.6,
+            "big5_order": 1.6,
+            "big5_alert": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "被一种「该做点正事」的愧疚追着，最后什么也没做成",
+          "effects": {
+            "sin_sloth": 1.6,
+            "virtue_diligence": -1,
+            "big5_rumination": 1.6,
+            "def_fawn": 0.6
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v1_q17",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "greed_charity",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "大学时和你成绩、家境都差不多的室友，昨天发了一张新房钥匙的照片，配文只有「小目标达成，感谢好运」。你们上一次聊天是半年前。",
+      "prompt": "你猜他按下发送键之前，心里最真实的那一层是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "终于可以发这一条了。这一步我等太久，也该让一些人看看。",
+          "effects": {
+            "sin_greed": 1.8,
+            "virtue_charity": -0.8,
+            "sin_pride": 1.2,
+            "mot_mastery": 1.4
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "犹豫了很久，怕看起来像在炫耀，删掉又重写了一遍。",
+          "effects": {
+            "sin_greed": 0.4,
+            "virtue_charity": 1.2,
+            "big5_alert": 1.4,
+            "mot_belonging": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "这些年的代价只有自己知道，发出来算是给自己一个交代。",
+          "effects": {
+            "sin_greed": -1.6,
+            "virtue_charity": 1.8,
+            "light_humanism": 1.2,
+            "lv_anchor": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "他根本没想那么多，就是随手拍了张照，发给最熟的那几个人看",
+          "effects": {
+            "sin_greed": 1.4,
+            "virtue_charity": -1.2,
+            "dark_narc": 1.6,
+            "big5_social": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v1_q18",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "sloth_diligence",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一项没有人会检查、也不影响任何评价的收尾工作摆在面前。你的实际状态是——",
+      "scale": {
+        "left": "还是按标准做完，我自己知道它够不够好",
+        "right": "做到能跑通就收手，剩下的力气留给真正被看见的事",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "sin_sloth": [
+          -2,
+          2
+        ],
+        "virtue_diligence": [
+          2,
+          -2
+        ],
+        "big5_industry": [
+          1.6,
+          -1.4
+        ],
+        "light_kant": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v1_q19",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "envy_kindness",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "你妈在电话里顺口提了一句：隔壁和你从小一起长大的那个，今年升了，家里已经张罗着请客了。",
+      "prompt": "挂掉电话之后，心里最真实的那一下是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "一阵很具体的酸，手心有点发凉，然后才回过神去说一句恭喜",
+          "effects": {
+            "sin_envy": 2,
+            "virtue_kindness": -1,
+            "big5_rumination": 1.2,
+            "mot_mastery": 1.4
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "真心替他高兴，但也忍不住开始想他这几年到底做对了哪几件事",
+          "effects": {
+            "sin_envy": -1.8,
+            "virtue_kindness": 1.8,
+            "big5_open": 1,
+            "mot_mastery": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先判断了一下这件事对我妈接下来会怎么说有什么影响，情绪很淡",
+          "effects": {
+            "sin_envy": -0.4,
+            "virtue_kindness": 0.2,
+            "dark_psycho": 1,
+            "cog_logic": 1.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "忽然不太想再聊下去，想找个安静的地方一个人待一会儿",
+          "effects": {
+            "sin_envy": 0.8,
+            "virtue_kindness": -0.2,
+            "def_detach": 1.4,
+            "att_avoidance": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v1_q20",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "lust_chastity",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "一个报酬高得离谱的机会找上门，代价是要长期游走在规则边缘，出事的概率不高，但一旦出事无法回头。",
+      "prompt": "你更接近哪种处理方式？",
+      "options": [
+        {
+          "key": "A",
+          "text": "先算清楚最坏结果，只要那个结果我能兜住，就可以谈",
+          "effects": {
+            "sin_lust": 1.2,
+            "virtue_chastity": -0.6,
+            "dark_psycho": 1.8,
+            "big5_alert": -0.4
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "几乎不用想就拒了，脏钱会让之后所有的日子都变轻",
+          "effects": {
+            "sin_lust": -1.8,
+            "virtue_chastity": 1.8,
+            "light_kant": 1.8,
+            "val_moral": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "会认真谈一次，把边界明确写清楚，能切干净就做一部分",
+          "effects": {
+            "sin_lust": 0.4,
+            "virtue_chastity": 0.8,
+            "cog_ambiguity": 1,
+            "dark_mach": 1.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "先接下来，真到了那一步再决定要不要踩过去",
+          "effects": {
+            "sin_lust": 1.8,
+            "virtue_chastity": -1.6,
+            "cog_speed": 1.4,
+            "val_moral": -1.2
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v1_q21",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "gluttony_temperance",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "回想那些「明明知道该停却没停」的时刻，它们更多出现在——",
+      "scale": {
+        "left": "很少，我的刹车基本都在线",
+        "right": "白天越是被安排，夜里越容易报复性地不肯睡",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "sin_gluttony": [
+          -2,
+          2
+        ],
+        "virtue_temperance": [
+          2,
+          -2
+        ],
+        "def_fawn": [
+          -1,
+          1.2
+        ],
+        "mot_autonomy": [
+          -0.8,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "v1_q22",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "pride_humility",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你花了三个月做的东西，被一个外行用非常外行的话公开否定，而且他很有影响力，场面安静了两秒。",
+      "prompt": "这两秒钟里，你最想守住的其实是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "把道理讲到所有人都听懂，让那句否定当场站不住脚",
+          "effects": {
+            "sin_pride": 1.8,
+            "virtue_humility": -1.4,
+            "big5_assert": 1.6,
+            "def_attack": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "不急着争，先问清他到底在担心什么，也许里面真有一句对的",
+          "effects": {
+            "sin_pride": -1.8,
+            "virtue_humility": 1.8,
+            "big5_open": 1.2,
+            "big5_compliance": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "表面的体面，笑一下把场面接过去，之后单独找他用结果说话",
+          "effects": {
+            "sin_pride": 0.8,
+            "virtue_humility": 0.4,
+            "covert_control": 1.6,
+            "dark_mach": 1.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "自己的判断，即使没人支持，我也知道这东西的分量在哪",
+          "effects": {
+            "sin_pride": 1.2,
+            "virtue_humility": 0.2,
+            "cog_independent": 1.8,
+            "mot_autonomy": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1093 @@
+{
+  "volume_id": "vol12",
+  "index": 12,
+  "title": "底层执念",
+  "subtitle": "九型人格核心恐惧与三大本能副型",
+  "theme_color": "#7D4E57",
+  "estimated_minutes": 6,
+  "intro": "这一卷不给你贴类型号。它只关心：深夜睡不着、钱不够用、被人轻轻推开的那几个时刻，你身上哪一根弦最先响。九种恐惧，三种本能，没有一种是病——它们都曾经在某一年救过你。",
+  "dimensions": [
+    "enn_1",
+    "enn_2",
+    "enn_3",
+    "enn_4",
+    "enn_5",
+    "enn_6",
+    "enn_7",
+    "enn_8",
+    "enn_9",
+    "inst_sp",
+    "inst_sx",
+    "inst_so"
+  ],
+  "questions": [
+    {
+      "id": "v12_q01",
+      "type": "forced_choice",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "enn_4",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "凌晨三点，房间里只剩路由器的绿灯亮着。手机屏已经暗了，你没睡着，也不算醒着。",
+      "prompt": "下面四种最坏的可能，哪一种一旦在脑子里坐实，会让你整个人凉下去？",
+      "options": [
+        {
+          "key": "A",
+          "text": "你这一生没留下任何只有你能留下的东西，和地铁里每一张模糊的脸没有区别",
+          "effects": {
+            "enn_4": 2,
+            "mot_purpose": 1,
+            "dark_narc": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "哪天你倒下，通讯录翻到底，也找不出一个能把银行卡密码和猫托付过去的人",
+          "effects": {
+            "enn_6": 2,
+            "inst_sp": 1.5,
+            "att_anxiety": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "有一天你连把一件事想清楚的力气都没有了，脑子里那几间房一间一间灭灯",
+          "effects": {
+            "enn_5": 2,
+            "def_detach": 1.2,
+            "mot_autonomy": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "你已经很多年没有真正想要过什么，别人问起，你只能说出他期待的那个答案",
+          "effects": {
+            "enn_9": 2,
+            "def_fawn": 1.2,
+            "big5_compliance": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "enn_1",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "你给一个重要的人写了一段很长的话，可能是道歉，也可能是终于说出口的那件事。按下发送后的二十分钟，你在做什么？",
+      "scale": {
+        "left": "放下手机去做别的，话已经说出去，剩下的归他",
+        "right": "把那段话在脑子里又读了三遍，找有没有哪一句会被理解成别的意思",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "enn_1": [
+          -2,
+          2
+        ],
+        "big5_rumination": [
+          -1.2,
+          1.6
+        ],
+        "schema_approval": [
+          -0.6,
+          1
+        ],
+        "att_anxiety": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v12_q03",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "stealth",
+      "mirror_key": "enn_3",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "部门调整，一个来了半年、资历比你浅的人接走了你做了三年的那摊事，理由写的是「让他练练」。",
+      "prompt": "散会后你在洗手间站了两分钟。镜子里冒出来的那句话，更接近哪一句？",
+      "options": [
+        {
+          "key": "A",
+          "text": "问题不在他，在我——我交出去的东西，已经有一阵连我自己都不想署名",
+          "effects": {
+            "enn_1": 1.8,
+            "big5_rumination": 1.2,
+            "dark_narc": -0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "这三年我替所有人补过窟窿、垫过时间，真到这一天，没人替我说一句",
+          "effects": {
+            "enn_2": 2,
+            "mot_belonging": 1.2,
+            "sin_wrath": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "我的全部价值都挂在「有用」两个字上，一旦被换掉，我就什么都不是",
+          "effects": {
+            "enn_3": 2,
+            "dark_narc": 1,
+            "schema_defect": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "拍板的人从头到尾没问过我一句，我在这套规则里连个位置都没有",
+          "effects": {
+            "enn_8": 2,
+            "big5_assert": 1.2,
+            "covert_control": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v12_q04",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "inst_sp",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "工资到账的短信和三条自动扣款几乎同时进来。你打开银行 App，通常会做到哪一步？",
+      "scale": {
+        "left": "看一眼余额，够这个月用就关掉",
+        "right": "把最近三个月每一笔都翻出来对一遍，找出是哪里漏了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "inst_sp": [
+          -2,
+          2
+        ],
+        "mot_security": [
+          -1.4,
+          1.6
+        ],
+        "big5_alert": [
+          -0.8,
+          1.2
+        ],
+        "enn_6": [
+          -0.6,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "v12_q05",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "enn_4",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "零点四十，你刷到前任发的照片：新家阳台上一盆你没见过的植物，配文只有一个句号。",
+      "prompt": "手指停在屏幕上的那三秒，你身上最先发生的是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把照片放大，看阳台的瓷砖、窗外的楼、玻璃上有没有第二个人影",
+          "effects": {
+            "enn_4": 1.8,
+            "inst_sx": 1.6,
+            "big5_alert": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "心跳快了一下，然后立刻划走，起身去厨房洗了个杯子",
+          "effects": {
+            "enn_4": -1.2,
+            "def_detach": 1.8,
+            "inst_sx": -1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "截图存进相册，说不清为什么，但就是不想让它从眼前消失",
+          "effects": {
+            "enn_4": 1.4,
+            "att_anxiety": 1.2,
+            "big5_rumination": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "忽然很想找个人说话，打开通讯录，从上往下滑了两遍",
+          "effects": {
+            "inst_sx": 1.4,
+            "mot_belonging": 1.6,
+            "att_anxiety": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q06",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "stealth",
+      "mirror_key": "enn_6",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "周六晚上你翻到三个好友的合照，同一家店、同一晚。群里上一次说话是十天前，没人提过这件事。",
+      "prompt": "你把手机放下，又拿起来。此刻你更可能是哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "在群里发一句「下次记得叫我呀」加个笑脸，然后真的不再主动开口",
+          "effects": {
+            "enn_6": 1.6,
+            "inst_so": 1.4,
+            "def_fawn": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "直接问一句「你们上周聚了？怎么没叫我」，问完把手机放下去做别的",
+          "effects": {
+            "enn_6": -1.2,
+            "big5_assert": 1.4,
+            "big5_alert": -0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "不问，但接下来一阵子，他们再约你时，你总能找到一个推掉的理由",
+          "effects": {
+            "enn_6": 1.2,
+            "def_detach": 1.2,
+            "inst_so": -1.2,
+            "att_avoidance": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "先在脑子里把最近两次聊天回放一遍，找自己哪句话可能说得不合适",
+          "effects": {
+            "enn_6": 1.8,
+            "schema_defect": 1.2,
+            "def_fawn": 1.2
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "inst_so",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一个不算熟的饭局散场，大家在路边互相扫码。你的手机伸出去了几次？",
+      "scale": {
+        "left": "只加散场前真正聊得来的那一两个，其余笑笑就过去了",
+        "right": "基本上一圈都扫了，还会顺手记下每个人在忙什么",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "inst_so": [
+          -2,
+          2
+        ],
+        "big5_social": [
+          -1.6,
+          1.6
+        ],
+        "mot_belonging": [
+          -1,
+          1.2
+        ],
+        "enn_3": [
+          -0.8,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "v12_q08",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "enn_3",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你花两小时随手帮朋友改了一份东西，他发朋友圈说是「大神手笔」，底下三十多个赞。",
+      "prompt": "你刷到这条的时候，心里第一念更接近——",
+      "options": [
+        {
+          "key": "A",
+          "text": "有点心虚，想在评论区补一句「其实我没花多少时间」，把话说实",
+          "effects": {
+            "enn_1": 1.6,
+            "virtue_humility": 1.2,
+            "light_kant": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "收着，顺手截图存进自己的作品集，这种机会本来就不该浪费",
+          "effects": {
+            "enn_3": 1.8,
+            "mot_mastery": 1.2,
+            "dark_narc": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "有点别扭，他夸的那个人，好像和我认识的我并不是同一个",
+          "effects": {
+            "enn_4": 1.6,
+            "schema_defect": 1.2,
+            "dark_narc": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "说不上什么感觉，反正是顺手帮忙，他能高兴一下也挺好",
+          "effects": {
+            "enn_9": 1.4,
+            "enn_3": -1.2,
+            "def_fawn": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v12_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "enn_9",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "四个人站在路口讨论去哪吃，已经站了二十分钟。有人开始说「都行」，有人开始刷手机。",
+      "prompt": "这种时候，你身上那根弦更靠近哪一端？",
+      "scale": {
+        "left": "直接拍板走进最近那家，不好吃下次再换",
+        "right": "说一句「我都行」，然后等一个看起来最想说话的人先开口",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "enn_9": [
+          -2,
+          2
+        ],
+        "big5_compliance": [
+          -1.2,
+          1.4
+        ],
+        "big5_assert": [
+          1.4,
+          -1.2
+        ],
+        "mot_autonomy": [
+          1.2,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v12_q10",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "enn_8",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "晚高峰地铁，一个人从后面挤过来，手肘撞在你胸口，还回头白了你一眼说「看着点」。",
+      "prompt": "身体先于脑子反应的那一下，你做了什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "立刻撞回去半步，声音抬起来：撞我的是你，你还白我一眼",
+          "effects": {
+            "enn_8": 2,
+            "def_attack": 1.6,
+            "big5_assert": 1.2,
+            "enn_9": -1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "什么都没说，但站定不动，眼睛一直看着他，直到他先转开",
+          "effects": {
+            "enn_8": 1.2,
+            "big5_assert": 0.8,
+            "sin_pride": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "侧身让开，心里说算了，但手心在抖，到站前一句话都不想说",
+          "effects": {
+            "enn_9": 1.6,
+            "enn_8": -1.4,
+            "big5_rumination": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "掏出手机对着他，说你再讲一遍，先把证据留下来再说",
+          "effects": {
+            "covert_control": 1.6,
+            "def_intellectual": 1,
+            "enn_8": 0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q11",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "stealth",
+      "mirror_key": "enn_7",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "一个机会落到你面前：钱多一倍，但要搬去另一个城市签两年，中间几乎请不了长假。",
+      "prompt": "你用来推掉它的四条理由，底下各压着一种怕。哪一条最像你？",
+      "options": [
+        {
+          "key": "A",
+          "text": "接下来两年就被写死了，谁知道两年后我还想不想过这种日子",
+          "effects": {
+            "enn_7": 2,
+            "mot_autonomy": 1.4,
+            "def_detach": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "这边有人是真的需要我，我要是走了，他这阵子会很难过下去",
+          "effects": {
+            "enn_2": 2,
+            "mot_belonging": 1.4,
+            "def_fawn": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "去了等于把现在的成绩清零，还要重新证明一次我是谁",
+          "effects": {
+            "enn_3": 1.8,
+            "sin_pride": 1,
+            "mot_mastery": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "条件是他们定的，规则也是他们定的，我不喜欢被人这么安排",
+          "effects": {
+            "enn_8": 1.8,
+            "big5_assert": 1.2,
+            "mot_autonomy": 1
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v12_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "enn_5",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "周日晚上八点，一个熟人打来电话。不是急事，你知道他一开口就会聊四十分钟。",
+      "prompt": "手机在你手里震着，你会怎么处理？",
+      "scale": {
+        "left": "接起来，一边听一边把该做的家务做完",
+        "right": "让它响完，过两分钟回一条「刚在忙，怎么了」",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "enn_5": [
+          -2,
+          2
+        ],
+        "def_detach": [
+          -1.4,
+          1.6
+        ],
+        "big5_social": [
+          1.4,
+          -1.4
+        ],
+        "enn_2": [
+          1.2,
+          -1
+        ],
+        "mot_autonomy": [
+          -1.2,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v12_q13",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "ennea_energy",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "prompt": "一百点「我不能失去」的分量，只能发给下面六样。分得越多，说明它真的消失时你越撑不住。点数要分完，一项也不能剩。",
+      "items": [
+        {
+          "key": "shelter",
+          "label": "一个写着自己名字的住处，和随时能动的现金",
+          "dim": "inst_sp",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "one_person",
+          "label": "一个人知道我所有底细还愿意留下",
+          "dim": "inst_sx",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "circle",
+          "label": "一个圈子里有我的位置，有人会想起我",
+          "dim": "inst_so",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "needed",
+          "label": "有人真的需要我，我对某个人不可替代",
+          "dim": "enn_2",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "no_push",
+          "label": "我说不的时候，没有人敢硬来",
+          "dim": "enn_8",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "no_storm",
+          "label": "日子平顺，不用面对撕破脸的场面",
+          "dim": "enn_9",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q14",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "ennea_values",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "prompt": "如果只能拿十年去换三样东西，请按顺序点选。第一个位置，你留给哪一样？",
+      "values": [
+        {
+          "key": "own_work",
+          "label": "一件只有我做得出来的东西",
+          "effects": {
+            "enn_4": 1.6,
+            "mot_purpose": 0.8,
+            "enn_3": 0.6
+          }
+        },
+        {
+          "key": "no_report",
+          "label": "不必向任何人报备的日程",
+          "effects": {
+            "inst_sp": 1.2,
+            "mot_autonomy": 1.4,
+            "enn_8": 0.4
+          }
+        },
+        {
+          "key": "still_here",
+          "label": "一个十年后还在的人",
+          "effects": {
+            "inst_sx": 1.6,
+            "mot_belonging": 1,
+            "enn_6": 0.8
+          }
+        },
+        {
+          "key": "remembered",
+          "label": "这个名字被这个行业记住",
+          "effects": {
+            "enn_3": 1.8,
+            "inst_so": 1.2,
+            "sin_pride": 0.6
+          }
+        },
+        {
+          "key": "calm_body",
+          "label": "一副不再紧绷的身体和神经",
+          "effects": {
+            "inst_sp": 1.8,
+            "enn_7": 0.6,
+            "big5_alert": -0.8
+          }
+        },
+        {
+          "key": "trusted",
+          "label": "一句「这事交给你我放心」",
+          "effects": {
+            "enn_1": 1.6,
+            "enn_6": 1.2,
+            "virtue_diligence": 1
+          }
+        },
+        {
+          "key": "my_terms",
+          "label": "所有事都按我的条件来",
+          "effects": {
+            "enn_8": 1.8,
+            "mot_autonomy": 1,
+            "dark_narc": 0.6
+          }
+        },
+        {
+          "key": "full_house",
+          "label": "一屋子人，谁都不用假装",
+          "effects": {
+            "inst_so": 1.6,
+            "enn_9": 1.2,
+            "big5_compassion": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "v12_q15",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "inst_sx",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "你和一个人聊到凌晨两点，说了一些从来没对别人说过的事。第二天醒来，光从窗帘缝里进来。",
+      "prompt": "你躺着还没睁眼。第一个念头是什么？",
+      "scale": {
+        "left": "想马上再见到他，昨晚那种浓度让人有点上瘾",
+        "right": "有一点想收回来，昨晚给出去太多了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "inst_sx": [
+          2,
+          -2
+        ],
+        "att_avoidance": [
+          -1.6,
+          1.8
+        ],
+        "def_detach": [
+          -1.2,
+          1.4
+        ],
+        "big5_compassion": [
+          1.2,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v12_q16",
+      "type": "forced_choice",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "enn_4",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "医院走廊，你陪妈妈等一张复查报告。旁边一位阿姨一直在讲女儿在哪座城市、年薪多少。你妈听着，忽然转头问你一句：「你那个工作，还行吧？」",
+      "prompt": "那句话落地之后，你最怕被自己看见的是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "你的体面是一层层补上去的，中间有一块地方空着，一戳就塌",
+          "effects": {
+            "enn_3": 1.8,
+            "dark_narc": 1,
+            "schema_defect": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "你忙着给她倒水、把外套叠好，其实是怕自己在这张长椅上没位置",
+          "effects": {
+            "enn_2": 1.8,
+            "inst_so": 1.2,
+            "def_fawn": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "你早就想站起来走开，只是没走，甚至不敢承认自己一直想走",
+          "effects": {
+            "enn_9": 1.8,
+            "big5_compliance": 1.2,
+            "def_detach": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "你一直觉得自己和这条走廊里的人不是同一类，这念头既让你骄傲又孤单",
+          "effects": {
+            "enn_4": 1.8,
+            "sin_pride": 0.8,
+            "att_avoidance": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q17",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "enn_1",
+      "is_sensitive": false,
+      "weight": 1.2,
+      "context": "早上出门，你发现对门又把两袋垃圾堆在你家门边的墙角。这已经是这个月第三次。",
+      "prompt": "你站在门口，手上还拎着要丢的袋子。哪个动作最先出现？",
+      "options": [
+        {
+          "key": "A",
+          "text": "敲门，把话说清楚：这袋麻烦你拿进去，这个月第三次了",
+          "effects": {
+            "enn_1": 1.8,
+            "big5_assert": 1.2,
+            "sin_wrath": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "自己顺手带下楼，心里记下这家人，以后不再打招呼",
+          "effects": {
+            "enn_9": 1.4,
+            "enn_1": -1.2,
+            "def_detach": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "拍照，发给物业，附一句「麻烦按规定处理一下」",
+          "effects": {
+            "covert_control": 1.6,
+            "enn_1": 1,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "什么都不做，但接下来一整天，一想到那两袋东西就烦躁",
+          "effects": {
+            "enn_1": 1.4,
+            "big5_rumination": 1.6,
+            "sin_wrath": 1
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v12_q18",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "enn_2",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "夜里十一点半，一个关系不错但很久没联系的人发来两个字：在吗。",
+      "prompt": "你看到这条消息的那一秒，身体里的反应更接近？",
+      "scale": {
+        "left": "先回了「在」，然后一直等他说下去，今晚剩下的时间基本都交给他",
+        "right": "先看了眼时间，回一句「在，怎么了」，心里希望不是什么大事",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "enn_2": [
+          2,
+          -2
+        ],
+        "def_fawn": [
+          1.6,
+          -1.4
+        ],
+        "mot_belonging": [
+          1.2,
+          -1
+        ],
+        "big5_compassion": [
+          1,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v12_q19",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "inst_sp",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "体检报告刷出来，其他都正常，只有一栏标着一个向上的箭头，写着「建议复查」。号只能约到下周三。",
+      "prompt": "看到那个箭头的三秒里，你脑子里最先跑起来的是哪一件事？",
+      "options": [
+        {
+          "key": "A",
+          "text": "立刻打开搜索框，把所有最坏的可能一条条看过去，看到凌晨",
+          "effects": {
+            "enn_6": 1.8,
+            "big5_alert": 1.4,
+            "big5_rumination": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "把页面关掉，先睡，真要有什么事也得下周才知道",
+          "effects": {
+            "enn_7": 1.6,
+            "def_detach": 1.4,
+            "inst_sp": -1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "开始算钱：真要治，存款够几个月，工作怎么请假，家里怎么说",
+          "effects": {
+            "inst_sp": 1.8,
+            "mot_security": 1.4,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "忽然很想告诉一个人，哪怕只是发一句「我今天查出点问题」",
+          "effects": {
+            "mot_belonging": 1.6,
+            "inst_sx": 1.2,
+            "att_anxiety": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q20",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "stealth",
+      "mirror_key": "enn_1",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "三个人吃饭，账单上多了一道谁都没点的菜，四十六块。服务员站在旁边等着刷卡。",
+      "prompt": "这时候你心里那本账，最先翻出来的是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把服务员叫过来核对，这道菜去掉——不是为这四十多块，是这账不对",
+          "effects": {
+            "enn_1": 1.8,
+            "big5_assert": 1,
+            "sin_wrath": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "算了，别为四十多块让一顿饭变了味，照单付掉，谁也不提",
+          "effects": {
+            "enn_9": 1.6,
+            "enn_1": -1.2,
+            "virtue_patience": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "当场不说，回去在群里发一个精确到小数点的数字，把自己那份减掉",
+          "effects": {
+            "covert_control": 1.6,
+            "enn_6": 1.2,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "主动多付一点，把这点差别抹平，谁也不必再提这件事",
+          "effects": {
+            "enn_2": 1.6,
+            "def_fawn": 1.2,
+            "sin_pride": 0.6
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v12_q21",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "stealth",
+      "mirror_key": "inst_sp",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你手里有一笔钱，刚好够一套小房子的首付，也刚好够你辞职空一年。",
+      "prompt": "你在纸上算了三遍。最后落在哪一句上？",
+      "options": [
+        {
+          "key": "A",
+          "text": "先把地基钉死，房子买了，往后十年我就有一个退不掉的坐标",
+          "effects": {
+            "inst_sp": 1.8,
+            "enn_7": -1.4,
+            "mot_security": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "空一年，先把自己从那台机器里捞出来，钱以后还能再挣",
+          "effects": {
+            "enn_7": 1.8,
+            "mot_autonomy": 1.4,
+            "inst_sp": -1.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "劈成两半，一半按住不动，一半买时间，两边都不彻底",
+          "effects": {
+            "enn_6": 1.4,
+            "big5_alert": 1,
+            "inst_sp": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "两个都先不选，放着，等一个更清楚的说法自己出现",
+          "effects": {
+            "enn_6": 1.2,
+            "enn_9": 1.2,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v12_q22",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "inst_sx",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "在一起三个月，某天他忽然说：我总觉得有一块地方，你不让我进去。",
+      "prompt": "这句话落在桌上的时候，你心里更接近——",
+      "options": [
+        {
+          "key": "A",
+          "text": "他说得对，可那块地方是我最后一块自己的地盘，我不想交出去",
+          "effects": {
+            "enn_5": 1.8,
+            "mot_autonomy": 1.4,
+            "att_avoidance": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "有点慌，立刻解释「我没有」，然后把最近所有的事都告诉他",
+          "effects": {
+            "enn_2": 1.6,
+            "att_anxiety": 1.4,
+            "def_fawn": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "心里一沉：又来了，每次快到这一步，就会有人要得更多",
+          "effects": {
+            "att_avoidance": 1.8,
+            "inst_sx": -1.2,
+            "def_detach": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "觉得被看见了，甚至有点感动，我自己都没发现我一直这样",
+          "effects": {
+            "enn_4": 1.4,
+            "inst_sx": 1.2,
+            "big5_compassion": 1
+          },
+          "social_desirability": 2
+        }
+      ]
+    }
+  ]
+}

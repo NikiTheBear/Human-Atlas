@@ -1,0 +1,1039 @@
+{
+  "volume_id": "vol9",
+  "index": 9,
+  "title": "认知星盘",
+  "subtitle": "荣格八维认知功能栈与阴影位",
+  "theme_color": "#2F5266",
+  "estimated_minutes": 5,
+  "intro": "这一卷不问你有多聪明，只看你如何加工世界：靠什么理解一件事，靠什么判断一个人，靠什么确认自己没走偏。八种认知功能没有高下，只有此刻谁在台前、谁被留在后台的阴影位。",
+  "dimensions": [
+    "jung_te",
+    "jung_ti",
+    "jung_fe",
+    "jung_fi",
+    "jung_ne",
+    "jung_ni",
+    "jung_se",
+    "jung_si"
+  ],
+  "questions": [
+    {
+      "id": "v9_q01",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_fi",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "上周六你们为一件很小的事吵到凌晨一点，谁也没说服谁，各自背过身睡了。第二天早上洗衣机在转，两个人在同一个厨房里绕开对方。",
+      "prompt": "水壶烧开的那两分钟里，你脑子里最先启动的是哪一种处理方式？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把昨晚每句话逐句复原，找出他哪一段其实前后矛盾、根本站不住",
+          "effects": {
+            "jung_ti": 2,
+            "jung_fe": -0.9,
+            "cog_logic": 1.2,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "先弄清自己心里那道坎到底是什么：我究竟在哪一句上觉得被冒犯",
+          "effects": {
+            "jung_fi": 2,
+            "jung_ti": -0.8,
+            "val_moral": 0.9,
+            "att_anxiety": 0.7
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "想他昨晚是不是也没睡好，先倒一杯他喝的东西递过去，把气氛化开",
+          "effects": {
+            "jung_fe": 2,
+            "jung_ti": -0.6,
+            "big5_compassion": 1.3,
+            "big5_compliance": 0.7
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "直接把规矩定下来：这类事以后再发生，谁负责哪一步，别又耗一整晚",
+          "effects": {
+            "jung_te": 2,
+            "jung_fi": -0.8,
+            "big5_order": 1.2,
+            "big5_assert": 0.9
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v9_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_si",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "凌晨两点四十，你已经躺了三个小时，手机扣在床头。你没在想工作，脑子却自己开始放东西。它放的是——",
+      "scale": {
+        "left": "白天那些具体画面：谁说话时手在抖、那杯没喝完的茶、楼道里换掉的地砖",
+        "right": "一条线，顺着它一直往前推，推到三年后这件事会变成什么形状",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "jung_si": [
+          2,
+          -2
+        ],
+        "jung_ni": [
+          -2,
+          2
+        ],
+        "cog_global": [
+          -1.4,
+          1.4
+        ],
+        "big5_rumination": [
+          1.2,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v9_q03",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "mirror_key": "jung_te",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "公司账上的钱只够发这个月工资。周一早上九点，白板上还写着原定三个月的路线图，老板说了句「你们看着办」就出去了。",
+      "prompt": "白板笔递到你手里，你先擦掉的是哪一块？",
+      "options": [
+        {
+          "key": "A",
+          "text": "先砍掉三件最贵又不产钱的事，剩下的人按能交付的日期重排一遍",
+          "effects": {
+            "jung_te": 2,
+            "jung_ne": -0.9,
+            "big5_order": 1.3,
+            "cog_speed": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "先看屋里这七八张脸：谁会被裁、谁家里刚添了孩子，怎么分才不至于塌",
+          "effects": {
+            "jung_fe": 2,
+            "jung_te": -1.1,
+            "big5_compassion": 1.3,
+            "mot_belonging": 0.9
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "不等讨论完，先把自己手上那条最快能换钱的线当天跑起来，边跑边改",
+          "effects": {
+            "jung_se": 2,
+            "jung_ne": -0.8,
+            "big5_industry": 1.4,
+            "cog_speed": 1.1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "把原来那条路整个扔掉，问一句：不做现在这个产品，我们还有什么能活",
+          "effects": {
+            "jung_ne": 1.9,
+            "jung_si": -1.1,
+            "cog_diverge": 1.3,
+            "big5_open": 1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v9_q04",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "jung_se",
+      "is_sensitive": false,
+      "weight": 1.25,
+      "context": "夏天傍晚，你在便利店门口等雨停。一个外卖员的车在积水里滑倒，后座的餐盒散了一地，后面排队的喇叭开始响。",
+      "prompt": "雨还在下，你的脚动之前，身体已经先做了什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "已经蹲下去了，先把还封着的那几盒捞起来，别让雨水顺着缝泡进去",
+          "effects": {
+            "jung_se": 2,
+            "jung_fi": -0.6,
+            "big5_compassion": 1.2,
+            "def_sublimate": 0.7
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先看他有没有摔伤，再抬头看按喇叭的是谁、周围有谁举着手机",
+          "effects": {
+            "jung_fe": 2,
+            "jung_ti": -0.8,
+            "big5_alert": 1.4,
+            "cog_speed": 0.7
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "心里先浮上一句「他今天大概已经跑了两百单」，眼睛有点热，人还站在檐下",
+          "effects": {
+            "jung_fi": 2,
+            "jung_se": -1.1,
+            "big5_compassion": 1.3,
+            "mot_belonging": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "一下想起去年同样的路口也下着雨，也有人这样倒地，那次没有人管",
+          "effects": {
+            "jung_si": 2,
+            "jung_se": -1.3,
+            "big5_rumination": 1.2,
+            "def_detach": 0.7
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v9_q05",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "jung_fi",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你表姐结婚九年，两个孩子。上周她打电话说想离，理由给得很轻：「就是不想再演了。」电话那头她在剥橘子，你能听见皮被撕开的声音。",
+      "prompt": "挂了电话之后，你心里冒出来的那句话更接近哪一句？",
+      "options": [
+        {
+          "key": "A",
+          "text": "先算清楚：房子怎么分、两个孩子跟谁、她九年没上班还剩多少挣钱的能力",
+          "effects": {
+            "jung_te": 2,
+            "jung_fi": -1,
+            "cog_logic": 1.2,
+            "mot_security": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "「不想再演了」这句是真的。一个人不该为了让别人放心，把自己一点点耗干",
+          "effects": {
+            "jung_fi": 2,
+            "jung_te": -1.2,
+            "val_moral": 1.1,
+            "big5_compassion": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "这九年我看着她一路过来，每次都是同一句话同一种忍法，这次大概也一样",
+          "effects": {
+            "jung_si": 2,
+            "jung_ne": -0.9,
+            "big5_rumination": 1.1,
+            "cog_global": -0.7
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "第二天直接开车过去，把她从那个家里拉出来吃顿饭，看看她现在什么样子",
+          "effects": {
+            "jung_se": 2,
+            "jung_si": -0.8,
+            "big5_assert": 1.2,
+            "def_sublimate": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v9_q06",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_ne",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "十一点半，一个大学同学发来六十秒语音：他要辞掉干了六年的事，去开一家店。语音里能听见他在走动。",
+      "prompt": "听完第一遍，你脑子里长出来、并且已经分岔的，是哪一类东西？",
+      "scale": {
+        "left": "他那家店能长成的五六种样子，还有三条完全不同的岔路",
+        "right": "他这一步是被什么推着走的，以及两年后他大概会站在哪里",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "jung_ne": [
+          2,
+          -2
+        ],
+        "jung_ni": [
+          -2,
+          2
+        ],
+        "cog_diverge": [
+          1.3,
+          -1.1
+        ],
+        "big5_open": [
+          1.4,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v9_q07",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_ni",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "中介带你看了第四套房子，进门第一句是「这套再不定，下周就没了」。你站在客厅中央，窗外的塔吊正在转。",
+      "prompt": "你手上没有笔，心里那本账却已经翻开了。它先算哪一笔？",
+      "options": [
+        {
+          "key": "A",
+          "text": "忽然看清这扇窗定下了什么：未来十年的早晨、通勤、和谁坐在一起吃饭",
+          "effects": {
+            "jung_ni": 2,
+            "jung_se": -0.8,
+            "cog_global": 1.4,
+            "mot_security": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "掏出手机问清单价、物业费、同户型近半年的成交价，以及这套挂了多少天",
+          "effects": {
+            "jung_te": 2,
+            "jung_ni": -0.9,
+            "big5_order": 1.3,
+            "cog_logic": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "不问了，走到阳台上摸一摸栏杆，听楼下是什么声音，先在这站上五分钟",
+          "effects": {
+            "jung_se": 2,
+            "jung_ni": -1.1,
+            "big5_aesthetic": 1.3,
+            "mot_hedonism": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "盯住他那句「下周就没了」往下问：这个说法从哪来，他哪一句开始接不住",
+          "effects": {
+            "jung_ti": 2,
+            "jung_fe": -0.9,
+            "cog_independent": 1.3,
+            "big5_alert": 0.9
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v9_q08",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "jung_fe",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "你搬进新租的房子已经一个月。搬家那天你谁也没叫，想着往后慢慢约。这周你翻了翻日历，暖房这件事好像已经过了那个当口，没人再提。",
+      "prompt": "你把日历合上，头三秒里，你心里冒出来的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "「原来不主动开口，我在别人那里就真的不存在。」这句话很轻地压下来",
+          "effects": {
+            "jung_fi": 2,
+            "jung_fe": -1,
+            "big5_rumination": 1.3,
+            "att_anxiety": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "先复盘这条线是怎么松的：这一个月我一次也没说请他们来，大概是我自己先退了",
+          "effects": {
+            "jung_ti": 2,
+            "jung_fi": -0.8,
+            "def_intellectual": 1.1,
+            "cog_logic": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "在群里发一张客厅的照片，说「找一天来坐坐」，然后再看谁接话",
+          "effects": {
+            "jung_fe": 2,
+            "jung_fi": -1.2,
+            "covert_control": 0.8,
+            "big5_compliance": 1.3
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "不发了，把这事放下。下周末自己找个地方待一整天，谁也不约",
+          "effects": {
+            "jung_se": 2,
+            "jung_ni": -0.8,
+            "big5_assert": 1.3,
+            "def_detach": 0.7
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v9_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_se",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "出差回来你去做了个按摩。房间里只有空调声和精油的味道，技师的手按在肩胛骨下面那一块，很疼。",
+      "prompt": "疼的那几十秒里，你的注意力落在什么地方？",
+      "scale": {
+        "left": "全在那一块疼上，跟着呼吸，别的什么也没有想",
+        "right": "顺着这块僵往回推：这半年我到底怎么活的，不解决明年会在哪儿疼",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "jung_se": [
+          2,
+          -2
+        ],
+        "jung_ni": [
+          -2,
+          2
+        ],
+        "big5_alert": [
+          -0.6,
+          1
+        ],
+        "def_intellectual": [
+          -0.8,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v9_q10",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_ti",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "周五下午，甲方在群里发来一条六十秒语音，转成文字四百多字，里面有三处彼此打架的要求，末尾一句「你们先按这个做」。",
+      "prompt": "文档打开之后，你从哪里下手？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把三处打架的地方一条条摘出来，先弄明白他到底要哪一种，再决定做不做",
+          "effects": {
+            "jung_ti": 2,
+            "jung_te": -0.8,
+            "cog_logic": 1.4,
+            "big5_order": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "按能交付的样子重排：这周做什么、要多少钱、哪一条这版不做，回一封确认函",
+          "effects": {
+            "jung_te": 2,
+            "jung_ne": -0.7,
+            "big5_assert": 1.3,
+            "cog_speed": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "从四百字里挑一句被浪费掉的话，顺着它想一个他自己也没想到的做法",
+          "effects": {
+            "jung_ne": 2,
+            "jung_ti": -1,
+            "cog_diverge": 1.4,
+            "big5_open": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "翻出上个月那份几乎一样的文档，把当时怎么处理的步骤照着重走一遍",
+          "effects": {
+            "jung_si": 2,
+            "jung_ne": -1.1,
+            "cog_ambiguity": -1.1,
+            "big5_order": 1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v9_q11",
+      "type": "impulse_3s",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_si",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "你隔了两年才回一次家。进门还没换鞋，你妈已经从厨房端出一碗汤：「还是照你小时候那样炖的。」汤面浮着几粒枸杞，味道和十岁那年一模一样。",
+      "prompt": "碗端在手里烫，那一刻最先涌上来的是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "记忆整块回来了：午睡后的竹席、她喊你吃饭的声音、那只缺口的勺子",
+          "effects": {
+            "jung_si": 2,
+            "jung_ne": -0.9,
+            "big5_rumination": 1.1,
+            "mot_belonging": 1.3
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "有点想哭，因为她记得一件我自己都忘了的小事，而且记了二十年",
+          "effects": {
+            "jung_fi": 2,
+            "big5_compassion": 1.4,
+            "att_anxiety": 0.7,
+            "jung_ti": -0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "先夸她一句「还是你炖得好」，让她高兴，把两年没说的话再往下压一压",
+          "effects": {
+            "jung_fe": 2,
+            "jung_fi": -1.1,
+            "big5_compliance": 1.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "太烫了，先放下，去厨房拿个碗分出一半给她，两个人在灶台边站着喝完",
+          "effects": {
+            "jung_se": 2,
+            "jung_si": -0.8,
+            "def_detach": 0.6,
+            "big5_compassion": 0.9
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v9_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "jung_te",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "楼上漏水泡了你家天花板一角，物业说「得等业主回来确认」，已经拖了十一天。",
+      "prompt": "第三趟去物业办公室的路上，你脑子里那件事已经在往下推了。推到哪一步？",
+      "scale": {
+        "left": "把每一步变成能追责的东西：拍照、留记录、给一个具体日期，到期就往上级递",
+        "right": "想想它到底卡在哪一环，有没有一个不用跟他们耗的入口，从别处绕过去",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "jung_te": [
+          2,
+          -2
+        ],
+        "jung_ne": [
+          -1.6,
+          1.6
+        ],
+        "big5_assert": [
+          1.4,
+          -0.8
+        ],
+        "cog_logic": [
+          1.2,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v9_q13",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "mirror_key": "jung_ti",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "一个认识十年的朋友开口借八万，说母亲做手术，三个月内还。你知道他去年投资亏过一次，也知道他母亲确实在住院。",
+      "prompt": "对话框停在那儿，你没有立刻回，先在心里做了一件什么事？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把他上一次借钱的时间和还款情况对一遍，数字核清楚了再往下谈",
+          "effects": {
+            "jung_ti": 2,
+            "jung_fe": -1,
+            "cog_logic": 1.3,
+            "big5_alert": 1.1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "借，但写一条：金额、日期、怎么还，两个人各留一份，先把麻烦处理掉",
+          "effects": {
+            "jung_te": 2,
+            "jung_fi": -0.8,
+            "big5_order": 1.3,
+            "val_moral": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "他人还在医院走廊，我先转三万过去，剩下的再想办法，别的以后再说",
+          "effects": {
+            "jung_fe": 2,
+            "jung_te": -1.2,
+            "big5_compassion": 1.4,
+            "mot_belonging": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "我借钱只有一条标准：这笔钱回不来，我会不会因此看轻他。会，就不借",
+          "effects": {
+            "jung_fi": 2,
+            "jung_fe": -1.1,
+            "val_moral": 1.4,
+            "cog_independent": 1.1
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v9_q14",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "explicit",
+      "mirror_key": "jung_fe",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "这周他说了两句话。周一：「你忙你的，我没事。」周五：「你这周一次都没问过我在忙什么。」现在他在厨房切菜，背对着你。",
+      "prompt": "你站在门口，手里还握着手机。下一步你怎么走进去？",
+      "scale": {
+        "left": "把这两句话摆在一起看：哪句是真的，中间那四天到底发生了什么",
+        "right": "先不追逻辑，走过去站在他旁边，让他把话说完，让空气先软下来",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "jung_ti": [
+          2,
+          -2
+        ],
+        "jung_fe": [
+          -2,
+          2
+        ],
+        "big5_compassion": [
+          -0.8,
+          1.4
+        ],
+        "att_avoidance": [
+          0.8,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v9_q15",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "stealth",
+      "mirror_key": "jung_ne",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "年终奖到账那晚，你一个人坐在客厅，屏幕上的数字比预期多了两万三。这笔钱没有任何用途被指定。",
+      "prompt": "关掉手机之前，你心里已经把它安放好了。它被放在了哪一格？",
+      "options": [
+        {
+          "key": "A",
+          "text": "一个还没成形的念头：报那个一直没敢报的课，或者干脆摆个小摊试试",
+          "effects": {
+            "jung_ne": 2,
+            "jung_si": -1,
+            "big5_open": 1.4,
+            "cog_diverge": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "一个更远的位置：这笔钱放在三年后的哪一格，才算真正没白来一趟",
+          "effects": {
+            "jung_ni": 2,
+            "jung_se": -0.8,
+            "cog_global": 1.3,
+            "mot_purpose": 1.1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "一顿今晚就能约的饭、一双想了两年的鞋，让这个月有个能记住的日子",
+          "effects": {
+            "jung_se": 2,
+            "jung_ni": -1,
+            "mot_hedonism": 1.3,
+            "big5_aesthetic": 0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "那个一直空着的应急账户，跟往年一样，先把它填到六个月的量",
+          "effects": {
+            "jung_si": 2,
+            "jung_ne": -1.1,
+            "mot_security": 1.3,
+            "big5_alert": 1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v9_q16",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "jung_ni",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "在一起第二年，某个周三的晚饭吃到一半，对方放下筷子问你：「你到底想要什么？」抽油烟机还在响。",
+      "prompt": "在那三秒里，你身体比嘴先给出的答案是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "一句很具体、可能有点难听但是真的话：我想被人当成第一顺位",
+          "effects": {
+            "jung_fi": 2,
+            "jung_te": -0.7,
+            "val_moral": 1.2,
+            "att_anxiety": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "一串可以列出来的东西：住在哪、几年内要不要孩子、钱怎么管",
+          "effects": {
+            "jung_te": 2,
+            "jung_fi": -1,
+            "big5_order": 1.3,
+            "big5_assert": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "忽然看清这个问题的来路：他问的不是未来，是我这两年一直没给的那个答复",
+          "effects": {
+            "jung_ni": 2,
+            "jung_se": -0.9,
+            "cog_global": 1.3,
+            "att_anxiety": 0.7
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "什么也没想，先伸手把他的碗挪开一点：「先吃饭，吃完再说」",
+          "effects": {
+            "jung_se": 2,
+            "jung_ni": -1,
+            "def_detach": 0.9,
+            "big5_compliance": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v9_q17",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "jung_si",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "大年初二，饭桌上你妈第无数次提起你表哥：三十五岁，两套房，孩子进了最好的小学。说完她给你夹了一筷子鱼：「妈不是催你。」",
+      "prompt": "那口鱼放进嘴里，你心里最清楚的念头是哪一句？",
+      "options": [
+        {
+          "key": "A",
+          "text": "想起的是九几年这张桌子：那时谁也没什么钱，鱼是同一个做法，笑得却更响",
+          "effects": {
+            "jung_si": 2,
+            "jung_ne": -0.9,
+            "big5_rumination": 1.3,
+            "mot_belonging": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "我知道她怕什么，也清楚这些不是我要的，两件事可以同时成立，不必争",
+          "effects": {
+            "jung_fi": 2,
+            "jung_fe": -0.8,
+            "val_moral": 1.2,
+            "cog_independent": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "顺着她的话往下问：表哥现在几点下班、周末还有没有空陪孩子",
+          "effects": {
+            "jung_fe": 1.8,
+            "jung_fi": -1.1,
+            "covert_control": 1,
+            "big5_compliance": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "忽然觉得这桌饭还能有别的过法：明年换我定地方，谁也别在家里吃",
+          "effects": {
+            "jung_ne": 2,
+            "jung_si": -1.1,
+            "cog_diverge": 1.3,
+            "big5_assert": 1
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v9_q18",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "explicit",
+      "mirror_key": "jung_fi",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "凌晨一点，你在洗手间洗脸，抬头看见镜子里那张脸。今天没出什么大事，但一整天都不太对。",
+      "prompt": "水还在流，你看着镜子里的自己，心里跑的是什么？",
+      "scale": {
+        "left": "我大概知道自己在难受什么，这件事没法向谁解释清楚，但对我而言是真的",
+        "right": "我给自己找一个说得通的原因：是没睡好，是今天那句话，还是这个月都这样",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "jung_fi": [
+          2,
+          -2
+        ],
+        "jung_ti": [
+          -1.8,
+          1.8
+        ],
+        "big5_rumination": [
+          1.2,
+          -0.6
+        ],
+        "def_intellectual": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v9_q19",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "jung_stack",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "context": "你在常去的那家面馆做了个梦：对面坐着一个人，把你脑子里处理世界的方式一样样摆上桌，说只能留下三样，其余的要收走。",
+      "prompt": "桌面上的八样东西，你最先留下的是哪三样？请按顺序点选。",
+      "values": [
+        {
+          "key": "te",
+          "label": "把混乱压成一张能执行的表",
+          "effects": {
+            "jung_te": 1.5,
+            "big5_order": 0.4
+          }
+        },
+        {
+          "key": "ti",
+          "label": "把一个说法抠到逻辑上站不住",
+          "effects": {
+            "jung_ti": 1.5,
+            "cog_logic": 0.4
+          }
+        },
+        {
+          "key": "fe",
+          "label": "先让在场的人都不那么难受",
+          "effects": {
+            "jung_fe": 1.5,
+            "big5_compassion": 0.4
+          }
+        },
+        {
+          "key": "fi",
+          "label": "守住心里那条不能越的线",
+          "effects": {
+            "jung_fi": 1.5,
+            "val_moral": 0.4
+          }
+        },
+        {
+          "key": "ne",
+          "label": "看见一条路长出五六条岔路",
+          "effects": {
+            "jung_ne": 1.5,
+            "cog_diverge": 0.4
+          }
+        },
+        {
+          "key": "ni",
+          "label": "从一堆事里看出同一个底下的东西",
+          "effects": {
+            "jung_ni": 1.5,
+            "cog_global": 0.4
+          }
+        },
+        {
+          "key": "se",
+          "label": "现在这一刻就动手、就尝到",
+          "effects": {
+            "jung_se": 1.5,
+            "mot_hedonism": 0.4
+          }
+        },
+        {
+          "key": "si",
+          "label": "回到熟悉的那条老路和那个味道",
+          "effects": {
+            "jung_si": 1.5,
+            "mot_security": 0.4
+          }
+        }
+      ]
+    },
+    {
+      "id": "v9_q20",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "jung_energy",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "context": "你有一个完全没被安排的周六，从早上七点到晚上十一点，十六个小时归你自己。手机可以关掉，谁也不知道你在哪儿。",
+      "prompt": "把一百点精力分到这六件事上。分完之后，你才看得出自己到底靠什么充电。",
+      "items": [
+        {
+          "key": "fe",
+          "label": "约人：让屋子里有别人的声音和气味",
+          "dim": "jung_fe",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "fi",
+          "label": "一个人把心里那点说不清的东西想清楚",
+          "dim": "jung_fi",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "ne",
+          "label": "随手翻到点什么，让它长出一堆新念头",
+          "dim": "jung_ne",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "ni",
+          "label": "把最近所有事连成一条线，看清它往哪儿去",
+          "dim": "jung_ni",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "se",
+          "label": "出门，用手和身体去碰真的东西",
+          "dim": "jung_se",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "si",
+          "label": "回到熟悉的地方，把旧的东西再过一遍",
+          "dim": "jung_si",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    }
+  ]
+}

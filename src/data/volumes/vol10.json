@@ -1,0 +1,787 @@
+{
+  "volume_id": "vol10",
+  "index": 10,
+  "title": "秩序与混沌",
+  "subtitle": "D&D 九宫格阵营与十二叙事原型底色",
+  "theme_color": "#7A4B3A",
+  "estimated_minutes": 4,
+  "intro": "这一卷不设道德评分表。它只问一件事：当没有摄像头、没有旁人、也看不见后果的时候，你相信什么在维持这个世界——是白纸黑字的规矩，还是此刻站在你面前的这个人。两种答案都有代价，也都有尊严。",
+  "dimensions": [
+    "dd_order",
+    "dd_good"
+  ],
+  "questions": [
+    {
+      "id": "v10_q01",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "alignment_order",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "雨夜十一点，城郊那条直路上一个摄像头都没有。前方路口亮着红灯，五百米内看不到一辆车、一个人。一个外卖骑手从你身边绕过去闯了灯，水花溅了你一裤腿。",
+      "prompt": "绿灯还要等四十秒，你站在原地。此刻你更接近哪一种做法？",
+      "options": [
+        {
+          "key": "A",
+          "text": "快步跟过去，扶住那辆歪在雨里的电动车，帮他把汤码回去。",
+          "effects": {
+            "dd_order": -1.4,
+            "dd_good": 1.7,
+            "wv_social": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "左右看完确实没车就走过去。灯是用来防碰撞的，此刻这条路上没有碰撞。",
+          "effects": {
+            "dd_order": -1.8,
+            "dd_good": -1.2,
+            "cog_independent": 1.1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "等完这四十秒。规则不是给摄像头看的，没人盯着的时候，它才真的算数。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": 1.2,
+            "light_kant": 1.0
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "照样等，但拍下车牌回家提一单——这条规矩对每个人都该一样重。",
+          "effects": {
+            "dd_order": 1.7,
+            "dd_good": -1.2,
+            "big5_assert": 0.9
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v10_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "alignment_good",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "菜市场收摊前，摊主一边跟隔壁聊天一边给你找钱，多找了二十块。你拎着菜走出去十几米，低头才发现。",
+      "scale": {
+        "left": "转身走回去，把那二十块放回秤台边",
+        "right": "接着走。这是他自己算错，不是我伸手拿的",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dd_good": [
+          1.8,
+          -1.6
+        ],
+        "dd_order": [
+          1.3,
+          -1.2
+        ],
+        "val_moral": [
+          1.2,
+          -1.0
+        ],
+        "sin_greed": [
+          -0.9,
+          1.1
+        ]
+      }
+    },
+    {
+      "id": "v10_q03",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "alignment_good",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你的一位老朋友失业三个月了，一直没跟家里说。今晚他带你去他女朋友家吃饭，饭桌上她随口说起他最近总加班到很晚，他笑着点头。",
+      "prompt": "桌下他的膝盖轻轻碰了碰你。你接下来那句话会往哪边走？",
+      "options": [
+        {
+          "key": "A",
+          "text": "顺着他的话编圆，回头把这事记下来——下次他开口借钱，我有依据。",
+          "effects": {
+            "dd_order": -1.2,
+            "dd_good": -1.2,
+            "dark_mach": 1.1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "顺着他说下去。这是他的事，什么时候说是他的权利，我只负责不当场拆台。",
+          "effects": {
+            "dd_order": -1.5,
+            "dd_good": 1.8,
+            "mot_belonging": 1.0
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "照实说一句「他最近没上班，具体你问他」，剩下的交给他自己。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": -1.3,
+            "light_kant": 1.1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "把话岔开，聊点别的。我没有撒谎，也不替他决定哪一天该开口。",
+          "effects": {
+            "dd_order": 1.3,
+            "dd_good": 1.4,
+            "cog_ambiguity": 1.0
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v10_q04",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "alignment_good",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "晚高峰的地铁站台，一个男人因为裤脚被拖把碰到，对着保洁阿姨越说越大声，手指几乎戳到她脸上。周围人都低头看手机。",
+      "prompt": "你离他们只有三步，第一秒身体先做出的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "走过去站到阿姨侧前半步，一句话不说，就那么平视着他。",
+          "effects": {
+            "dd_order": 1.2,
+            "dd_good": 1.9,
+            "big5_assert": 1.1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先录下来再叫站台工作人员——没记录的事，最后就是各说各话。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": -1.2,
+            "big5_compliance": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "心里一紧，但把耳机音量调大，加快脚步走进车门。",
+          "effects": {
+            "dd_order": -1.2,
+            "dd_good": -1.5,
+            "def_detach": 1.1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "直接开口：「人家拖地，你的鞋挡着道了」，语气比他还冲。",
+          "effects": {
+            "dd_order": -1.3,
+            "dd_good": 1.3,
+            "sin_wrath": 1.2
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v10_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "alignment_order",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "老房子的拆迁意向书下来了。家族群里，几位长辈已经商量好怎么分，没人问过一直住在里面照顾奶奶的那个人。轮到你表态时，你心里最想做的更接近——",
+      "scale": {
+        "left": "顺着大家的意思，「你们定就好，我没什么意见」",
+        "right": "把话挑明：「这七年是谁在照顾，得先听我说完」",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dd_order": [
+          1.6,
+          -1.4
+        ],
+        "dd_good": [
+          -1.4,
+          1.6
+        ],
+        "big5_compliance": [
+          1.2,
+          -1.0
+        ],
+        "mot_autonomy": [
+          -1.0,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v10_q06",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "alignment_order",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "公司内网的考勤系统有个谁都知道、也没人修的漏洞：补卡申请可以自己审批。这个月你迟到过三次，其中两次确实是自己的问题，扣的钱不算少。",
+      "prompt": "页面上那个「自己批自己」的按钮，你会按下它吗？",
+      "options": [
+        {
+          "key": "A",
+          "text": "三次全补。这套制度本来就没打算跟人讲道理，能过就过。",
+          "effects": {
+            "dd_order": -1.9,
+            "dd_good": -1.5,
+            "sin_greed": 1.0
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "关掉页面，走正常的补卡流程，批不批由组长自己判断。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": 1.3,
+            "light_kant": 1.0
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "照扣，然后把三次截图发给组长，请全组按同一套标准来。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": -1.2,
+            "val_standard": 1.0
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "三次都补，然后把入口告诉全组——凭什么只有我一个人知道。",
+          "effects": {
+            "dd_order": -1.2,
+            "dd_good": 1.2,
+            "mot_belonging": 0.9
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v10_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "alignment_order",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "你和朋友合伙买了台三万多的机器接私活。三个月后他说不做了，设备留给你，那半年的钱「就当帮兄弟一把」。你看着那台还在折旧的机器——",
+      "scale": {
+        "left": "「行，机器我留着，钱的事算了」，就当交了一次学费",
+        "right": "把账摊开：「按市价折旧折一半，这个数我们今天说清楚」",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "dd_order": [
+          -1.5,
+          1.4
+        ],
+        "dd_good": [
+          1.2,
+          -1.3
+        ],
+        "light_kant": [
+          -1.0,
+          0.9
+        ],
+        "def_detach": [
+          1.1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v10_q08",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "alignment_good",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "凌晨两点，你下楼扔垃圾，看见一个男人蹲在楼下的电动车旁，手里捏着一截铁片，车锁已经撬开一半，车灯在暗处闪着。",
+      "prompt": "他抬头，正好也看见了你。这一秒，你身体里最先动起来的是哪一股？",
+      "options": [
+        {
+          "key": "A",
+          "text": "退回楼道，打 110，再把单元门反锁——他选的路，后果自负。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": -1.2,
+            "mot_security": 1.0
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "捂住口袋快步走开。半夜这种事，本来就轮不到我来管。",
+          "effects": {
+            "dd_order": -1.2,
+            "dd_good": -1.8,
+            "def_detach": 0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "冲上去吼一句「你干什么」，声音大得整栋楼都听得见。",
+          "effects": {
+            "dd_order": -1.6,
+            "dd_good": 1.3,
+            "sin_wrath": 1.0
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "停住，慢慢举起手机对准他，喊一句「我已经拍了」。",
+          "effects": {
+            "dd_order": 1.2,
+            "dd_good": 1.4,
+            "big5_assert": 1.1
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v10_q09",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "alignment_order",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "医院检验科前排队四十多人，取号屏上还有二十七个。一个抱着发烧孩子的母亲走到你面前，说她只差一张抽血单，问能不能插在你前面。",
+      "prompt": "你身后还站着三十多个人。你此刻会怎么处理？",
+      "options": [
+        {
+          "key": "A",
+          "text": "请她去找护士台，那里有急症通道，比我这里排队要快得多。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": 1.3,
+            "cog_logic": 1.0
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "摇头。后面三十几个人里，抱着孩子的可能不止她一个。",
+          "effects": {
+            "dd_order": 1.5,
+            "dd_good": -1.4,
+            "val_boundary": 1.0
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "让她站我前面，但先回头问一声身后的人，有人不同意就作罢。",
+          "effects": {
+            "dd_order": 1.2,
+            "dd_good": 1.8,
+            "big5_compassion": 1.1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "让她过去。规矩是给活人用的，孩子这会儿烧到三十九度。",
+          "effects": {
+            "dd_order": -1.7,
+            "dd_good": 1.6,
+            "wv_social": -0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v10_q10",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "alignment_good",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "凌晨一点，你刷到一条转发过千的众筹：一个陌生父亲说孩子要动手术，还差八万。照片有点糊，没有病历，也没有医院的名字。",
+      "scale": {
+        "left": "划过去。我救不了每一个刷到的人，也不知道这是不是真的",
+        "right": "随手转五十块。真的假的我都认了，就当这一下没白刷",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "dd_good": [
+          -1.5,
+          1.6
+        ],
+        "dd_order": [
+          1.3,
+          -1.2
+        ],
+        "light_faith": [
+          -1.0,
+          1.2
+        ],
+        "cog_logic": [
+          1.1,
+          -0.9
+        ]
+      }
+    },
+    {
+      "id": "v10_q11",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "alignment_order",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "二手房过户前一夜，中介压低声音跟你说，成交价可以写成两份，税能少交五万多，这条街上一直这么办。你妈在旁边点头，说这笔钱本来是留给装修的。",
+      "prompt": "笔就放在桌上，你最后落笔的那份是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "「写两份吧。」我妈为这五万攒了三年，我没法当着她的面把这份钱推回去。",
+          "effects": {
+            "dd_order": -1.7,
+            "dd_good": 1.6,
+            "mot_belonging": 1.0
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "「按真实价格签，那五万我自己补。」省下来的钱，往后每晚都得替它担一次心。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": 1.3,
+            "light_kant": 1.0
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "「按真价签。省下的是给我装修的钱，真要出事，站进去的是我。」",
+          "effects": {
+            "dd_order": 1.6,
+            "dd_good": -1.3,
+            "val_standard": 1.1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "「写两份吧。规矩要真管得住，这条街上早就没人这么干了。」",
+          "effects": {
+            "dd_order": -1.9,
+            "dd_good": -1.4,
+            "cog_independent": 1.0
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v10_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "alignment_good",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "朋友聚会，一个人成了全场玩笑的靶子，连他的口音、他的新工作都被拿出来讲。他自己也在笑。笑声停下来的时候，你坐在哪里？",
+      "scale": {
+        "left": "跟着笑。气氛已经到这儿了，认真起来反而扫兴",
+        "right": "把话头挪开，或者干脆坐到他旁边去接着聊",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "dd_good": [
+          -1.5,
+          1.6
+        ],
+        "dd_order": [
+          1.3,
+          -1.3
+        ],
+        "big5_compassion": [
+          -1.0,
+          1.2
+        ],
+        "val_boundary": [
+          1.0,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v10_q13",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "alignment_good",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "外卖放到你家门口，是一份你没点的餐：整只烤鸭配两个菜，小票上写着另一个单元的门牌号，价钱是你平时一顿的三倍。系统显示「已送达」。",
+      "prompt": "骑手已经走远，那份餐还在你手里。你打算怎么办？",
+      "options": [
+        {
+          "key": "A",
+          "text": "先拍照存证，两个小时没人来认，就当平台送了我一顿。",
+          "effects": {
+            "dd_order": 1.3,
+            "dd_good": -1.2,
+            "cog_logic": 0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "直接吃。这一单的钱平台早就赚平了，它记在损耗里，不记在谁头上。",
+          "effects": {
+            "dd_order": -1.9,
+            "dd_good": -1.7,
+            "cog_independent": 1.0
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "拍照发给平台客服，让他们联系那个单元真正的收件人。",
+          "effects": {
+            "dd_order": 1.8,
+            "dd_good": 1.5,
+            "light_kant": 1.0
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "拎到那个单元门口敲门问一句，是谁家点的就还回去。",
+          "effects": {
+            "dd_order": -1.2,
+            "dd_good": 1.9,
+            "big5_compassion": 1.0
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v10_q14",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "alignment_values",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "prompt": "下面八件事，挑出你最不能容忍别人破坏的三件，最不能忍的排第一。不是它们「应该」重要，而是真的发生了你会当场站起来。",
+      "values": [
+        {
+          "key": "broken_promise_rule",
+          "label": "说好的规矩，被有权力的人一句话推翻",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": 1.2
+          }
+        },
+        {
+          "key": "punching_down",
+          "label": "成年人把气撒在不能还手的人身上",
+          "effects": {
+            "dd_order": 1.2,
+            "dd_good": 1.9
+          }
+        },
+        {
+          "key": "public_humiliation",
+          "label": "有人当众羞辱一个刚说错话的年轻人",
+          "effects": {
+            "dd_order": 1.3,
+            "dd_good": 1.6
+          }
+        },
+        {
+          "key": "locked_by_process",
+          "label": "一个人被流程卡在原地，周围没有一个人肯通融",
+          "effects": {
+            "dd_order": -1.5,
+            "dd_good": 1.6
+          }
+        },
+        {
+          "key": "ungrateful",
+          "label": "你帮过的人，转过身就当没这回事",
+          "effects": {
+            "dd_order": 1.3,
+            "dd_good": -1.4
+          }
+        },
+        {
+          "key": "only_one_following",
+          "label": "所有人都在钻空子，只有你还在按流程走",
+          "effects": {
+            "dd_order": 1.5,
+            "dd_good": -1.3
+          }
+        },
+        {
+          "key": "decided_for_you",
+          "label": "有人替你做了决定，还一口一个为你好",
+          "effects": {
+            "dd_order": -1.7,
+            "dd_good": -1.2
+          }
+        },
+        {
+          "key": "words_moved_upstairs",
+          "label": "你私下说过的话，被人原样搬到了台面上",
+          "effects": {
+            "dd_order": -1.3,
+            "dd_good": -1.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "v10_q15",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "alignment_cost",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "prompt": "假设你手里有一百点，只能投给你住的这条街。没有一分是白给的：投在哪里，就等于承认你相信什么在支撑它。",
+      "items": [
+        {
+          "key": "rule_no_exception",
+          "label": "一条连制定者也不能例外的规矩",
+          "dim": "dd_order",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "open_ledger",
+          "label": "每一笔账都能被任何人查到的账本",
+          "dim": "dd_order",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "process_owner",
+          "label": "出事之后有人按流程负责到底的通道",
+          "dim": "dd_order",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "step_down",
+          "label": "给一时过不去的人留一个不被追问的台阶",
+          "dim": "dd_good",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "count_the_silent",
+          "label": "把没人替其说话的那部分人算进去",
+          "dim": "dd_good",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "show_up",
+          "label": "哪家出了事，第一个到场的那份余力",
+          "dim": "dd_good",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    },
+    {
+      "id": "v10_q16",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "alignment_order",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "小区群里发起联名，要求物业禁止一位老人半夜在垃圾桶边收纸箱，「影响形象，也有消防隐患」。接龙已经排到四十多户，你的头像排在后面。",
+      "prompt": "轮到你了。这条接龙，你接不接？",
+      "options": [
+        {
+          "key": "A",
+          "text": "不接，也不说话。别人家的事，轮不到我替他们表态。",
+          "effects": {
+            "dd_order": -1.2,
+            "dd_good": -1.5,
+            "def_detach": 1.0
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "接，但加一句：先跟老人谈，给他一个固定时段和堆放点。",
+          "effects": {
+            "dd_order": 1.9,
+            "dd_good": 1.4,
+            "cog_ambiguity": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "不接，回一句：他没堵消防通道，那些纸箱是他这个月的菜钱。",
+          "effects": {
+            "dd_order": -1.3,
+            "dd_good": 1.8,
+            "big5_assert": 1.1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "接。半夜翻桶的声音我确实听过很多次，我的睡眠也是真的。",
+          "effects": {
+            "dd_order": 1.5,
+            "dd_good": -1.9,
+            "val_boundary": 1.1
+          },
+          "social_desirability": 0
+        }
+      ]
+    }
+  ]
+}

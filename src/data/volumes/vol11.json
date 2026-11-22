@@ -1,0 +1,1051 @@
+{
+  "volume_id": "vol11",
+  "index": 11,
+  "title": "哲人底色",
+  "subtitle": "八大哲学流派与海特六大道德基础",
+  "theme_color": "#4D5D4E",
+  "estimated_minutes": 5,
+  "intro": "这一卷不测你读过多少书。它想看清的是：当一件不好的事真的落在你身上，你会用哪一套语言把它解释过去；以及别人踩到哪条线上时，你心里最原始的那一下会先亮起来。请凭第一感觉作答，不必挑更体面的那个答案。",
+  "dimensions": [
+    "phil_stoic",
+    "phil_existential",
+    "phil_absurd",
+    "phil_cynic",
+    "phil_pragmatic",
+    "phil_epicurean",
+    "phil_nihilism",
+    "phil_humanist",
+    "mft_care",
+    "mft_fairness",
+    "mft_loyalty",
+    "mft_authority",
+    "mft_sanctity",
+    "mft_liberty"
+  ],
+  "questions": [
+    {
+      "id": "v11_q01",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "phil_stoic",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你用了两年、几乎所有的周末，还有一部分积蓄做一件事。就在快收成的前一个月，一条你完全没有参与决定权的政策变动，让它归了零。",
+      "prompt": "哭过或者没哭过之后，最先把你从地上扶起来的是哪一种念头？",
+      "options": [
+        {
+          "key": "A",
+          "text": "结果本来就不完全归我，归我的只有此刻站成什么样，和接下来先做完哪件小事",
+          "effects": {
+            "phil_stoic": 2,
+            "def_intellectual": 1.2,
+            "lv_suffering": 1.2,
+            "phil_absurd": -1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "没有人承诺过剧本。旧的那本撕了，那就由我重写一版，写砸了也算我自己的",
+          "effects": {
+            "phil_existential": 2,
+            "mot_autonomy": 1.4,
+            "lv_anchor": 0.8,
+            "phil_nihilism": -1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "推上去的东西总会滚下来。先笑一下，然后去吃一顿很烫很辣的东西",
+          "effects": {
+            "phil_absurd": 2,
+            "phil_epicurean": 1.7,
+            "lv_suffering": -1.2,
+            "phil_stoic": -1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "认真到这个地步还是被这样拿走，以后别再把整颗心押在任何一件事上",
+          "effects": {
+            "phil_cynic": 2,
+            "phil_nihilism": 1.4,
+            "light_faith": -1.4,
+            "lv_suffering": -0.8
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v11_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "phil_pragmatic",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "一个合作了两年的人，把你私下只讲给他听过的一个想法原样拿去用了，署名是他。",
+      "prompt": "接下来那几天，你反复回到的其实是哪一层？",
+      "scale": {
+        "left": "怎么止损、以后怎么防，他为什么这么做我并不太关心",
+        "right": "他当时到底在怕什么、缺什么，才会伸这只手",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "phil_pragmatic": [
+          2,
+          -2
+        ],
+        "phil_humanist": [
+          -2,
+          2
+        ],
+        "phil_cynic": [
+          1.6,
+          -1.6
+        ],
+        "mft_care": [
+          -1.2,
+          1.6
+        ],
+        "light_faith": [
+          -1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v11_q03",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "phil_humanist",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "三个人在异国的小城，行程第二天。一个人坚持要去看那座来回六小时的美术馆，另一个人想留在广场晒太阳。你其实更想留下，但你知道那位朋友为这趟旅行攒了很久的钱。",
+      "prompt": "你说出口的那句话，更接近——",
+      "options": [
+        {
+          "key": "A",
+          "text": "「少数服从多数吧。你们去哪我去哪，我没什么特别的偏好」",
+          "effects": {
+            "phil_cynic": 2,
+            "mft_authority": -1.6,
+            "mft_liberty": 1.2,
+            "wv_nature": -1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "「那就去。六小时而已，回来剩下的时间再分，谁也不亏」",
+          "effects": {
+            "phil_pragmatic": 2,
+            "wv_causal": 1.2,
+            "cog_global": 0.8,
+            "phil_cynic": -1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "「你们定，我都可以。去哪儿都比在原地站着讲道理强」，然后闭嘴",
+          "effects": {
+            "phil_stoic": 1.8,
+            "cog_logic": 1.2,
+            "mft_liberty": 1.2,
+            "phil_absurd": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "「他攒了半年就为这个。广场明天还在，他的假期不在了」",
+          "effects": {
+            "phil_humanist": 2,
+            "mft_care": 1.4,
+            "wv_nature": 1.2,
+            "phil_cynic": -1.2
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v11_q04",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "mft_loyalty",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "一桌朋友吃饭，一个认识很多年的人把你当年最狼狈的那件事，当成笑料讲给刚认识的人听。桌上有两个人笑出了声。",
+      "prompt": "笑声响起来的那三秒，你身体先做了什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "先跟着笑一下，把场面接住，然后整晚没再和他多说一句话",
+          "effects": {
+            "mft_loyalty": -1.8,
+            "phil_cynic": 1.2,
+            "wv_nature": -1,
+            "val_boundary": 1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "直接说「这个不好笑」，声音不大，但桌上的人都听见了",
+          "effects": {
+            "mft_liberty": 1.8,
+            "mft_loyalty": -1,
+            "light_kant": 1.2,
+            "sin_pride": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "等他讲完，很平静地补一句：那件事当时对我并不轻",
+          "effects": {
+            "mft_care": 1.8,
+            "mft_loyalty": 1.4,
+            "light_kant": 1.2,
+            "virtue_humility": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "心里一下凉了，开始清点这个人到底知道我多少件事",
+          "effects": {
+            "mft_loyalty": -1.6,
+            "phil_cynic": 1.6,
+            "dark_mach": 1.2,
+            "wv_nature": -1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v11_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "mft_sanctity",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "外婆过世后的第一个清明，家里按老规矩摆了一桌东西。一个年轻亲戚把供着的那只旧碗拿起来当烟灰缸，说反正也没人用了。",
+      "prompt": "你站在旁边，身体里最先冒出来的东西是什么？",
+      "scale": {
+        "left": "只是一只旧碗，他没有恶意，人也比碗重要",
+        "right": "说不清为什么，胃里先紧了一下，就是不能这样",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "mft_sanctity": [
+          -2,
+          2
+        ],
+        "mft_liberty": [
+          1.6,
+          -1.6
+        ],
+        "phil_humanist": [
+          1.4,
+          -1.4
+        ],
+        "phil_cynic": [
+          1.2,
+          -1.2
+        ],
+        "mft_care": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v11_q06",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "mft_liberty",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "小区突然贴出通知：为了「统一管理」，所有电动车必须停到八百米外的集中点，晚十点后不得进出。没征求过任何人意见，理由只有一句：上面要求。",
+      "prompt": "业主群吵成一片，你更愿意站在哪一边——",
+      "options": [
+        {
+          "key": "A",
+          "text": "该守的守，但车我照停楼下，谁来说就把道理跟他说完",
+          "effects": {
+            "mft_liberty": 2,
+            "mft_authority": -1.8,
+            "sin_pride": 1.2,
+            "phil_cynic": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "先联合几户按程序推翻它：找物业、找街道、留书面记录",
+          "effects": {
+            "phil_pragmatic": 1.8,
+            "mft_authority": 1,
+            "cog_logic": 1.2,
+            "mft_liberty": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "停哪里都行，我只觉得「统一管理」这四个字很好笑",
+          "effects": {
+            "phil_cynic": 2,
+            "phil_absurd": 1.2,
+            "mft_authority": -1.2,
+            "light_faith": -1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "规定再蠢也是规定，我照做，省下的力气用在别的地方",
+          "effects": {
+            "mft_authority": 2,
+            "mft_liberty": -1.8,
+            "phil_stoic": 1.4,
+            "wv_social": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v11_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "mft_authority",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "你住的楼有一条规矩：夜里十一点后出入要登记。那天你抱着发烧的孩子从医院回来，已经一点多，值班室黑着灯，桌上摊着登记本。",
+      "prompt": "你在门口停了半秒，然后会——",
+      "scale": {
+        "left": "把值班的人叫醒，登记完再上楼，规矩就是规矩",
+        "right": "直接上楼，孩子等不了，规矩本来就该让开",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mft_authority": [
+          2,
+          -2
+        ],
+        "mft_care": [
+          -1.4,
+          1.8
+        ],
+        "phil_pragmatic": [
+          -1.2,
+          1.4
+        ],
+        "light_kant": [
+          1.2,
+          -1.4
+        ]
+      }
+    },
+    {
+      "id": "v11_q08",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "phil_existential",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "一场吵到后半段的对话里，对方忽然说：「和你在一起的这几年，我一直在将就。」你知道这句有一半是气话，但另一半可能是真的。",
+      "prompt": "那句话落地的一秒，你脑子里先亮起来的是哪一句？",
+      "options": [
+        {
+          "key": "A",
+          "text": "原来这几年在他那里是这个版本，那我们把话讲开，怎么改一起说",
+          "effects": {
+            "phil_existential": 2,
+            "mft_care": 1.2,
+            "def_intellectual": 1,
+            "lv_suffering": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "有点想笑：两个人都觉得自己在将就，还都以为自己在忍",
+          "effects": {
+            "phil_absurd": 1.8,
+            "phil_cynic": 1.2,
+            "phil_epicurean": 1,
+            "mft_care": -0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "一阵很冷的安静，什么都感觉不到，只想先把这场对话结束",
+          "effects": {
+            "phil_stoic": 1.8,
+            "phil_nihilism": 1.2,
+            "mft_care": -1.2,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "心口疼了一下，先想的是他这几年到底憋了多少没说出口的",
+          "effects": {
+            "mft_care": 1.8,
+            "phil_humanist": 1.6,
+            "phil_stoic": -1,
+            "wv_nature": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v11_q09",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "mft_fairness",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "两年前你借给一位很好的朋友一笔钱，说好三个月。他提过两次「下个月一定」，然后再没提。昨天你刷到他晒了块表，配文是「该对自己好一点」。",
+      "prompt": "你把手机放下，第一件想做的事更接近哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把当初的转账记录找出来发给他，附一句：这笔我们该结一下了",
+          "effects": {
+            "mft_fairness": 2,
+            "light_kant": 1.2,
+            "sin_pride": 0.8,
+            "phil_pragmatic": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "算了。人都会给自己找理由，我以后不再借，也不用演一场戏",
+          "effects": {
+            "phil_cynic": 2,
+            "phil_nihilism": 1.2,
+            "mft_fairness": -1.2,
+            "lv_anchor": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "不催。他真宽裕了自己会想起来，想不起来就当花钱买个明白",
+          "effects": {
+            "mft_loyalty": 1.8,
+            "phil_cynic": 1.2,
+            "mft_fairness": -1.6,
+            "virtue_charity": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "先算清这笔钱在我这里还剩多少分量，再用不撕破的方式拿回来",
+          "effects": {
+            "phil_pragmatic": 2,
+            "mft_fairness": 1.2,
+            "dark_mach": 1.2,
+            "mft_loyalty": -0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v11_q10",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "phil_nihilism",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "凌晨三点，你醒着，房间很静。你忽然很清楚地想到：一百年后，今天这些事不会有人记得，连名字都不会。",
+      "prompt": "你躺着没有动，那个念头先在你身上变成了什么？",
+      "scale": {
+        "left": "一阵说不出的轻松，像有人替我卸掉了一块东西",
+        "right": "一阵发凉，然后更想抓紧眼前这几个还活着的人",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "phil_nihilism": [
+          1.8,
+          -1.8
+        ],
+        "phil_epicurean": [
+          1.6,
+          -1.6
+        ],
+        "phil_absurd": [
+          1.6,
+          -1.6
+        ],
+        "phil_humanist": [
+          -1.8,
+          1.8
+        ],
+        "lv_anchor": [
+          -1.2,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v11_q11",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "phil_absurd",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "一场决定明年方向的会上，所有人都在点头通过一个你私下算过、明显撑不住的方案。你提了两句，主持人说「先按这个走」，然后继续往下讲。",
+      "prompt": "笔停在纸面上，你心里先冒出来的是哪种声音？",
+      "options": [
+        {
+          "key": "A",
+          "text": "该说的我说到了，剩下的交给现实，半年后数据会替我说完",
+          "effects": {
+            "phil_pragmatic": 1.8,
+            "def_intellectual": 1.2,
+            "mft_authority": 1,
+            "phil_absurd": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "不行，我要把话说完，哪怕这一屋子人今晚都不高兴",
+          "effects": {
+            "mft_liberty": 1.8,
+            "sin_pride": 1.4,
+            "phil_stoic": 1,
+            "mft_authority": -1.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "有点想笑：这样一个东西，也要所有人一起点头才算数",
+          "effects": {
+            "phil_absurd": 2,
+            "phil_cynic": 1.4,
+            "cog_global": 1.2,
+            "mft_authority": -1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "既然定了，我就做得尽量像样，别让后面接手的人受苦",
+          "effects": {
+            "phil_stoic": 1.8,
+            "mft_care": 1.6,
+            "def_sublimate": 1.2,
+            "mft_liberty": -0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v11_q12",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "phil_epicurean",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "凌晨一点，你躺在床上刷到一条动态：一个和你同龄、起点差不多的人，晒出了刚拿到的东西——一套房，或者一本书的封面，或者一张全家福。屏幕的光落在天花板上。",
+      "prompt": "手机举在半空的那三秒，你先感觉到的是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "一阵很具体的酸，手心发凉，然后把手机扣在胸口没再动",
+          "effects": {
+            "phil_nihilism": 1.6,
+            "phil_stoic": -1.4,
+            "lv_anchor": -1.2,
+            "mot_purpose": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "笑了一下：他过他的，我过我这一晚，起来给自己煮碗面",
+          "effects": {
+            "phil_epicurean": 2,
+            "phil_absurd": 1.2,
+            "lv_suffering": -1.2,
+            "phil_nihilism": -1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "睡不着了，索性打开电脑，把拖了三个月的事做掉一小块",
+          "effects": {
+            "phil_pragmatic": 1.8,
+            "mot_purpose": 1.4,
+            "phil_epicurean": -1.2,
+            "def_sublimate": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "忽然觉得这些都没意义，早起、加班、存钱，最后都一样",
+          "effects": {
+            "phil_nihilism": 2,
+            "phil_cynic": 1.2,
+            "phil_epicurean": -0.8,
+            "lv_anchor": 0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v11_q13",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "phil_cynic",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "你帮过一个朋友很大的忙：介绍工作、垫过钱、在他最难的时候陪着。两年后他过得很好，但提起你时，说的都是「也就那样」。",
+      "prompt": "那个下午你一个人坐了很久，最后落下来的结论是？",
+      "scale": {
+        "left": "大多数人就是这样，善意要省着用，以后只留给很少几个人",
+        "right": "他有他的处境，我不打算因为这一句改掉自己的做法",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "phil_cynic": [
+          2,
+          -2
+        ],
+        "phil_humanist": [
+          -1.8,
+          1.8
+        ],
+        "light_faith": [
+          -1.4,
+          1.4
+        ],
+        "mft_care": [
+          -1,
+          1.2
+        ],
+        "wv_nature": [
+          -1.2,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v11_q14",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "mft_care",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你最好的朋友下周办婚礼。三天前，你在一间餐厅门口看见他的未婚妻和另一个人牵着手走出来，那个人不是他。他这两天还在群里发喜糖的照片。",
+      "prompt": "这件事现在压在你手里，你会怎么处理？",
+      "options": [
+        {
+          "key": "A",
+          "text": "当晚就告诉他，原话讲清，不添一句判断。他有权知道，早比晚好",
+          "effects": {
+            "mft_care": 2,
+            "mft_sanctity": 1.6,
+            "light_kant": 1.2,
+            "mft_loyalty": -0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先去找那个人把话说死：三天内自己讲清楚，否则我来讲",
+          "effects": {
+            "phil_pragmatic": 1.8,
+            "dark_mach": 1.2,
+            "mft_loyalty": 1.2,
+            "mft_fairness": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "不说。婚礼是他的选择，我去掀这件事，最后被恨的人是我",
+          "effects": {
+            "phil_cynic": 1.8,
+            "mft_care": -1.6,
+            "mft_sanctity": -1.4,
+            "mft_loyalty": -1.4
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "只跟他说一句：婚礼前有没有什么想跟我讲的。剩下的等他自己开口",
+          "effects": {
+            "phil_humanist": 1.6,
+            "mft_care": 1.2,
+            "mft_sanctity": 1,
+            "cog_ambiguity": 1.2
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v11_q15",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "mft_liberty",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "家族群里，几位长辈已经替你商量好了明年的事——工作、房子，甚至和谁见面。他们说得热闹，最后一句是「我们都是为你好」。",
+      "prompt": "你打完一行字又删掉，最终的决定更接近——",
+      "scale": {
+        "left": "领这份情，但事情按我的来，我会说清楚，不怕他们不高兴",
+        "right": "顺着他们的安排走，争这些太累，家里和气更重要",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mft_liberty": [
+          1.8,
+          -1.8
+        ],
+        "mft_authority": [
+          -1.8,
+          1.8
+        ],
+        "phil_existential": [
+          1.6,
+          -1.4
+        ],
+        "mot_autonomy": [
+          1.4,
+          -1.2
+        ],
+        "phil_stoic": [
+          -0.8,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v11_q16",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "mft_fairness",
+      "is_sensitive": false,
+      "weight": 1.25,
+      "context": "排了四十分钟的队，前面忽然插进来一个中年男人，手里拎着药袋，眼睛下面两团青黑。后面有人小声骂了一句。",
+      "prompt": "看到他插进去的那一刻，你的第一反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "直接开口：后面一队人都在排，请你到后面去",
+          "effects": {
+            "mft_fairness": 2,
+            "sin_pride": 1,
+            "mft_care": -1.2,
+            "phil_stoic": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "算了，让他先。他手上还拎着药，我这四十分钟不算什么",
+          "effects": {
+            "mft_care": 2,
+            "phil_humanist": 1.2,
+            "mft_fairness": -1.6,
+            "phil_absurd": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "看向收银台，让这件事由店里的人来开口处理",
+          "effects": {
+            "phil_pragmatic": 1.8,
+            "mft_fairness": 1.2,
+            "dark_mach": 1,
+            "mft_care": -0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "心里骂了一句，嘴上什么也没说，但这半天的好心情没了",
+          "effects": {
+            "phil_cynic": 1.6,
+            "mft_fairness": 1,
+            "lv_suffering": -1,
+            "mft_care": -0.8
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v11_q17",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "phil_stoic",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "父亲把攒了十几年的养老钱，投进了同乡介绍的一个「稳赚不赔」的项目。你查过，那东西的合同里全是洞。他不听劝，还说你不懂人情。",
+      "prompt": "你坐在他对面，最想先做的是哪一件？",
+      "options": [
+        {
+          "key": "A",
+          "text": "不再争对错，先把能追回的部分一步步追回来，追不回的认了",
+          "effects": {
+            "phil_stoic": 2,
+            "phil_pragmatic": 1.4,
+            "cog_logic": 1,
+            "mft_authority": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "该说的说完，剩下的他自己承担。人总要为自己的判断付账",
+          "effects": {
+            "phil_cynic": 1.8,
+            "phil_nihilism": 1.2,
+            "mft_care": -1.4,
+            "val_boundary": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "先不劝。他需要一个「我还有用」的感觉，这不只是钱的事",
+          "effects": {
+            "phil_humanist": 2,
+            "mft_care": 1.6,
+            "wv_nature": 1.2,
+            "phil_pragmatic": -0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "吵到底。哪怕今晚翻脸，也得让他把这笔钱拿回来",
+          "effects": {
+            "mft_care": 1.6,
+            "mft_authority": -1.6,
+            "phil_stoic": -1.2,
+            "sin_pride": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v11_q18",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "mft_loyalty",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "相处半年后，对方提出：既然要认真，就把手机互相开放，随时可以看。「没什么可藏的，才算真的坦诚。」他说得很平静。",
+      "prompt": "这句话让你心里先起了一层什么，你更接近哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "给。他要的是安心，这份安心我给得起，但我大概不会真去翻他的",
+          "effects": {
+            "mft_loyalty": 2,
+            "mft_care": 1.2,
+            "mft_liberty": -1.2,
+            "virtue_humility": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "不给。不是有什么要藏，是两个人之间得留一块不属于彼此的地方",
+          "effects": {
+            "mft_liberty": 2,
+            "phil_existential": 1.6,
+            "mft_loyalty": -1.4,
+            "sin_pride": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v11_q19",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "moral_foundations",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "prompt": "下面八件事，都是别人可以对你做的「越界」。请挑出你最不能容忍的三件，最不能忍的那件放第一。",
+      "values": [
+        {
+          "key": "care",
+          "label": "有人当着一屋子人，羞辱一个完全没法还手的人",
+          "effects": {
+            "mft_care": 1.6,
+            "phil_humanist": 0.8,
+            "light_humanism": 0.6
+          }
+        },
+        {
+          "key": "fairness",
+          "label": "同一件事，别人做没事，你做就被拿出来罚",
+          "effects": {
+            "mft_fairness": 1.6,
+            "val_moral": 0.8,
+            "light_kant": 0.5
+          }
+        },
+        {
+          "key": "loyalty",
+          "label": "你替他扛下的事，他转头说是自己做的",
+          "effects": {
+            "mft_loyalty": 1.6,
+            "mft_fairness": 0.6,
+            "mft_care": 0.4
+          }
+        },
+        {
+          "key": "authority",
+          "label": "有人当着所有人，把你当成一个不懂规矩的人来教训",
+          "effects": {
+            "mft_authority": 1.6,
+            "sin_pride": 0.6,
+            "wv_social": 0.5
+          }
+        },
+        {
+          "key": "sanctity",
+          "label": "有人拿你家里最不能碰的那件事，当笑话讲给外人听",
+          "effects": {
+            "mft_sanctity": 1.6,
+            "mft_loyalty": 0.6,
+            "lv_anchor": 0.5
+          }
+        },
+        {
+          "key": "liberty",
+          "label": "有人替你把你接下来三年安排好了，还说这都是为你好",
+          "effects": {
+            "mft_liberty": 1.6,
+            "phil_existential": 0.8,
+            "mot_autonomy": 0.6
+          }
+        },
+        {
+          "key": "truth",
+          "label": "有人用一套漂亮的话，把明明发生过的事说成没发生",
+          "effects": {
+            "phil_cynic": 1.4,
+            "val_moral": 0.6,
+            "mft_fairness": 0.5
+          }
+        },
+        {
+          "key": "waste",
+          "label": "有人把十分钟能解决的事，拖成一场谁也不肯先动的对峙",
+          "effects": {
+            "phil_pragmatic": 1.4,
+            "cog_logic": 0.5,
+            "phil_absurd": 0.4
+          }
+        }
+      ]
+    },
+    {
+      "id": "v11_q20",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "philo_energy",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "prompt": "一百点，只能分给下面六样东西。没有哪一样是「应该」要的，只有此刻真的缺的那样，才值得多放一点。",
+      "items": [
+        {
+          "key": "stoic",
+          "label": "在失控的场面里不慌的那点定力",
+          "dim": "phil_stoic",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "existential",
+          "label": "亲手改写意义的那支笔",
+          "dim": "phil_existential",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "epicurean",
+          "label": "把普通一晚过得像样的一点力气",
+          "dim": "phil_epicurean",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "humanist",
+          "label": "还愿意相信人的那点软",
+          "dim": "phil_humanist",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "fairness",
+          "label": "对所有人一样清楚的规则",
+          "dim": "mft_fairness",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "liberty",
+          "label": "不被任何人替你决定的那块地方",
+          "dim": "mft_liberty",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    }
+  ]
+}

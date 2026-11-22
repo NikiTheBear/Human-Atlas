@@ -1,0 +1,839 @@
+{
+  "volume_id": "vol4",
+  "index": 4,
+  "title": "三观罗盘",
+  "subtitle": "世界观、人生观与价值观的九维坐标",
+  "theme_color": "#2A5C55",
+  "estimated_minutes": 6,
+  "intro": "这里测绘的是你的哲学操作系统：你如何解释世界，如何安放痛苦，以及哪些东西在你这里不可交易。最后一题，请用仅有一百点的人生给它排序。",
+  "dimensions": [
+    "wv_nature",
+    "wv_causal",
+    "wv_social",
+    "lv_happiness",
+    "lv_suffering",
+    "lv_anchor",
+    "val_moral",
+    "val_boundary",
+    "val_standard"
+  ],
+  "questions": [
+    {
+      "id": "v4_q01",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "wv_nature",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一个陌生人在深夜的街上，主动问你要不要帮忙提一下手里的重物。你的默认解读更接近——",
+      "scale": {
+        "left": "他就是顺手，人多数时候是善意的",
+        "right": "先礼貌拒绝，我不太习惯把未知当成安全",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "wv_nature": [
+          2,
+          -2
+        ],
+        "light_faith": [
+          1.6,
+          -1.4
+        ],
+        "big5_alert": [
+          -1,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "v4_q02",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "wv_causal",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "回看你这几年最大的一次转折，你更愿意把它归因于——",
+      "options": [
+        {
+          "key": "A",
+          "text": "自己在几个关键时刻做出的选择，哪怕当时看不清",
+          "effects": {
+            "wv_causal": 1.8,
+            "cog_independent": 1.2,
+            "mot_autonomy": 1.2,
+            "light_faith": 0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "时代、运气，以及一些我来不及参与、也改不动的安排",
+          "effects": {
+            "wv_causal": -1.8,
+            "cog_ambiguity": 1,
+            "light_faith": 0.8,
+            "big5_rumination": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "几个具体的人，在我不认识他们的那些年里替我开了门",
+          "effects": {
+            "wv_causal": -0.6,
+            "mot_belonging": 1.4,
+            "light_faith": 1.4,
+            "att_anxiety": 0.6
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v4_q03",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "wv_social",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "同一件事，规则上不允许，但所有人都在做，而且做了确实更有效率。你的态度更接近——",
+      "scale": {
+        "left": "规则既然定在这，我不会第一个去破",
+        "right": "规则是给平均值定的，具体情况该具体判断",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "wv_social": [
+          1.8,
+          -1.8
+        ],
+        "light_kant": [
+          1.4,
+          -1.2
+        ],
+        "cog_ambiguity": [
+          -1,
+          1.2
+        ],
+        "dark_mach": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v4_q04",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "lv_happiness",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "你的邻居四十岁，辞掉了年薪很高的工作，去开了一家只有六张桌子的小馆子。所有人都说他疯了。",
+      "prompt": "你觉得他真正换来的东西是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "一种每天都能自己说了算的生活，哪怕收入少了三分之二",
+          "effects": {
+            "lv_happiness": -1.4,
+            "mot_autonomy": 1.8,
+            "lv_anchor": -1.2,
+            "mot_hedonism": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "一件真正属于他、可以一直做到老的作品，哪怕小",
+          "effects": {
+            "lv_happiness": 1.6,
+            "mot_purpose": 1.8,
+            "mot_mastery": 1.2,
+            "lv_suffering": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "一次深思熟虑过的赌，他算过自己到底能撑多久才敢下注",
+          "effects": {
+            "lv_happiness": 0.4,
+            "cog_logic": 1.6,
+            "mot_security": 0.8,
+            "lv_anchor": 0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "终于不用再扮演那个被所有人需要的角色，可以安静一点",
+          "effects": {
+            "lv_happiness": -1.8,
+            "big5_social": -1.4,
+            "lv_anchor": 1.6,
+            "att_avoidance": 1.2
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v4_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "lv_suffering",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一段确实很难熬的日子过去之后，你的真实总结更接近——",
+      "scale": {
+        "left": "它确实给了我一些别处拿不到的东西",
+        "right": "苦难就是苦难，我不打算给它附加意义",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "lv_suffering": [
+          2,
+          -2
+        ],
+        "mot_purpose": [
+          1.2,
+          -1
+        ],
+        "light_faith": [
+          0.8,
+          -0.4
+        ],
+        "big5_rumination": [
+          0.4,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v4_q06",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "lv_anchor",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "如果你被放到一个没有人认识你、也没有任何头衔的地方待一年，你更担心的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "失去舞台，我可能真的会不知道自己还是谁，那才是最怕的",
+          "effects": {
+            "lv_anchor": -2,
+            "dark_narc": 1.2,
+            "mot_mastery": 1.2,
+            "big5_assert": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "其实不太担心，我一直有一部分是不需要被任何人看见的",
+          "effects": {
+            "lv_anchor": 2,
+            "mot_autonomy": 1.4,
+            "big5_social": -1.2,
+            "att_avoidance": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "担心和重要的人失去共同的生活节奏，慢慢就无话可说了",
+          "effects": {
+            "lv_anchor": -0.8,
+            "mot_belonging": 1.8,
+            "att_anxiety": 1.2,
+            "big5_compassion": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "担心这一年什么都没留下，安静地过去，像没发生过",
+          "effects": {
+            "lv_anchor": -0.6,
+            "mot_purpose": 1.6,
+            "big5_rumination": 1.2,
+            "sin_sloth": -0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v4_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "val_moral",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个决定让多数人受益，代价是某个具体的人要承担本不该他承担的损失。你的实际态度是——",
+      "scale": {
+        "left": "不能这么做，正确的方式不该靠牺牲某个人来成立",
+        "right": "多数人的收益更重要，只能尽量补偿那一个人",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "val_moral": [
+          2,
+          -2
+        ],
+        "light_kant": [
+          1.6,
+          -1.6
+        ],
+        "cog_logic": [
+          -0.8,
+          1.4
+        ],
+        "light_humanism": [
+          1.2,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v4_q08",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "val_boundary",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "一份待遇很好、同事也都体面的工作，唯一的问题是它要求你长期待在一个你不能自己决定的节奏里。",
+      "prompt": "这份工作对你来说更接近——",
+      "options": [
+        {
+          "key": "A",
+          "text": "可以做，只要回报足够，就等于我用自己的时间做了交换",
+          "effects": {
+            "val_boundary": -1.8,
+            "mot_security": 1.6,
+            "mot_mastery": 1.2,
+            "mot_autonomy": -1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "做不了太久，我对「被安排」这件事有生理性的排斥",
+          "effects": {
+            "val_boundary": 1.8,
+            "mot_autonomy": 2,
+            "big5_order": -0.8,
+            "att_avoidance": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v4_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "val_standard",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "评价一个你很尊敬的同行时，你心里最先给出的那一栏分数是哪一项？",
+      "scale": {
+        "left": "他做的东西够不够有效、够不够有用",
+        "right": "他做事的方式够不够干净、够不够讲究",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "val_standard": [
+          -1.8,
+          2
+        ],
+        "light_kant": [
+          -1,
+          1.4
+        ],
+        "cog_logic": [
+          1.2,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v4_q10",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "wv_social",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "你亲眼看到一个熟悉的人插队，理由是「我真的赶时间」，而队伍里有一位明显更需要的老人。",
+      "prompt": "你看到这一幕的第一秒，心里冒出来的东西是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "一股很清楚的不舒服，规则被破掉这件事本身就让我难受",
+          "effects": {
+            "wv_social": 1.8,
+            "light_kant": 1.6,
+            "sin_wrath": 0.8,
+            "val_moral": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先判断他是不是真的急，如果真有急事就算了",
+          "effects": {
+            "wv_social": -0.8,
+            "big5_compassion": 1.2,
+            "cog_ambiguity": 1,
+            "val_standard": -0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "心里不快，但不会开口，事后再看要不要提一句",
+          "effects": {
+            "wv_social": 0.4,
+            "big5_compliance": 1.4,
+            "def_fawn": 0.8,
+            "sin_wrath": -0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "马上开口，不管他有什么理由，这个位置得先吐出来",
+          "effects": {
+            "wv_social": 1.4,
+            "big5_assert": 1.6,
+            "def_attack": 1.4,
+            "sin_wrath": 1.2
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v4_q11",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "wv_causal",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "那些长期做得很好的人，你认为他们更主要靠的是——",
+      "scale": {
+        "left": "一套稳定、可复制的自我管理系统",
+        "right": "在几个关键节点上赶上了他们自己也无法复制的运气",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "wv_causal": [
+          1.8,
+          -1.8
+        ],
+        "big5_industry": [
+          1.4,
+          -0.8
+        ],
+        "cog_logic": [
+          0.8,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v4_q12",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "lv_happiness",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "如果只能保留下一种体验，并且维持十年，你更愿意是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "一直在做一件越来越难、但越来越像自己的事",
+          "effects": {
+            "lv_happiness": 1.8,
+            "mot_mastery": 1.6,
+            "mot_purpose": 1.2,
+            "mot_hedonism": -1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "一直在换地方、换口味、换遇见的人，密度很高",
+          "effects": {
+            "lv_happiness": -1.8,
+            "mot_hedonism": 2,
+            "big5_open": 1.2,
+            "mot_security": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "一直有一小群人，晚饭时会在同一张桌子旁等你",
+          "effects": {
+            "lv_happiness": 0.4,
+            "mot_belonging": 2,
+            "val_boundary": -1,
+            "att_anxiety": 0.4
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v4_q13",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "val_boundary",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "关于「稳定」，你内心的真实排序是——",
+      "scale": {
+        "left": "稳定很贵，它值得我把一部分可能性先换掉",
+        "right": "稳定更像一种提前的妥协，我宁愿留着不确定的部分",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "val_boundary": [
+          -1.8,
+          2
+        ],
+        "mot_security": [
+          2,
+          -1.6
+        ],
+        "mot_autonomy": [
+          -1.4,
+          1.8
+        ],
+        "cog_ambiguity": [
+          -1,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "v4_q14",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "val_moral",
+      "is_sensitive": true,
+      "weight": 1.35,
+      "context": "带过你的前辈陈姐发现，一起合伙的另外两个人正用一种不违约但明显不体面的方式，把她那份分红一点点挪进公账里。",
+      "prompt": "你猜她最终最可能做的事是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "先把账目留好，再选一个对自己最安全的时机把这件事摆出去",
+          "effects": {
+            "val_moral": 1.4,
+            "dark_mach": 1.6,
+            "covert_control": 1.2,
+            "light_kant": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "直接找那两个人对质，把话说清楚，哪怕后果不可控",
+          "effects": {
+            "val_moral": 1.4,
+            "light_kant": 1.8,
+            "big5_assert": 1.6,
+            "cog_speed": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先私下提醒别的出资人，让他们自己想办法保住那份",
+          "effects": {
+            "val_moral": 0.8,
+            "light_humanism": 1.6,
+            "big5_compassion": 1.2,
+            "covert_control": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "不碰，这时候出手对自己风险太大，先把自己挪出这条船",
+          "effects": {
+            "val_moral": -1.2,
+            "mot_security": 1.8,
+            "dark_psycho": 1,
+            "big5_alert": 1.2
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v4_q15",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "val_standard",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "朋友做了一件对你很好、但对别人不太公平的事。你更在意的是——",
+      "scale": {
+        "left": "他对我的那份好，我会记着",
+        "right": "他处理别人的方式，正好说明他以后会怎么处理我",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "val_standard": [
+          -1.4,
+          2
+        ],
+        "light_kant": [
+          -1,
+          1.4
+        ],
+        "mot_belonging": [
+          1.4,
+          -0.8
+        ],
+        "big5_alert": [
+          -0.6,
+          1
+        ],
+        "wv_nature": [
+          0.8,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v4_q16",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "lv_anchor",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一件让你真正有成就感的事，通常发生在——",
+      "scale": {
+        "left": "别人看得见的地方，反馈本身很重要",
+        "right": "只有我自己知道的那个房间里",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "lv_anchor": [
+          -1.8,
+          2
+        ],
+        "dark_narc": [
+          1.6,
+          -1.2
+        ],
+        "mot_mastery": [
+          1,
+          0.4
+        ],
+        "big5_social": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v4_q17",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "lv_suffering",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "两种人生，你更愿意走哪一条？",
+      "options": [
+        {
+          "key": "A",
+          "text": "一路相对平顺，很少被折断，也没做过什么真正难的事",
+          "effects": {
+            "lv_suffering": -1.8,
+            "mot_hedonism": 1.4,
+            "mot_security": 1.4,
+            "mot_purpose": -1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "有过几次非常艰难的断裂，但每次之后都更接近自己",
+          "effects": {
+            "lv_suffering": 1.8,
+            "mot_purpose": 1.6,
+            "big5_rumination": 1,
+            "mot_mastery": 1.2
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v4_q18",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "wv_nature",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "当你把一件重要的事交给别人时，你心里默认的那条基线是——",
+      "scale": {
+        "left": "他会尽力，我可以放心",
+        "right": "他会按他的优先级来处理，我得留一手",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "wv_nature": [
+          1.8,
+          -1.8
+        ],
+        "light_faith": [
+          1.6,
+          -1.6
+        ],
+        "covert_control": [
+          -1.4,
+          1.6
+        ]
+      }
+    },
+    {
+      "id": "v4_q19",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "lv_happiness",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一个非常普通的周三晚上，你更希望它是——",
+      "scale": {
+        "left": "有内容、有推进，睡前能说出今天做成了什么",
+        "right": "有滋味、有松弛，睡前身体是放松的",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "lv_happiness": [
+          1.8,
+          -1.8
+        ],
+        "mot_mastery": [
+          1.4,
+          -1
+        ],
+        "mot_hedonism": [
+          -1.4,
+          1.8
+        ]
+      }
+    },
+    {
+      "id": "v4_q20",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "values",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "prompt": "假设你这一生只能守住三样东西，请把最重要的排在第一。不是因为它们「应该」重要，而是因为失去它你真的会疼。",
+      "values": [
+        {
+          "key": "freedom",
+          "label": "自由",
+          "effects": {
+            "mot_autonomy": 1.4,
+            "val_boundary": 1.2,
+            "wv_causal": 0.4
+          }
+        },
+        {
+          "key": "dignity",
+          "label": "尊严",
+          "effects": {
+            "mot_mastery": 1,
+            "sin_pride": 0.8,
+            "val_standard": 1.2
+          }
+        },
+        {
+          "key": "wealth",
+          "label": "财富",
+          "effects": {
+            "mot_security": 1.4,
+            "sin_greed": 0.8,
+            "mot_mastery": 1
+          }
+        },
+        {
+          "key": "intimacy",
+          "label": "亲密",
+          "effects": {
+            "mot_belonging": 1.6,
+            "att_anxiety": 0.6,
+            "val_boundary": -0.8
+          }
+        },
+        {
+          "key": "security",
+          "label": "安全",
+          "effects": {
+            "mot_security": 1.4,
+            "cog_ambiguity": -1,
+            "big5_alert": 0.8
+          }
+        },
+        {
+          "key": "breakthrough",
+          "label": "突破",
+          "effects": {
+            "mot_mastery": 1.8,
+            "big5_industry": 0.8,
+            "dark_psycho": 0.4
+          }
+        },
+        {
+          "key": "fairness",
+          "label": "公平",
+          "effects": {
+            "val_moral": 1.2,
+            "light_kant": 1.4,
+            "wv_social": 1
+          }
+        },
+        {
+          "key": "ease",
+          "label": "松弛",
+          "effects": {
+            "mot_hedonism": 1.4,
+            "lv_happiness": -1,
+            "lv_suffering": -0.8
+          }
+        }
+      ]
+    }
+  ]
+}

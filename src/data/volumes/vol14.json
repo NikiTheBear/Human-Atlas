@@ -1,0 +1,888 @@
+{
+  "volume_id": "vol14",
+  "index": 14,
+  "title": "财富潜意识",
+  "subtitle": "四大金钱脚本与五种时间观",
+  "theme_color": "#8A6D3B",
+  "estimated_minutes": 5,
+  "intro": "这一卷不测你会不会赚钱。它只测一件事：钱在你身上最先唤起的反应——是想躲开，是抬头看，是拿它当尺子，还是攥着不敢松手。顺带看看你和时间的关系：力气放在已经过去的、正在发生的，还是还没来的日子上。十八个场景没有标准答案，也不存在所谓正确的金钱观。",
+  "dimensions": [
+    "money_avoid",
+    "money_worship",
+    "money_status",
+    "money_vigilance",
+    "time_past_neg",
+    "time_past_pos",
+    "time_present_hed",
+    "time_present_fate",
+    "time_future"
+  ],
+  "questions": [
+    {
+      "id": "v14_q01",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "money_status",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "六个人一顿吃掉七百多，人均不算便宜。结账时，那位收入明显比你宽裕的朋友先把卡递了过去，说这顿算他的，别扫兴。走出餐厅，夜风有点凉。",
+      "prompt": "沿着这条路往地铁站走，你心里最先起来的那句是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "回家路上就在算：下次得挑同等价位的地方回请一次，不然心里过不去",
+          "effects": {
+            "money_status": 1.8,
+            "money_vigilance": 1.2,
+            "sin_pride": 1,
+            "val_standard": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "大方道谢收下，记住他最近在找的那张小众唱片，下次送他不必拼价格",
+          "effects": {
+            "money_status": -1.6,
+            "virtue_charity": 1.2,
+            "mot_belonging": 1,
+            "money_vigilance": -0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "心里松了口气，把这顿省下的钱当晚就转进那个专门存着的账户",
+          "effects": {
+            "money_vigilance": 1.6,
+            "time_future": 1.4,
+            "mot_security": 1.2,
+            "money_status": -0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "没多想，只提议再往前走两步，去那家还开着的店坐一会儿，今晚还没散",
+          "effects": {
+            "time_present_hed": 1.8,
+            "money_avoid": 1.2,
+            "mot_hedonism": 1.4
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v14_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "money_avoid",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "十一点四十，客厅只剩冰箱在响。手机又亮了一下：本期账单可申请分期，最长十二期。",
+      "prompt": "这条短信你已经划掉过两次。今晚屏幕又亮起来，你的手指停在上面。",
+      "scale": {
+        "left": "点开，把总额、利息和还款日一笔一笔看清楚",
+        "right": "再放一晚，明天脑子清醒了再处理",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "money_avoid": [
+          -2,
+          2
+        ],
+        "money_vigilance": [
+          1.4,
+          -1.2
+        ],
+        "big5_alert": [
+          -0.4,
+          1
+        ],
+        "time_future": [
+          1.4,
+          -1.2
+        ]
+      }
+    },
+    {
+      "id": "v14_q03",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "money_vigilance",
+      "is_sensitive": false,
+      "weight": 1.25,
+      "context": "和朋友吃完结账，小票上少算了一道一百多的硬菜。收银台后面排着队，服务生正低头核对下一桌的单子。",
+      "prompt": "你把小票折了一下，最先动的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "把那张单子递回去，指着菜名说这道没算，让他重开一张",
+          "effects": {
+            "money_vigilance": 1.8,
+            "val_moral": 1.2,
+            "virtue_charity": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "没回去，但把这件事记住了，下次来多点一道，把这份抹平",
+          "effects": {
+            "money_vigilance": 0.8,
+            "val_moral": 0.6,
+            "mot_belonging": 1,
+            "sin_greed": -0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "收好走人，一百多对这家店不算什么，就当系统出错",
+          "effects": {
+            "money_vigilance": -1.8,
+            "val_moral": -1.4,
+            "sin_greed": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "心里有点不舒服：连自己家的账都算不明白，这店开不长",
+          "effects": {
+            "money_vigilance": 1.4,
+            "big5_alert": 1.2,
+            "val_standard": 1,
+            "virtue_charity": -0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v14_q04",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "time_past_pos",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "随机播放跳出一首十几年前的老歌，前奏三个音，你就知道是哪一首。",
+      "scale": {
+        "left": "那几年整块回来了，连当时坐在谁旁边、窗外几点钟都记得",
+        "right": "听两句就划过去了，那时候的我，现在不太想回去",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "time_past_pos": [
+          2,
+          -2
+        ],
+        "time_past_neg": [
+          -1.2,
+          1.6
+        ],
+        "mot_belonging": [
+          1,
+          -0.6
+        ],
+        "big5_rumination": [
+          0.8,
+          -0.4
+        ]
+      }
+    },
+    {
+      "id": "v14_q05",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "time_present_fate",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "车牌摇号结果出来，第三十八次没中。群里有人发了一句「命里有时终须有」，下面一排人在笑。",
+      "prompt": "你把页面关掉，抬头看了一眼窗外。这一刻，你心里更靠近哪一种说法？",
+      "options": [
+        {
+          "key": "A",
+          "text": "这东西本来就不由我，中不中都得过日子，关了就不想了",
+          "effects": {
+            "time_present_fate": 1.8,
+            "wv_causal": 1.2,
+            "def_detach": 1,
+            "mot_mastery": -1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "三十八次说明路子错了：换个区、换种方式，先把规则重读一遍",
+          "effects": {
+            "time_present_fate": -1.6,
+            "time_future": 1.6,
+            "mot_mastery": 1.4,
+            "big5_industry": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "名额就那么多，普通人排到天荒地老也轮不上，早看明白了",
+          "effects": {
+            "time_present_fate": 1.4,
+            "lv_suffering": 1.2,
+            "sin_envy": 0.8,
+            "def_detach": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "回了句玩笑，顺手约了晚上吃火锅，把这事当个段子讲出去",
+          "effects": {
+            "time_present_hed": 1.6,
+            "lv_suffering": -1.2,
+            "mot_hedonism": 1,
+            "wv_causal": 0.6
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v14_q06",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "money_worship",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "婚宴中场，隔壁桌两个人一直在算：这一桌多少钱、酒是什么牌子、新郎家做什么生意。",
+      "prompt": "你端着杯子听了几句，冰块化了一半。哪一种说法更接近你私下信奉的？",
+      "scale": {
+        "left": "钱确实是这个世界最硬的通行证，只是很少有人肯这么说",
+        "right": "我更想知道这两个人以后怎么过，一桌多少钱跟他们过得好不好无关",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "money_worship": [
+          2,
+          -2
+        ],
+        "money_status": [
+          1.2,
+          -1.2
+        ],
+        "lv_happiness": [
+          -1.2,
+          1.2
+        ],
+        "sin_greed": [
+          1,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "v14_q07",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "money_avoid",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "周四晚上八点，房东发来消息说这房子他打算卖了，这两天中介会带人来看。第二天你正吃着饭，门铃响了，进来三个人，其中一个一进门就拿卷尺量阳台。",
+      "prompt": "中介收着卷尺，笑着问：要是接着租，一个月能出到多少。你放下筷子，答的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "说自己还没算过，让他们先随便看，转身进厨房把池子里泡着的碗一个个洗完",
+          "effects": {
+            "money_avoid": 1.8,
+            "def_detach": 0.8,
+            "mot_security": -0.8,
+            "big5_order": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "把心里那个数字报出去，顺带问清违约金怎么算、房子卖了还能住到几月份",
+          "effects": {
+            "money_avoid": -2,
+            "big5_alert": 0.8,
+            "mot_security": 1.4,
+            "big5_order": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "笑着把话绕过去，反过来问他们这房子现在一平挂多少、已经挂了多长时间",
+          "effects": {
+            "money_status": 1.6,
+            "big5_alert": 1,
+            "cog_speed": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "当晚把附近在租的房子全翻一遍，列成一张表，第二天想清楚了再回他话",
+          "effects": {
+            "money_avoid": -1.6,
+            "time_future": 1.8,
+            "big5_order": 1
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v14_q08",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "time_present_hed",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "十二点四十，外卖软件里只剩那一家还开着，满减差八块。冰箱里有鸡蛋和半棵白菜。明早七点要起床，闹钟已经设好了。",
+      "prompt": "手指停在外卖页那个「去结算」的按钮上，久久没有按下去。",
+      "scale": {
+        "left": "点了，今天已经够累，这顿算补给自己的，明天的事明天再想",
+        "right": "关掉软件去煮两个蛋，二十分钟也就过去了，钱和睡眠都省下来",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "time_present_hed": [
+          2,
+          -1.8
+        ],
+        "time_future": [
+          -1.6,
+          1.8
+        ],
+        "mot_hedonism": [
+          1.4,
+          -1
+        ],
+        "big5_industry": [
+          -0.8,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v14_q09",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "money_worship",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "周六回家，你妈从柜子里搬出一桶油和一袋米，说银行的人讲得清楚：二十万存三年，年化四点五，还送这些。她把合同推到你面前，问你要不要也存一点。",
+      "prompt": "你翻着那几张纸，脑子里冒出来的念头，和纸面上印的字不在一条线上：",
+      "options": [
+        {
+          "key": "A",
+          "text": "先把风险等级和赎回条款翻出来，再问她这笔钱三年之内到底会不会用上",
+          "effects": {
+            "money_worship": -1.8,
+            "big5_alert": 1,
+            "mot_security": 1.2,
+            "big5_order": 0.6
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "心里其实有些服气：一年利息九千，比我加班一年攒下的还多，稳就是本事",
+          "effects": {
+            "money_worship": 2,
+            "sin_greed": 0.8,
+            "mot_security": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "劝她别全押在一处，留出三万能随时取的，剩下的再分，别为那点利息锁死",
+          "effects": {
+            "money_worship": -1.6,
+            "mot_security": 1.2,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "笑她一桶油就被收买了，转头自己打开手机，翻同类产品的收益排行看了半小时",
+          "effects": {
+            "money_worship": 1.6,
+            "sin_greed": 0.9,
+            "big5_open": 0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v14_q10",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "money_avoid",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "家族群里表弟发了婚礼请帖，艾特了所有人。你想起三年前他借的那三千，说好两个月还，中间提过两次，后来谁都没再提。",
+      "prompt": "手机还在手上，消息往上翻到那笔转账那一行，三秒之内你动了：",
+      "options": [
+        {
+          "key": "A",
+          "text": "先回一句恭喜，红包照旧包，那三千一个字不提——今天不该由我先开口",
+          "effects": {
+            "money_avoid": 1.8,
+            "virtue_kindness": 1.2,
+            "mot_belonging": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "把转账记录截了图发过去，跟一句：这个月我也紧，那三千你先还我",
+          "effects": {
+            "money_avoid": -1.8,
+            "big5_order": 0.8,
+            "val_standard": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "在群里抢了个红包就退出去，请帖的事，打算拖到婚礼前三天再说",
+          "effects": {
+            "money_avoid": 1.6,
+            "def_detach": 1,
+            "cog_speed": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "翻出这月还剩多少，红包按老规矩包足，亲戚面前这份礼数一点不能短",
+          "effects": {
+            "money_status": 1.6,
+            "mot_belonging": 1.2,
+            "virtue_charity": 0.9
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v14_q11",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "time_past_neg",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "凌晨两点十七，你在二手平台上看见自己去年卖掉的那台相机，挂在同一个人手里，标价比你卖时高了两千。底下有九个人点了想要。",
+      "prompt": "你把那张照片放大，又缩小，屏幕的光照在脸上。",
+      "scale": {
+        "left": "想起当时为什么卖：那笔钱填了家里哪个窟窿，那年账是怎么转开的",
+        "right": "想的是现在把它接回来，钱还能再挣，这台机器只有一台，错过就没了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "time_past_neg": [
+          2,
+          -1.6
+        ],
+        "time_present_hed": [
+          -1.6,
+          1.8
+        ],
+        "mot_hedonism": [
+          -1.2,
+          1.4
+        ],
+        "mot_belonging": [
+          0.8,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v14_q12",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "money_status",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "你妈在电话里说，表姐家孩子满月，你表哥包了三千。她补了一句：你看着办，别让人觉得你在外面过得不行。",
+      "prompt": "挂了电话，转账页面停在金额那一栏，光标一直闪。你手上在掂的分量，其实是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "按表哥的数目包过去，这种事上先低一头，往后年年都得低着那一头",
+          "effects": {
+            "money_status": 1.8,
+            "sin_pride": 1,
+            "mot_belonging": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "包两千，比表哥少一档但不难看，剩下的钱留着交下个季度的房租",
+          "effects": {
+            "money_status": 1.6,
+            "mot_security": 1,
+            "big5_order": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "包一千，孩子满月跟我包多少钱没关系，我妈那边我自己去说清楚",
+          "effects": {
+            "money_status": -1.8,
+            "mot_autonomy": 1.2,
+            "val_standard": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "翻出当年自己办事收的礼簿，照着上面的数目一笔笔回过去，不多不少",
+          "effects": {
+            "money_vigilance": 1.8,
+            "time_past_pos": 1.6,
+            "val_standard": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v14_q13",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "time_future",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "缴费单从窗口打出来，拖到地上还卷了一圈，父亲在病房里睡着。护士说下周还要再做一次。你哥在走廊尽头打电话，声音压得很低。",
+      "prompt": "排队的人还没挪到你，你靠着走廊那面墙，脑子里先翻起来的是哪一叠纸？",
+      "scale": {
+        "left": "这几年为看病花出去的每一笔，谁垫过、谁还没还，都记得清清楚楚",
+        "right": "过去的先不算，接下来三个月要准备多少、从哪凑，才叫正事",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "time_past_neg": [
+          2,
+          -1.6
+        ],
+        "time_future": [
+          -1.6,
+          1.8
+        ],
+        "lv_suffering": [
+          1.4,
+          -0.6
+        ],
+        "mot_security": [
+          -0.6,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v14_q14",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "money_worship",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "小区门口新开的店，扫码进群送一板鸡蛋。队伍绕了两圈，前面有退休的教授，也有抱着孩子的年轻妈妈，都在算这一板值七块八。",
+      "prompt": "你站在队尾，听见前面有人笑着说时间不值钱。你心里更认下面哪一句。",
+      "options": [
+        {
+          "key": "A",
+          "text": "钱是最实在的东西：七块八攥在手里是硬的，体面那东西摸不着也换不来米",
+          "effects": {
+            "money_worship": 1.8,
+            "val_standard": 1,
+            "lv_happiness": -0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "一板鸡蛋换一个微信号，店家不亏我也不亏，各人算各人心里那本账",
+          "effects": {
+            "money_vigilance": 1.8,
+            "big5_alert": 0.8,
+            "cog_speed": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "排着排着想起小时候跟奶奶排队领鸡蛋，那时候队伍里全是熟人，谁也不急",
+          "effects": {
+            "time_past_pos": 1.8,
+            "mot_belonging": 1.2,
+            "lv_happiness": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "没排队，进去按原价买了一板：七块八换二十分钟，这笔账我觉得值",
+          "effects": {
+            "money_worship": -1.6,
+            "mot_autonomy": 1.2,
+            "lv_happiness": 0.6
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v14_q15",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "time_past_neg",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "搬家收拾到柜子最底层，一张旧当票从柜脚下面滑出来，纸已经发黄，日期是七年前。押的东西你还有印象，是一块表，表带断过一次。",
+      "prompt": "你蹲在地上，把它从灰里捡起来的那三秒，身体已经先做了动作：",
+      "options": [
+        {
+          "key": "A",
+          "text": "捏在手里看了三秒，直接塞进垃圾袋：那两年的账，不想再从头翻一遍",
+          "effects": {
+            "time_past_neg": 1.8,
+            "def_detach": 1.2,
+            "lv_suffering": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "拍了张照存进相册，打开计算器按现在的利息重算，看当年到底亏掉多少",
+          "effects": {
+            "money_vigilance": 1.8,
+            "time_past_neg": 1.6,
+            "big5_alert": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "坐在还没拆开的纸箱上发了会儿呆，想起那年冬天连暖气都不敢开",
+          "effects": {
+            "time_past_neg": 1.6,
+            "lv_suffering": 1.2,
+            "mot_security": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "笑了一声就撕成两半扔掉，那种日子没什么好回想，苦就是苦，不掺别的",
+          "effects": {
+            "time_past_pos": -1.8,
+            "def_detach": 1.2,
+            "mot_autonomy": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v14_q16",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "time_future",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "你算了一下，卡里的钱不上班大概能撑七个月。地铁进站，上来一群刚下班的人，脸上都是那种说不清的表情，包带压着西装。",
+      "prompt": "「七个月」这个数字在脑子里转，你把手机锁了屏，隔了两秒又按亮。",
+      "scale": {
+        "left": "七个月是可以排的：每月花多少、第几个月必须接上，先列出来",
+        "right": "七个月就是七个月，先过好这周，真到那天总有办法，到时候再说",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "time_future": [
+          1.8,
+          -1.6
+        ],
+        "time_present_fate": [
+          -1.8,
+          1.6
+        ],
+        "mot_security": [
+          1.2,
+          -0.8
+        ],
+        "big5_alert": [
+          0.8,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v14_q17",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "money_values",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "context": "你在废纸上算了一笔账：如果突然多出十万，先填掉该填的窟窿，真正能自己支配的大概七万。桌上摆着八张纸条，每张写着一种花法，纸角被风扇吹起来。",
+      "prompt": "只能从这八种里挑三样，按你最想先动的那三样依次点选。",
+      "values": [
+        {
+          "key": "debt",
+          "label": "把欠的账一次还清，从此不用看还款日",
+          "effects": {
+            "money_vigilance": 1.6,
+            "mot_security": 1.2,
+            "time_future": 1.6
+          }
+        },
+        {
+          "key": "parents",
+          "label": "给爸妈换台舍不得买的空调，再做次体检",
+          "effects": {
+            "time_past_pos": 1.6,
+            "mot_belonging": 1.2,
+            "virtue_kindness": 1
+          }
+        },
+        {
+          "key": "retrain",
+          "label": "报一个能换赛道的课，把周末全砸进去",
+          "effects": {
+            "time_future": 1.6,
+            "mot_mastery": 1.2,
+            "big5_industry": 0.8
+          }
+        },
+        {
+          "key": "replace",
+          "label": "换掉用了六年的手机，和开机三分钟的电脑",
+          "effects": {
+            "time_present_hed": 1.6,
+            "mot_hedonism": 1.2,
+            "big5_order": 0.6
+          }
+        },
+        {
+          "key": "travel",
+          "label": "去一个一直想去的地方，把年假一次用完",
+          "effects": {
+            "time_present_hed": 1.6,
+            "mot_hedonism": 1,
+            "mot_autonomy": 0.8
+          }
+        },
+        {
+          "key": "invest",
+          "label": "买一只指数基金放着，十年之内都不看",
+          "effects": {
+            "money_worship": 1.6,
+            "time_future": 1.6,
+            "mot_security": 0.8
+          }
+        },
+        {
+          "key": "cash",
+          "label": "留成随时能取的现金，别的什么都不做",
+          "effects": {
+            "money_vigilance": 1.6,
+            "mot_security": 1.4,
+            "money_avoid": 1.6
+          }
+        },
+        {
+          "key": "roof",
+          "label": "修好老家那个漏雨的屋顶，留一条退路",
+          "effects": {
+            "time_past_pos": 1.6,
+            "mot_belonging": 1.2,
+            "lv_anchor": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "v14_q18",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "money_energy",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "context": "每月工资到账那晚，手机里一堆事等着你：账单、定投、要出的礼、想买但不急的包。你手上只剩一百点注意力，分完就睡。",
+      "prompt": "把这一百点注意力分到这六件事上，加起来正好一百，多一点少一点都不行。",
+      "items": [
+        {
+          "key": "track",
+          "label": "把这月的账一笔笔对完，看钱到底去了哪儿",
+          "dim": "money_vigilance",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "plan",
+          "label": "看一眼定投，把下个月自动划走的日子排好",
+          "dim": "time_future",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "face",
+          "label": "想清楚这个月哪些场合要出钱、该包多少",
+          "dim": "money_status",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "skip",
+          "label": "把账单短信一删，等哪天心情好了再一起看",
+          "dim": "money_avoid",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "treat",
+          "label": "算算还能拿出多少，去吃一顿像样的",
+          "dim": "time_present_hed",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "earn",
+          "label": "只盯进账：怎么让下个月多出两千块",
+          "dim": "money_worship",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    }
+  ]
+}

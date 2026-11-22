@@ -1,0 +1,851 @@
+{
+  "volume_id": "vol16",
+  "index": 16,
+  "title": "神经边缘",
+  "subtitle": "高敏感 × 刺激寻求的四象限",
+  "theme_color": "#3B6B6E",
+  "estimated_minutes": 4,
+  "intro": "这一卷问的不是你内向还是外向，而是你的神经系统在什么音量下最好用：多少刺激算刚好，多少开始过载；别人的情绪涌进来时，你是被填满还是被冲垮。四象限里没有更健康的一格，只有你此刻站的那一格。",
+  "dimensions": [
+    "hsp_sensory",
+    "hsp_emotional",
+    "hss_novelty",
+    "hss_intensity"
+  ],
+  "questions": [
+    {
+      "id": "v16_q01",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "neuro_festival",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "跨城看一场音乐节，散场时已经十一点半。人群从铁马口往外涌，耳朵里还留着一层嗡响，T 恤贴在背上，回酒店的地铁要坐十四站。",
+      "prompt": "走出场地那两百米，你身上最先启动的是哪一样？",
+      "options": [
+        {
+          "key": "A",
+          "text": "耳机不戴，专挑人少的巷子走，让耳鸣自己退下去，谁说话都先不回",
+          "effects": {
+            "hsp_sensory": 1.8,
+            "hss_intensity": -1.6,
+            "big5_social": -1,
+            "virtue_temperance": 0.7
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "还不想回酒店，跟着人流钻进夜市，找更吵的地方把耳朵继续填满",
+          "effects": {
+            "hss_intensity": 1.9,
+            "hss_novelty": 1.7,
+            "hsp_sensory": -1.7,
+            "hsp_emotional": -1.6,
+            "mot_hedonism": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "先发定位问同行的人走到哪了，散场之后一个人走的那段路最难受",
+          "effects": {
+            "hsp_emotional": 1.7,
+            "hss_novelty": -1.6,
+            "big5_social": 1.1,
+            "att_anxiety": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "在出口回头站了半分钟，心里已经在查下一场在哪，眼睛还有点热",
+          "effects": {
+            "hsp_emotional": 1.8,
+            "hss_novelty": 1.6,
+            "big5_aesthetic": 1.1,
+            "big5_rumination": 0.7
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v16_q02",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "mirror_key": "neuro_office",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "开放工位第三排，中央空调在你头顶一格一格换风，声音不高，一直没停。下午三点，同一行字你已经读了三遍，还是读成了别的东西。",
+      "prompt": "接下来这半小时，你会怎么把它过掉？",
+      "options": [
+        {
+          "key": "A",
+          "text": "从包里翻出降噪耳机戴上，提示音也关掉，先把这一小时的安静买回来",
+          "effects": {
+            "hsp_sensory": 1.9,
+            "hss_intensity": -1.6,
+            "hss_novelty": -1.6,
+            "big5_order": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "真正耗人的不是这声音，是隔壁组那个刚被说完话的人，一整天低着头",
+          "effects": {
+            "hsp_emotional": 1.8,
+            "hss_intensity": -1.7,
+            "big5_rumination": 0.9,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "把这声音当背景照样写下去，周围有点动静反而更进得去，别人的情绪也不太沾",
+          "effects": {
+            "hsp_sensory": -1.8,
+            "hsp_emotional": -1.6,
+            "hss_intensity": 1.7,
+            "virtue_temperance": 0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "起身下楼走一圈，买杯冰的，换个场景再回来，坐着硬扛没有用",
+          "effects": {
+            "hss_novelty": 1.8,
+            "cog_speed": 1,
+            "mot_hedonism": 0.9,
+            "big5_order": -0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v16_q03",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "neuro_mall",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "一层中庭在推新品，四五个柜台同时开着试香纸。你从电梯下来，一股甜混着一股木质调一起进鼻子，后面还压着爆米花的味道。",
+      "prompt": "走过那四十米的时候，你身上发生的是——",
+      "scale": {
+        "left": "不到十米就开始发晕，得先绕到侧门出去站一会儿，缓过来再往里走",
+        "right": "在柜台前停下来，让人再喷第三款，想知道混在一起会变成什么",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "hsp_sensory": [
+          2,
+          -2
+        ],
+        "hss_novelty": [
+          -1.7,
+          1.7
+        ],
+        "hss_intensity": [
+          -1.6,
+          1.7
+        ],
+        "big5_aesthetic": [
+          -0.7,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v16_q04",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "neuro_crash",
+      "is_sensitive": false,
+      "weight": 1.25,
+      "context": "连轴四天：两场活动、一次通宵改稿、一顿推不掉的饭。周五晚上十点你终于到家，灯没开，包还挂在门口。",
+      "prompt": "进门那三秒，身体先去够的是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "直接躺到地板上，等黑暗把耳朵里那层嗡声盖住，什么也不想再听",
+          "effects": {
+            "hsp_sensory": 1.9,
+            "hss_intensity": -1.7,
+            "big5_social": -1,
+            "def_detach": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "把音响拧开，音量推到能感觉地板在震，先让身体从麻里醒过来",
+          "effects": {
+            "hss_intensity": 1.9,
+            "hsp_sensory": 1.6,
+            "hsp_emotional": -1.6,
+            "mot_hedonism": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "坐在地上给最熟的那个人发一句「到了」，等一句回话才去洗澡",
+          "effects": {
+            "hsp_emotional": 1.7,
+            "hss_novelty": -1.6,
+            "att_anxiety": 1,
+            "big5_social": 0.9
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "站在玄关把攒了三天的消息一条条回完，然后问谁还醒着想出去吃口热的",
+          "effects": {
+            "hss_novelty": 1.7,
+            "hss_intensity": 1.6,
+            "hsp_sensory": -1.6,
+            "mot_hedonism": 0.9
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v16_q05",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "neuro_night",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "凌晨一点十分，楼下有辆改装车停在路口等灯，低音一声一声往上顶，玻璃跟着轻轻响。你明天七点要起。",
+      "prompt": "躺在床上听它，最先浮上来的反应是哪一个？",
+      "options": [
+        {
+          "key": "A",
+          "text": "翻身把窗关严，再塞上耳塞，只求那三十秒快点过完，明天还得早起",
+          "effects": {
+            "hsp_sensory": 1.8,
+            "hss_intensity": -1.7,
+            "big5_order": 0.9,
+            "mot_security": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "爬起来走到窗边往下看，一边觉得吵得心慌，一边又很想听它起步",
+          "effects": {
+            "hss_intensity": 1.8,
+            "hss_novelty": 1.7,
+            "hsp_sensory": 1.6,
+            "big5_open": 0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "忽然想到开车的人大概也睡不着，这城市里半夜醒着的人比想的多",
+          "effects": {
+            "hsp_emotional": 1.8,
+            "hss_novelty": -1.6,
+            "lv_suffering": 0.8,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "干脆起来下楼买瓶水，顺便看看这个点的街上都还有些什么样的人",
+          "effects": {
+            "hss_novelty": 1.9,
+            "hsp_sensory": -1.6,
+            "hsp_emotional": -1.6,
+            "cog_speed": 1,
+            "mot_hedonism": 0.9
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v16_q06",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "neuro_hotpot",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "六个人的局，坐在最里面那桌。牛油锅在中间滚，蒸汽把眼镜糊住，隔壁桌在划拳，服务员端着盘子从你背后过。已经聊到第三个小时。",
+      "prompt": "聊到第三个小时，你身体里冒出来的第一个动作是什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把椅子往外挪半米，别让蒸汽一直扑在脸上，再要一杯冰水压一压",
+          "effects": {
+            "hsp_sensory": 1.9,
+            "hss_intensity": -1.6,
+            "big5_order": 0.8,
+            "virtue_temperance": 0.7
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "脱掉外套挽起袖子，让锅底再加一档辣，声音也跟着放大一起喊",
+          "effects": {
+            "hss_intensity": 1.9,
+            "hss_novelty": 1.7,
+            "hsp_sensory": -1.7,
+            "mot_hedonism": 1,
+            "sin_gluttony": 0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "注意到对面那个一直没怎么动筷子的人，等会儿想单独问一句他怎么了",
+          "effects": {
+            "hsp_emotional": 1.9,
+            "hss_novelty": -1.6,
+            "big5_rumination": 0.8,
+            "lv_suffering": 0.7
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "悄悄看了眼表，算着还有多久能走，这些话每一年都是同一套讲法",
+          "effects": {
+            "hss_intensity": -1.7,
+            "hsp_emotional": -1.7,
+            "big5_social": -1,
+            "def_detach": 0.9
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v16_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "neuro_cinema",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "零点场，影厅只坐了七个人。预告片一结束，音效直接从后脑砸下来，前排有人低呼了一声，你手里的可乐在晃。",
+      "prompt": "接下来的九十分钟，你的注意力主要挂在什么地方？",
+      "scale": {
+        "left": "角色伸手去开那扇门的时候，我先替她怕了，一整场都在她身上",
+        "right": "越吓越来劲，字幕一出来就在想，有没有更狠的一部可以接着看",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "hsp_sensory": [
+          1.9,
+          -1.9
+        ],
+        "hsp_emotional": [
+          1.7,
+          -1.7
+        ],
+        "hss_intensity": [
+          -1.6,
+          1.8
+        ],
+        "def_detach": [
+          -0.8,
+          0.9
+        ]
+      }
+    },
+    {
+      "id": "v16_q08",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "neuro_commute",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "早高峰，你被挤在车门边。对面有人外放着短视频，隔一个人身上有很重的烟味，广播在报一个你没听过的站名。还有六站。",
+      "prompt": "这六站里，你身上最可能浮出来的是哪一种状态？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把耳机音量往上推，闭上眼，只留一小块自己的地方，谁也别碰我",
+          "effects": {
+            "hsp_sensory": 1.8,
+            "hss_novelty": -1.6,
+            "hss_intensity": -1.6,
+            "big5_social": -0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "反而看得很起劲：谁身上有酒味、谁刚哭过一眼就认得，六站不够猜",
+          "effects": {
+            "hss_novelty": 1.9,
+            "hsp_sensory": 1.6,
+            "big5_open": 1,
+            "big5_social": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "被那股烟味和短视频的声音一起磨着，胃开始不舒服，只想马上下车",
+          "effects": {
+            "hsp_sensory": 1.9,
+            "hsp_emotional": 1.6,
+            "hss_intensity": -1.7,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "站着一动不动，什么也没进脑子，到站、下车、上扶梯，一路自动播放",
+          "effects": {
+            "hss_intensity": 1.7,
+            "hsp_emotional": -1.7,
+            "hsp_sensory": -1.6,
+            "def_detach": 1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v16_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "explicit",
+      "mirror_key": "neuro_intimacy",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "他比平时晚回来四十分钟，进门把包放下就坐在床边，鞋也没脱。你端着一杯水进去，他抬了下眼，说「没事，就是有点累」。",
+      "prompt": "那杯水放到他手边之后，你这套接收器开到了几档？",
+      "scale": {
+        "left": "那句「没事」我一下就听出来了，胸口跟着往下沉，他还没讲我已经在替他难受",
+        "right": "他说没事我就先按没事办，等他想讲再讲，我这边的情绪不太会跟着走",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "hsp_emotional": [
+          2,
+          -2
+        ],
+        "hsp_sensory": [
+          1.8,
+          -1.8
+        ],
+        "hss_intensity": [
+          1.6,
+          -1.6
+        ],
+        "att_anxiety": [
+          1.2,
+          -1.1
+        ],
+        "def_detach": [
+          -1.2,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v16_q10",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "neuro_travel",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "到清迈的第二天，原定去的那座庙在修。包车司机说可以改去一个「本地人才去」的市场，也可能白跑一趟。车门开着，同行的人都在看你。",
+      "prompt": "司机的钥匙还插在锁孔里，你心里的方向盘先往哪边打？",
+      "options": [
+        {
+          "key": "A",
+          "text": "白跑也算一趟，让司机往那个市场开，原来那张行程表今天作废",
+          "effects": {
+            "hss_novelty": 1.9,
+            "hss_intensity": 1.6,
+            "big5_open": 1,
+            "big5_order": -0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "先查那个市场多大、几点收摊，确认不是一片空地，再决定上不上车",
+          "effects": {
+            "hss_novelty": -1.7,
+            "cog_ambiguity": -1.1,
+            "big5_order": 1.2,
+            "mot_security": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "站在太阳底下忽然有点撑不住，喇叭声一阵阵往脑子里钻，只想回酒店",
+          "effects": {
+            "hsp_sensory": 1.9,
+            "hss_novelty": -1.6,
+            "hss_intensity": -1.7,
+            "big5_social": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "干脆分开走，晚上在夜市碰头，谁也别为谁改掉自己想去的地方",
+          "effects": {
+            "hss_novelty": 1.7,
+            "mot_autonomy": 1.2,
+            "big5_assert": 1,
+            "cog_ambiguity": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v16_q11",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "neuro_bath",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "冬天，朋友拉你去泡汤。从热水池里出来那一下，室外零下四度，旁边就是冷水池，池边结了层薄霜。刚才有人下去十几秒就爬了上来，肩膀是红的。",
+      "prompt": "光脚站在池边的那几秒，哪个念头先动的手？",
+      "options": [
+        {
+          "key": "A",
+          "text": "直接下去，让那口冷气一口气冲到头顶，上来的时候整个人是醒的",
+          "effects": {
+            "hss_intensity": 1.9,
+            "hsp_sensory": 1.6,
+            "mot_hedonism": 1,
+            "big5_open": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "蹲下来先用手试水温，试了两次，还是缩回去转身回了热水池那边",
+          "effects": {
+            "hsp_sensory": 1.8,
+            "hss_intensity": -1.7,
+            "big5_alert": 1,
+            "mot_security": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "站在池边看别人下去，一边想笑一边有点羡慕，脚始终没往前挪",
+          "effects": {
+            "hsp_emotional": 1.7,
+            "hss_intensity": -1.6,
+            "big5_social": -0.8,
+            "def_detach": 0.7
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "冷一下热一下来回三四轮，直到耳朵嗡嗡的、有点发晕才肯停下来",
+          "effects": {
+            "hss_intensity": 1.9,
+            "hsp_sensory": 1.7,
+            "sin_gluttony": 0.9,
+            "virtue_temperance": -0.9
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v16_q12",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "neuro_ktv",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "朋友三十岁生日，包了个小包厢。歌放得很大，麦克风偶尔啸叫，桌上七八个空瓶，寿星已经唱哑了，一直把麦往你手里塞。",
+      "prompt": "麦到你手上时，这四分钟你打算唱成什么样？",
+      "options": [
+        {
+          "key": "A",
+          "text": "接了唱，唱完再主动点一首更吵的，把整桌人的声音一起往上顶",
+          "effects": {
+            "hss_intensity": 1.8,
+            "big5_social": 1.2,
+            "big5_assert": 1,
+            "hsp_sensory": -1.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "笑着摆手推掉，坐到最靠门那个位置，替大家倒酒、分蛋糕、拍照",
+          "effects": {
+            "hsp_sensory": 1.7,
+            "big5_social": -1,
+            "big5_assert": -1,
+            "hss_intensity": -1.7
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "只唱一首很慢的，唱的时候整个包厢安静下来，唱完就把麦递回去",
+          "effects": {
+            "hsp_emotional": 1.8,
+            "big5_aesthetic": 1.1,
+            "big5_assert": 0.7,
+            "hss_intensity": -1.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "拿过麦但不唱，把原唱开着当主持，一桌人挨个点歌、互相起哄",
+          "effects": {
+            "hss_novelty": 1.7,
+            "big5_social": 1.2,
+            "big5_assert": 1.1,
+            "hsp_sensory": -1.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v16_q13",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "neuro_insomnia",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "context": "凌晨三点二十，你已经醒着四十分钟。冰箱的压缩机一会儿响一下，心跳在枕头里听得很清楚。七点的闹钟还挂着。",
+      "prompt": "那四十分钟里，躺着的那具身体在忙什么？",
+      "scale": {
+        "left": "数得出身体每一处不对劲：肩、牙关、心跳，越听越清楚，也就越睡不着",
+        "right": "忽然觉得这个点挺好，索性不睡了，起来做点白天根本做不了的事",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "hsp_sensory": [
+          2,
+          -1.8
+        ],
+        "hss_novelty": [
+          -1.6,
+          1.7
+        ],
+        "hss_intensity": [
+          -1.7,
+          1.7
+        ],
+        "big5_rumination": [
+          1.2,
+          -0.8
+        ],
+        "cog_speed": [
+          -1.1,
+          1.1
+        ]
+      }
+    },
+    {
+      "id": "v16_q14",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "neuro_values",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "context": "周五下班前，有人问你周末打算怎么过。你愣了一下，脑子里先浮上来的不是日程，是几种完全不同的两天。假设这八样都在桌上，只能留下三样。",
+      "prompt": "一个理想的周末由什么组成？请按顺序点选三样。",
+      "values": [
+        {
+          "key": "quiet_room",
+          "label": "一整天不出门，房间里只有雨声",
+          "effects": {
+            "hsp_sensory": 1.7,
+            "big5_social": -0.7,
+            "hss_intensity": -1.7
+          }
+        },
+        {
+          "key": "front_row",
+          "label": "挤到最前排，鼓点打在胸口上",
+          "effects": {
+            "hss_intensity": 1.7,
+            "hsp_sensory": 1.7,
+            "big5_social": 0.7
+          }
+        },
+        {
+          "key": "strange_city",
+          "label": "一个人在没去过的城市走一整天",
+          "effects": {
+            "hss_novelty": 1.7,
+            "mot_autonomy": 0.7,
+            "hsp_emotional": -1.7
+          }
+        },
+        {
+          "key": "close_talk",
+          "label": "和最亲的两三个人聊到凌晨三点",
+          "effects": {
+            "hsp_emotional": 1.7,
+            "big5_social": 0.7,
+            "hss_intensity": -1.7
+          }
+        },
+        {
+          "key": "night_market",
+          "label": "钻进很吵的夜市，从街头吃到街尾",
+          "effects": {
+            "hss_intensity": 1.7,
+            "sin_gluttony": 0.7,
+            "hsp_sensory": -1.7
+          }
+        },
+        {
+          "key": "one_way_ticket",
+          "label": "临时买张票就走，到了再想去哪儿",
+          "effects": {
+            "hss_novelty": 1.7,
+            "big5_order": -0.7,
+            "hss_intensity": 1.7
+          }
+        },
+        {
+          "key": "long_bath",
+          "label": "泡很久的澡，然后早早睡下",
+          "effects": {
+            "hsp_sensory": 1.7,
+            "virtue_temperance": 0.7,
+            "hss_intensity": -1.7
+          }
+        },
+        {
+          "key": "sad_film",
+          "label": "看一部会难受很久的电影，独自消化",
+          "effects": {
+            "hsp_emotional": 1.7,
+            "big5_aesthetic": 0.7,
+            "hss_novelty": -1.7
+          }
+        }
+      ]
+    },
+    {
+      "id": "v16_q15",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "neuro_energy",
+      "is_sensitive": false,
+      "weight": 1.3,
+      "context": "你有个完全空的周六，从睁眼到睡前没有任何安排，手机可以关机，谁也不会来找你。一百点精力摆在桌上，分完才知道自己在什么音量下恢复得最快。",
+      "prompt": "把一百点精力分到这六件事上，你会怎样切这一刀？",
+      "items": [
+        {
+          "key": "quiet",
+          "label": "一间安静到能听见冰箱电流声的屋子",
+          "dim": "hsp_sensory",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "crowd",
+          "label": "很响很挤的现场，灯光一直打在脸上",
+          "dim": "hss_intensity",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "strange",
+          "label": "没去过的城市，不做攻略，到了再说",
+          "dim": "hss_novelty",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "confide",
+          "label": "把攒了很久的话，对一个人讲到见底",
+          "dim": "hsp_emotional",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "body",
+          "label": "热水、长睡、走很远，先把身体养回来",
+          "dim": "hsp_sensory",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "late",
+          "label": "到凌晨还不想回家，让今天再长一点",
+          "dim": "hss_intensity",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    },
+    {
+      "id": "v16_q16",
+      "type": "stealth_scale",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "mirror_key": "neuro_cart",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "在一起第三年，你们在超市里为一件很小的事僵住。他说了句「随你」，推着车往前走了两步。头顶的音箱在放一首很轻的歌，走道里只有你们两个人。",
+      "prompt": "推着车跟在他后面那半分钟，你的反应从哪一层先起来？",
+      "scale": {
+        "left": "他一说「随你」我心里就发紧，开始回想这两天哪里出了错，越想越沉",
+        "right": "他真要随我，那就照我的来，这种小事翻一遍只会更麻烦",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "hsp_emotional": [
+          1.9,
+          -1.7
+        ],
+        "hsp_sensory": [
+          1.9,
+          -1.6
+        ],
+        "def_detach": [
+          -1.1,
+          1.1
+        ],
+        "hss_intensity": [
+          -1.6,
+          1.6
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+# 依赖
+node_modules/
+
+# 系统噪声
+.DS_Store
+Thumbs.db
+*.swp
+
+# 构建产物（Pages 由 Actions 现场构建，不入库）
+dist/
+
+# 样式备份（改动前快照，不入库）
+styles_backup_*/
+
+# 日志与临时文件
+*.log
+.build-probe.js
+
+# 本地私有配置（永不入库）
+.env
+.env.local
+.env.*.local
+
+# 审计包的中间产物（由 npm run pack 重新生成）
+audit-parts/

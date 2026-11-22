@@ -1,0 +1,812 @@
+{
+  "volume_id": "vol2",
+  "index": 2,
+  "title": "性格底色",
+  "subtitle": "大五人格的十个微观子维",
+  "theme_color": "#4A6B5D",
+  "estimated_minutes": 5,
+  "intro": "这一卷不谈好坏，只测绘硬件。没有更好的性格，只有更适合的生态位。请在「你通常如此」和「你希望自己如此」之间，选择前者。",
+  "dimensions": [
+    "big5_open",
+    "big5_aesthetic",
+    "big5_order",
+    "big5_industry",
+    "big5_social",
+    "big5_assert",
+    "big5_compassion",
+    "big5_compliance",
+    "big5_alert",
+    "big5_rumination"
+  ],
+  "questions": [
+    {
+      "id": "v2_q01",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_open",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一场谈话突然拐进了一个你完全陌生的领域，对方开始用它自己的黑话讲得很起劲。你的状态更接近——",
+      "scale": {
+        "left": "立刻被勾住，想把这套陌生逻辑拆开来看看",
+        "right": "耐心听完，但心里更想回到熟悉的地带",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_open": [
+          2,
+          -2
+        ],
+        "cog_ambiguity": [
+          1.4,
+          -1.2
+        ],
+        "big5_alert": [
+          -0.8,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "v2_q02",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "big5_aesthetic",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "如果要用一整天来换一种体验，你更愿意换到哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "在一间安静的美术馆里，被某件作品按在原地很久，说不清为什么",
+          "effects": {
+            "big5_aesthetic": 2,
+            "big5_open": 1.2,
+            "sin_lust": 0.4,
+            "cog_logic": -0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "把一个复杂问题彻底拆开、重装，直到它跑得又快又稳",
+          "effects": {
+            "big5_aesthetic": -1.2,
+            "big5_open": 1,
+            "cog_global": 1.2,
+            "big5_industry": 1.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "和一群很久没见的人待在一起，从下午一直聊到店里打烊",
+          "effects": {
+            "big5_aesthetic": -0.6,
+            "big5_social": 1.8,
+            "mot_belonging": 1.4,
+            "big5_assert": 0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v2_q03",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_order",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "出门旅行前的那一晚，你的房间通常是——",
+      "scale": {
+        "left": "东西按清单摆好，几点出门都在脑子里排过一遍",
+        "right": "大致抓几件就走，到了再看缺什么",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_order": [
+          2,
+          -2
+        ],
+        "cog_speed": [
+          -1.4,
+          1.4
+        ],
+        "big5_alert": [
+          1.2,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "v2_q04",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_industry",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "一件事做到第 80%，剩下的收尾最枯燥也最不出彩，而新的、更有趣的事已经在敲门了。",
+      "prompt": "你身体里最先出现的倾向是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "先把尾巴收干净再开新的，半成品堆着我会一直不踏实",
+          "effects": {
+            "big5_industry": 2,
+            "big5_order": 1.6,
+            "virtue_diligence": 1.2,
+            "big5_open": -0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "让新的先跑起来，旧的等有情绪了再回去收拾",
+          "effects": {
+            "big5_industry": -1.2,
+            "big5_order": -1,
+            "sin_sloth": 1.2,
+            "big5_open": 1.4
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "给自己定一个硬期限，然后在这个期限里把它收掉",
+          "effects": {
+            "big5_industry": 1.4,
+            "big5_order": 1.2,
+            "cog_speed": -0.6,
+            "dark_mach": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "把收尾工作丢给更擅长的人，我只做最前面那段",
+          "effects": {
+            "big5_industry": -1.8,
+            "dark_mach": 1.2,
+            "mot_mastery": 0.8,
+            "big5_compliance": -0.8
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v2_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_social",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一场持续了三个小时的多人聚会接近尾声。此刻你的电量——",
+      "scale": {
+        "left": "越聊越亮，还想再找几个人续摊",
+        "right": "只剩百分之十，脑子里已经在想怎么礼貌地先走",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_social": [
+          2,
+          -2
+        ],
+        "mot_autonomy": [
+          -1,
+          1.4
+        ],
+        "att_avoidance": [
+          -1,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v2_q06",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "big5_assert",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "十几个人的饭桌上，话题正好停在一个你极其熟悉、也极有判断的领域，而场面开始冷下来。",
+      "prompt": "那个冷场出现的第一秒，你的反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "顺着话头就接过去，把场面重新点着，这个位置我很熟",
+          "effects": {
+            "big5_assert": 2,
+            "big5_social": 1.4,
+            "dark_narc": 0.8,
+            "big5_compliance": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "心里有个完整的观点，但犹豫了两秒，别人先开口了",
+          "effects": {
+            "big5_assert": -1.4,
+            "big5_rumination": 1.2,
+            "def_fawn": 0.8,
+            "big5_social": -0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "安静看着，等有人把话递到我面前来，我再开口也不迟",
+          "effects": {
+            "big5_assert": -1,
+            "big5_social": -1.2,
+            "att_avoidance": 1,
+            "cog_logic": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "抛一个问题出去，让最会讲的人接，我负责听",
+          "effects": {
+            "big5_assert": 0.4,
+            "big5_social": 0.6,
+            "covert_control": 1.2,
+            "big5_compliance": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v2_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_compassion",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "朋友在电话里哭，说的是一件在客观上确实有他自己责任的事。你最先浮现的动作是——",
+      "scale": {
+        "left": "先安静听他把委屈倒完，道理等他缓过来再说",
+        "right": "忍不住先把问题出在哪讲清楚，讲清楚了他就不难受了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_compassion": [
+          2,
+          -2
+        ],
+        "def_intellectual": [
+          -1.2,
+          1.6
+        ],
+        "big5_compliance": [
+          0.8,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v2_q08",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "big5_compliance",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "两种不舒服，哪一种你更能忍受？",
+      "options": [
+        {
+          "key": "A",
+          "text": "为了维持表面的和气，把自己真正想说的话咽回去",
+          "effects": {
+            "big5_compliance": 1.8,
+            "def_fawn": 1.4,
+            "sin_wrath": -1,
+            "big5_rumination": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "把话说明白，哪怕当场气氛变得很僵，之后几天都不舒服",
+          "effects": {
+            "big5_compliance": -1.8,
+            "def_attack": 1.4,
+            "big5_assert": 1.4,
+            "sin_wrath": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v2_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_alert",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一件事进展得太顺利了，顺利到没有任何障碍。你心里那个声音更接近——",
+      "scale": {
+        "left": "很安心，事情本来就该这样",
+        "right": "反而开始不安，总觉得哪里埋着一个我还没看见的坑",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_alert": [
+          -1.8,
+          2
+        ],
+        "big5_rumination": [
+          -1,
+          1.4
+        ],
+        "cog_ambiguity": [
+          0.8,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "v2_q10",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "big5_rumination",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "晚上十一点四十，你突然想起傍晚在朋友聚会上说的一句话。当时没人接，现在越想越觉得那句话可能让人不舒服。",
+      "prompt": "接下来二十分钟，你最可能的状态是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "在脑子里反复重播那个场面，连别人当时的表情都拿出来分析",
+          "effects": {
+            "big5_rumination": 2,
+            "big5_alert": 1.4,
+            "att_anxiety": 1.2,
+            "big5_compassion": 0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "想一下，判断没什么大事，翻个身就睡过去了，第二天也未必记得",
+          "effects": {
+            "big5_rumination": -1.8,
+            "big5_alert": -1,
+            "def_detach": 1.2,
+            "att_avoidance": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "干脆发条消息解释一下，不然这一夜都过不去，非说清楚不可",
+          "effects": {
+            "big5_rumination": 1.2,
+            "att_anxiety": 1.6,
+            "def_fawn": 1.4,
+            "big5_compassion": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "把这件事当成一个待办记下来，明天直接问他一句就好",
+          "effects": {
+            "big5_rumination": -0.8,
+            "cog_logic": 1.2,
+            "big5_order": 1,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v2_q11",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_open",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一个你原本坚信的判断，被新出现的证据正面推翻了。你的第一感受是——",
+      "scale": {
+        "left": "有点兴奋，又有一块地图被补上了",
+        "right": "先不太舒服，需要一点时间才能重新接受这件事",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_open": [
+          1.8,
+          -1.8
+        ],
+        "sin_pride": [
+          -1,
+          1.2
+        ],
+        "cog_independent": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v2_q12",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "big5_order",
+      "is_sensitive": false,
+      "weight": 1.35,
+      "context": "这是你计划了半年的长途旅行，第二天的转机航班临时取消，原本排好的行程全部要重来。同行的人已经开始问「那现在怎么办」。",
+      "prompt": "你接下来的样子最可能是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "迅速重排一遍，混乱只会存在很短一段时间",
+          "effects": {
+            "big5_order": 2,
+            "big5_industry": 1.2,
+            "cog_speed": 0.4,
+            "big5_alert": 0.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "表面照旧，心里会为那段被夺走的秩序难受到晚上",
+          "effects": {
+            "big5_order": 1.4,
+            "big5_rumination": 1.6,
+            "big5_alert": 1,
+            "def_detach": -0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "索性全部推翻，就地换一套完全不同的玩法",
+          "effects": {
+            "big5_order": -0.6,
+            "big5_open": 1.6,
+            "cog_diverge": 1.2,
+            "big5_industry": -0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v2_q13",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_aesthetic",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "走进一个陌生的房间，你最先注意到的通常是——",
+      "scale": {
+        "left": "整体的气质：光线、比例、气味，一进门就有感觉",
+        "right": "具体的东西：几把椅子、插座在哪、出口通向哪里",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_aesthetic": [
+          1.8,
+          -1.8
+        ],
+        "cog_global": [
+          1,
+          -1.2
+        ],
+        "big5_alert": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v2_q14",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_industry",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "关于「坚持」这件事，下面哪一句更像你真实的经验？",
+      "options": [
+        {
+          "key": "A",
+          "text": "坚持靠的是把它变成日常的一部分，靠意志力硬撑撑不了太久",
+          "effects": {
+            "big5_industry": 1.8,
+            "big5_order": 1.6,
+            "virtue_diligence": 1.2,
+            "cog_global": 0.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "坚持靠的是一件事足够有意思，够有意思我就能一直做下去",
+          "effects": {
+            "big5_industry": -0.6,
+            "big5_open": 1.6,
+            "mot_hedonism": 1,
+            "virtue_diligence": 0.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "坚持靠的是有人在等我的结果，没有人等我就会散掉",
+          "effects": {
+            "big5_industry": 0.2,
+            "mot_belonging": 1.6,
+            "att_anxiety": 1,
+            "big5_order": -0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "坚持靠的是把它变成一个不能失败的事，我会给自己造这种局",
+          "effects": {
+            "big5_industry": 1.4,
+            "dark_mach": 1.4,
+            "mot_mastery": 1.6,
+            "big5_alert": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v2_q15",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_assert",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一群人讨论到一半，你发现大家正在往一个你觉得明显不对的方向走。你的实际动作是——",
+      "scale": {
+        "left": "直接把我的判断摆出来，哪怕现在是少数",
+        "right": "先跟着走一段，看看是不是我自己判断错了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_assert": [
+          1.8,
+          -1.8
+        ],
+        "cog_independent": [
+          1.4,
+          -1.6
+        ],
+        "big5_compliance": [
+          -1.2,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "v2_q16",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "big5_rumination",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "如果一定要选一种，你更愿意接受哪一种自己？",
+      "options": [
+        {
+          "key": "A",
+          "text": "情绪起伏明显，但每一次都能尝到活着的那种浓度",
+          "effects": {
+            "big5_rumination": 1.8,
+            "big5_compassion": 1.4,
+            "big5_aesthetic": 1.2,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "情绪非常稳，别人很难让你失衡，但也很少真的被什么击中",
+          "effects": {
+            "big5_rumination": -1.8,
+            "def_detach": 1.4,
+            "big5_alert": -0.8,
+            "big5_compassion": -1
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v2_q17",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "big5_compassion",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "同一件事，两个版本的说法：一个是真心的抱怨，一个是精心修饰的邀功。你通常多快能分辨出来？",
+      "scale": {
+        "left": "几乎立刻，语气里那一点不对劲就很明显",
+        "right": "常要等事情走过一段，回头才发现哪里不对",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_compassion": [
+          1.6,
+          -1.2
+        ],
+        "big5_alert": [
+          1,
+          -1.2
+        ],
+        "def_project": [
+          -0.6,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v2_q18",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_social",
+      "is_sensitive": false,
+      "weight": 1.35,
+      "prompt": "如果给你一个完全没人认识你的城市、一整天的空白时间，你更愿意——",
+      "options": [
+        {
+          "key": "A",
+          "text": "找一家本地人最常去的小店，试着和老板聊起来",
+          "effects": {
+            "big5_social": 1.8,
+            "big5_assert": 1,
+            "mot_hedonism": 1,
+            "big5_open": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "一个人随便走，不带目的地，走到哪算哪",
+          "effects": {
+            "big5_social": -1.2,
+            "mot_autonomy": 1.8,
+            "big5_open": 1.4,
+            "cog_ambiguity": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "找个安静的咖啡馆，把一直没时间想的事想清楚",
+          "effects": {
+            "big5_social": -1.6,
+            "cog_logic": 1.4,
+            "def_intellectual": 1,
+            "mot_autonomy": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "把这一天用来做一件早就计划好、一直没执行的事",
+          "effects": {
+            "big5_social": -0.8,
+            "big5_industry": 1.8,
+            "big5_order": 1.2,
+            "mot_mastery": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v2_q19",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "big5_compliance",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个你很喜欢的人提出了一个你其实不太想答应的请求。你的第一反应通常是——",
+      "scale": {
+        "left": "先答应下来，事后再想怎么办",
+        "right": "直接说不，然后花力气把这份不舒服解释清楚",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_compliance": [
+          1.8,
+          -1.8
+        ],
+        "def_fawn": [
+          1.6,
+          -1.2
+        ],
+        "att_anxiety": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v2_q20",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "big5_alert",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "伴侣今天回家后话很少，你问了两句，对方说「没事，我有点累」。之后一直戴着耳机，睡前也没有像往常那样靠过来。",
+      "prompt": "那两句「没事」之后的半小时，你身体里发生的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "胃先紧了，脑子里已经开始列出所有可能出问题的清单",
+          "effects": {
+            "big5_alert": 2,
+            "big5_rumination": 1.8,
+            "att_anxiety": 1.2,
+            "big5_compassion": 0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "没多想，让对方自己待着，继续做手上那点事",
+          "effects": {
+            "big5_alert": -1.6,
+            "big5_rumination": -1.2,
+            "def_detach": 1.2,
+            "cog_logic": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "先回想了一下最近有没有踩到什么，确认没问题就放下了",
+          "effects": {
+            "big5_alert": 0.8,
+            "cog_logic": 1.6,
+            "def_intellectual": 1,
+            "big5_order": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "开始在心里预演怎么问，把今晚所有走向都演练一遍",
+          "effects": {
+            "big5_alert": 1.4,
+            "big5_industry": 1.4,
+            "covert_control": 1,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    }
+  ]
+}

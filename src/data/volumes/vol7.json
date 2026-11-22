@@ -1,0 +1,788 @@
+{
+  "volume_id": "vol7",
+  "index": 7,
+  "title": "亲密防线",
+  "subtitle": "依恋模式与六大心理防御机制",
+  "theme_color": "#6D5472",
+  "estimated_minutes": 5,
+  "intro": "这一卷关心的是：当关系靠得太近、或你被真正伤到的那一刻，你的潜意识会先弹出哪一个保护罩。它通常比你的理智快零点三秒。",
+  "dimensions": [
+    "att_anxiety",
+    "att_avoidance",
+    "def_intellectual",
+    "def_detach",
+    "def_sublimate",
+    "def_attack",
+    "def_fawn",
+    "def_project"
+  ],
+  "questions": [
+    {
+      "id": "v7_q01",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "att_anxiety",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一条发给重要的人的消息，已经过了四个小时没有回。中间你看过手机几次？",
+      "scale": {
+        "left": "一次都没有，我知道他在忙",
+        "right": "很多次，而且会开始反复看自己上一条是不是说得不对",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "att_anxiety": [
+          -2,
+          2
+        ],
+        "big5_rumination": [
+          -1.2,
+          1.8
+        ],
+        "def_fawn": [
+          -0.8,
+          1.2
+        ],
+        "big5_alert": [
+          -0.6,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v7_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "att_avoidance",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一段关系走到了非常好的阶段，对方开始把很多私人的事交给你。你身体里出现的第一反应是——",
+      "scale": {
+        "left": "心里是暖的，我想更靠近他一点",
+        "right": "有一点点想退，太近的时候我会需要一点自己的空间",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "att_avoidance": [
+          -2,
+          2
+        ],
+        "big5_social": [
+          1,
+          -1.2
+        ],
+        "mot_autonomy": [
+          -1.4,
+          1.6
+        ],
+        "big5_compassion": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v7_q03",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "def_intellectual",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你在一次重要的场合被当面否定了，回家的路上，胸口一直闷着。",
+      "prompt": "接下来的两个小时里，你更可能做的事是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "把整件事拆开分析，找出他在逻辑上站不住的地方，一条条列出来",
+          "effects": {
+            "def_intellectual": 2,
+            "cog_logic": 1.4,
+            "big5_rumination": 0.8,
+            "def_detach": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "什么也不想，直接去跑步、去收拾房间，让身体先累下来",
+          "effects": {
+            "def_sublimate": 2,
+            "def_intellectual": -1,
+            "big5_industry": 1,
+            "big5_rumination": -0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "把这件事讲给一个很信任的人听，讲到情绪出来为止",
+          "effects": {
+            "def_intellectual": -1.6,
+            "mot_belonging": 1.6,
+            "big5_compassion": 1.2,
+            "att_anxiety": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "干脆打开电脑干活，用下一件事把这整段时间彻底填满",
+          "effects": {
+            "def_detach": 1.6,
+            "def_sublimate": 1,
+            "big5_industry": 1.4,
+            "big5_rumination": -0.4
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v7_q04",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "def_detach",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "你刚收到一个很坏的消息，手指还在发抖，人卡在电梯里。电梯门还没开，身后站着两个你并不熟的同事。",
+      "prompt": "那十几秒里，你身体自动接管的方式是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "一下子什么感觉都没有了，像隔着一层玻璃在看自己",
+          "effects": {
+            "def_detach": 2,
+            "big5_compassion": -0.8,
+            "att_avoidance": 1.2,
+            "def_intellectual": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "眼泪先上来了，完全压不住，只能低头假装看手机",
+          "effects": {
+            "def_detach": -1.8,
+            "big5_compassion": 1.6,
+            "att_anxiety": 1.4,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "脑子立刻开始处理：接下来要打几个电话、做什么决定",
+          "effects": {
+            "def_intellectual": 1.6,
+            "def_detach": 0.8,
+            "big5_order": 1.2,
+            "cog_logic": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "一股火先出来，想找一个人问清楚为什么会这样",
+          "effects": {
+            "def_attack": 1.8,
+            "sin_wrath": 1.4,
+            "big5_assert": 1,
+            "def_detach": -0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v7_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "def_fawn",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "你走进一个房间，发现里面两个人正在低声争一件事，你一进门他们就停了。你的第一动作是——",
+      "scale": {
+        "left": "当作没看见，继续做自己的事",
+        "right": "立刻开始读空气，判断自己是不是那个话题",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "def_fawn": [
+          -1.8,
+          2
+        ],
+        "big5_compassion": [
+          0.8,
+          1.4
+        ],
+        "att_anxiety": [
+          -0.8,
+          1.6
+        ],
+        "big5_alert": [
+          -0.4,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "v7_q06",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "def_attack",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "家族群里，有人用一个明显扭曲过的说法描述了你去年做的一个决定，而且这段话被好几位长辈接着往下说了。",
+      "prompt": "你更可能的选择是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "当场在群里打断，把原话说清楚，语气会明显变硬",
+          "effects": {
+            "def_attack": 2,
+            "big5_assert": 1.6,
+            "sin_wrath": 1.2,
+            "big5_compliance": -1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "群里不接，之后单独找那个人，把这件事处理掉",
+          "effects": {
+            "def_attack": 0.4,
+            "covert_control": 1.6,
+            "dark_mach": 1,
+            "big5_compliance": -0.4
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先忍着，等下把完整的事实写成一段长文字发出去",
+          "effects": {
+            "def_intellectual": 1.6,
+            "light_kant": 1.2,
+            "big5_order": 1,
+            "def_attack": -0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "几乎没反应，我大概会在心里把这个人彻底划掉",
+          "effects": {
+            "def_attack": -1.4,
+            "def_detach": 1.8,
+            "att_avoidance": 1.2,
+            "sin_wrath": 0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v7_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "def_project",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "别人夸你的时候，你内心深处最先冒出来的判断通常是——",
+      "scale": {
+        "left": "他大概是真的这么觉得，我先收下",
+        "right": "他可能只是客气，或者想让我做点什么",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "def_project": [
+          -2,
+          2
+        ],
+        "big5_alert": [
+          -1.2,
+          1.6
+        ],
+        "light_faith": [
+          1.4,
+          -1.4
+        ],
+        "sin_pride": [
+          0.4,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v7_q08",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "att_avoidance",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你的高中同桌和一个人相处了半年，对方开始提到明年一起住。他笑着说好，那天晚上一个人在楼下走了很久。",
+      "prompt": "你觉得他那一刻最真实的感受是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "很高兴，同时有一种什么东西正在结束的慌，说不清是舍不得还是怕",
+          "effects": {
+            "att_avoidance": 2,
+            "mot_autonomy": 1.4,
+            "def_detach": 1,
+            "big5_rumination": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "只是在算实际的事：钱、位置、通勤、两个人的习惯能不能合",
+          "effects": {
+            "att_avoidance": 0.6,
+            "def_intellectual": 1.8,
+            "cog_logic": 1.2,
+            "att_anxiety": -0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "有点想哭，他一直想要的就是这个，只是没想到真的来了",
+          "effects": {
+            "att_avoidance": -1.8,
+            "mot_belonging": 1.8,
+            "att_anxiety": 1,
+            "big5_compassion": 1.2
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v7_q09",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "def_attack",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "在一场争吵里，对方忽然扔出一句：「你在乎的从来只有你自己。」你知道这句话不完全是事实，但你也没法说它全错。",
+      "prompt": "这句话落地的那一秒，你的第一反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "立刻反击，用一句更准的话扎回去，让他也疼一下",
+          "effects": {
+            "def_attack": 2,
+            "sin_wrath": 1.8,
+            "big5_assert": 1.2,
+            "big5_compassion": -1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "整个人一下空了，所有话都堵住了，只想离开房间",
+          "effects": {
+            "def_detach": 1.8,
+            "def_fawn": 0.8,
+            "big5_rumination": 1.4,
+            "def_attack": -1.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "先承认那部分是真的，然后问他这次具体是哪件事让他这么想",
+          "effects": {
+            "def_intellectual": 1.2,
+            "light_kant": 1.4,
+            "big5_compassion": 1.6,
+            "def_attack": -1.6
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "马上道歉，先把他的情绪稳住，剩下的之后再说",
+          "effects": {
+            "def_fawn": 2,
+            "att_anxiety": 1.6,
+            "big5_compliance": 1.4,
+            "def_attack": -1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v7_q10",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "def_sublimate",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一段很难受的日子过去后，你回头看，那段时间你的产出往往是——",
+      "scale": {
+        "left": "反而很高，痛苦被我烧成了燃料",
+        "right": "几乎停摆，我做不到一边疼一边做事",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "def_sublimate": [
+          2,
+          -2
+        ],
+        "big5_industry": [
+          1.4,
+          -1
+        ],
+        "big5_rumination": [
+          -0.6,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v7_q11",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "att_anxiety",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你和一个人很好，好到你已经习惯了他每天都会出现。今天他没有出现，也没有说为什么。",
+      "prompt": "你实际的应对方式是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "会等到很晚，然后把手机放在看得到的地方，反复拿起又放下",
+          "effects": {
+            "att_anxiety": 2,
+            "big5_rumination": 1.8,
+            "def_fawn": 1,
+            "mot_belonging": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "照常过自己的晚上，他不出现一定有不出现的理由",
+          "effects": {
+            "att_anxiety": -1.8,
+            "att_avoidance": 1.2,
+            "mot_autonomy": 1.2,
+            "light_faith": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "会主动发一条很轻的消息过去，然后盯着屏幕看他的反应",
+          "effects": {
+            "att_anxiety": 1.2,
+            "big5_assert": 1,
+            "def_intellectual": 0.6,
+            "light_kant": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "不问，也不会等，但心里开始给这段关系悄悄降级",
+          "effects": {
+            "att_anxiety": 0.8,
+            "att_avoidance": 1.6,
+            "def_detach": 1.4,
+            "big5_compliance": -0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v7_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "def_fawn",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "你和一个情绪起伏比较大的人长期相处。你在这段关系里的真实位置更接近——",
+      "scale": {
+        "left": "我会被他的情绪带着走，先处理他的状态再说自己",
+        "right": "我会守住自己的节奏，他的情绪是他的功课",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "def_fawn": [
+          2,
+          -2
+        ],
+        "att_anxiety": [
+          1.4,
+          -1.2
+        ],
+        "big5_compliance": [
+          1.6,
+          -1.4
+        ],
+        "big5_compassion": [
+          1.2,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v7_q13",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "def_intellectual",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "两种「难过」，你更常经历的是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "情绪很浓，但我说不清它到底是什么，只能等它过去",
+          "effects": {
+            "def_intellectual": -1.8,
+            "big5_compassion": 1.4,
+            "big5_rumination": 1.2,
+            "cog_logic": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "情绪不浓，但我能在脑子里把它解释得非常清楚，甚至有点得意",
+          "effects": {
+            "def_intellectual": 1.8,
+            "cog_logic": 1.4,
+            "def_detach": 0.8,
+            "big5_compassion": -1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v7_q14",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "def_project",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个朋友最近对你有些冷淡。你心里最有分量的那个解释是——",
+      "scale": {
+        "left": "他大概最近自己过得不容易",
+        "right": "他是不是在什么地方对我不满了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "def_project": [
+          -1.8,
+          2
+        ],
+        "att_anxiety": [
+          -1.2,
+          1.6
+        ],
+        "big5_compassion": [
+          1.2,
+          -0.6
+        ],
+        "big5_alert": [
+          -0.6,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v7_q15",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "def_detach",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "在一场真正让你难过的电影或消息之后，你通常需要多久才能重新感觉到自己？",
+      "scale": {
+        "left": "其实没走远，情绪一直在，我只是在压它",
+        "right": "很快就能抽出来，像换了个人一样继续",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "def_detach": [
+          -1.8,
+          2
+        ],
+        "big5_compassion": [
+          1.2,
+          -1.2
+        ],
+        "def_intellectual": [
+          -0.6,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v7_q16",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "att_anxiety",
+      "is_sensitive": true,
+      "weight": 1.35,
+      "context": "认识十年的发小和伴侣在一起五年，关系稳定。伴侣最近换了一份要频繁出差的工作。",
+      "prompt": "你猜她接下来最可能的样子是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "表面支持，但心里会开始数对方不在的日子，越想越不安",
+          "effects": {
+            "att_anxiety": 2,
+            "big5_rumination": 1.6,
+            "def_fawn": 0.8,
+            "mot_belonging": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "会认真谈一次边界：多久见一次、怎么保持联系、哪些事必须同步",
+          "effects": {
+            "att_anxiety": -0.6,
+            "light_kant": 1.4,
+            "big5_order": 1.2,
+            "big5_assert": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "其实有点松了口气，多出来的一段时间她可以做自己的事",
+          "effects": {
+            "att_anxiety": -1.4,
+            "att_avoidance": 1.8,
+            "mot_autonomy": 1.4,
+            "def_detach": 0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "会把更多精力放回工作，反正这段时间也没别的安排",
+          "effects": {
+            "att_anxiety": -0.4,
+            "def_sublimate": 1.6,
+            "mot_mastery": 1.4,
+            "att_avoidance": 0.6
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v7_q17",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "def_attack",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "有人踩到了你非常在意的那条线。你通常的反应节奏是——",
+      "scale": {
+        "left": "当场就会把态度放到脸上，让对方立刻知道",
+        "right": "当时几乎没反应，事后在心里演练很多遍才把话说完",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "def_attack": [
+          2,
+          -1.8
+        ],
+        "big5_assert": [
+          1.4,
+          -1.4
+        ],
+        "big5_rumination": [
+          -1,
+          1.6
+        ],
+        "sin_wrath": [
+          1.2,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v7_q18",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "def_sublimate",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "一个人如果被生活反复捶打，你最希望他最后长出的是哪一种能力？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把那些东西变成作品、手艺或者身体的力量",
+          "effects": {
+            "def_sublimate": 1.8,
+            "mot_purpose": 1.2,
+            "big5_industry": 1,
+            "lv_suffering": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "能把它说清楚、理解透，然后放下",
+          "effects": {
+            "def_intellectual": 1.8,
+            "cog_logic": 1.2,
+            "def_detach": 0.6,
+            "lv_suffering": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "敢于当场不让那些东西再发生一次",
+          "effects": {
+            "def_attack": 1.6,
+            "big5_assert": 1.4,
+            "sin_wrath": 0.8,
+            "mot_autonomy": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "还能继续相信人，继续愿意靠近别人",
+          "effects": {
+            "light_faith": 1.8,
+            "big5_compassion": 1.6,
+            "mot_belonging": 1.2,
+            "def_fawn": -0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    }
+  ]
+}

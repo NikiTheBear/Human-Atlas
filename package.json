@@ -1,0 +1,28 @@
+{
+  "name": "human-atlas",
+  "private": true,
+  "version": "3.0.0",
+  "description": "人性全息图谱 The Human Atlas — 分卷潜行式多维深度测评系统（纯前端 / 零依赖）",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node serve.js",
+    "dev": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node serve.js",
+    "data": "node scripts/merge-volume-fragments.js && node scripts/build-data.js",
+    "single": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node scripts/build-single.js",
+    "build": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node scripts/build-single.js && node scripts/build.js",
+    "test": "node tests/verify-scoring.js && node tests/verify-engine.js",
+    "check": "node tests/verify-engine.js",
+    "test:scoring": "node tests/verify-scoring.js",
+    "test:engine": "node tests/verify-engine.js",
+    "merge": "node scripts/merge-volume-fragments.js",
+    "test:monte": "node tests/monte-carlo-audit.js 2000",
+    "test:monte:full": "node tests/monte-carlo-audit.js 10000",
+    "test:all": "node tests/verify-scoring.js && node tests/verify-engine.js && node tests/monte-carlo-audit.js 2000",
+    "audit": "node tests/audit.mjs 10000",
+    "audit:quick": "node tests/audit.mjs 1000",
+    "pack": "node scripts/build-audit-pack.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

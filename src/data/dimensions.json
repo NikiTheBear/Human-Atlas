@@ -1,0 +1,993 @@
+{
+  "version": 4,
+  "note": "维度注册表 · 顺序即存档码编码顺序。v4 起共 127 维（本源八卷 60 + 破圈八卷 67）。",
+  "dims": [
+    {
+      "id": "sin_pride",
+      "name": "傲慢驱力",
+      "volume": "vol1",
+      "category": "sin",
+      "axis": "pride_humility"
+    },
+    {
+      "id": "virtue_humility",
+      "name": "谦逊秩序",
+      "volume": "vol1",
+      "category": "virtue",
+      "axis": "pride_humility"
+    },
+    {
+      "id": "sin_greed",
+      "name": "贪婪驱力",
+      "volume": "vol1",
+      "category": "sin",
+      "axis": "greed_charity"
+    },
+    {
+      "id": "virtue_charity",
+      "name": "慷慨流动",
+      "volume": "vol1",
+      "category": "virtue",
+      "axis": "greed_charity"
+    },
+    {
+      "id": "sin_lust",
+      "name": "沉溺驱力",
+      "volume": "vol1",
+      "category": "sin",
+      "axis": "lust_chastity"
+    },
+    {
+      "id": "virtue_chastity",
+      "name": "节制自持",
+      "volume": "vol1",
+      "category": "virtue",
+      "axis": "lust_chastity"
+    },
+    {
+      "id": "sin_envy",
+      "name": "嫉妒雷达",
+      "volume": "vol1",
+      "category": "sin",
+      "axis": "envy_kindness"
+    },
+    {
+      "id": "virtue_kindness",
+      "name": "欣赏能力",
+      "volume": "vol1",
+      "category": "virtue",
+      "axis": "envy_kindness"
+    },
+    {
+      "id": "sin_gluttony",
+      "name": "放纵代偿",
+      "volume": "vol1",
+      "category": "sin",
+      "axis": "gluttony_temperance"
+    },
+    {
+      "id": "virtue_temperance",
+      "name": "克制秩序",
+      "volume": "vol1",
+      "category": "virtue",
+      "axis": "gluttony_temperance"
+    },
+    {
+      "id": "sin_wrath",
+      "name": "愤怒烈度",
+      "volume": "vol1",
+      "category": "sin",
+      "axis": "wrath_patience"
+    },
+    {
+      "id": "virtue_patience",
+      "name": "宽容稳态",
+      "volume": "vol1",
+      "category": "virtue",
+      "axis": "wrath_patience"
+    },
+    {
+      "id": "sin_sloth",
+      "name": "逃避惯性",
+      "volume": "vol1",
+      "category": "sin",
+      "axis": "sloth_diligence"
+    },
+    {
+      "id": "virtue_diligence",
+      "name": "勤勉推进",
+      "volume": "vol1",
+      "category": "virtue",
+      "axis": "sloth_diligence"
+    },
+    {
+      "id": "big5_open",
+      "name": "概念探索欲",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_open"
+    },
+    {
+      "id": "big5_aesthetic",
+      "name": "审美体验敏锐",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_aesthetic"
+    },
+    {
+      "id": "big5_order",
+      "name": "秩序与计划感",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_order"
+    },
+    {
+      "id": "big5_industry",
+      "name": "目标韧性与自律",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_industry"
+    },
+    {
+      "id": "big5_social",
+      "name": "社交充能倾向",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_social"
+    },
+    {
+      "id": "big5_assert",
+      "name": "表达主导与存在感",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_assert"
+    },
+    {
+      "id": "big5_compassion",
+      "name": "情绪共情力",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_compassion"
+    },
+    {
+      "id": "big5_compliance",
+      "name": "冲突妥协倾向",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_compliance"
+    },
+    {
+      "id": "big5_alert",
+      "name": "风险预警敏感",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_alert"
+    },
+    {
+      "id": "big5_rumination",
+      "name": "情绪反刍与波动",
+      "volume": "vol2",
+      "category": "big5",
+      "axis": "big5_rumination"
+    },
+    {
+      "id": "dark_mach",
+      "name": "马基雅维利谋略",
+      "volume": "vol3",
+      "category": "dark",
+      "axis": "dark_mach"
+    },
+    {
+      "id": "dark_narc",
+      "name": "自恋光环渴求",
+      "volume": "vol3",
+      "category": "dark",
+      "axis": "dark_narc"
+    },
+    {
+      "id": "dark_psycho",
+      "name": "冷酷果决",
+      "volume": "vol3",
+      "category": "dark",
+      "axis": "dark_psycho"
+    },
+    {
+      "id": "light_humanism",
+      "name": "人本主义",
+      "volume": "vol3",
+      "category": "light",
+      "axis": "light_humanism"
+    },
+    {
+      "id": "light_kant",
+      "name": "康德式正直",
+      "volume": "vol3",
+      "category": "light",
+      "axis": "light_kant"
+    },
+    {
+      "id": "light_faith",
+      "name": "人性信仰",
+      "volume": "vol3",
+      "category": "light",
+      "axis": "light_faith"
+    },
+    {
+      "id": "covert_control",
+      "name": "隐性掌控欲",
+      "volume": "vol3",
+      "category": "dark",
+      "axis": "covert_control"
+    },
+    {
+      "id": "wv_nature",
+      "name": "人性预设",
+      "volume": "vol4",
+      "category": "worldview",
+      "axis": "wv_nature",
+      "negLabel": "审慎防备",
+      "posLabel": "善意信任"
+    },
+    {
+      "id": "wv_causal",
+      "name": "因果归因",
+      "volume": "vol4",
+      "category": "worldview",
+      "axis": "wv_causal",
+      "negLabel": "顺应随机",
+      "posLabel": "长期掌控"
+    },
+    {
+      "id": "wv_social",
+      "name": "社会逻辑",
+      "volume": "vol4",
+      "category": "worldview",
+      "axis": "wv_social",
+      "negLabel": "现实博弈",
+      "posLabel": "契约规则"
+    },
+    {
+      "id": "lv_happiness",
+      "name": "幸福取向",
+      "volume": "vol4",
+      "category": "lifeview",
+      "axis": "lv_happiness",
+      "negLabel": "体验主义",
+      "posLabel": "实现主义"
+    },
+    {
+      "id": "lv_suffering",
+      "name": "苦难态度",
+      "volume": "vol4",
+      "category": "lifeview",
+      "axis": "lv_suffering",
+      "negLabel": "拒绝内耗",
+      "posLabel": "意义转化"
+    },
+    {
+      "id": "lv_anchor",
+      "name": "存在锚点",
+      "volume": "vol4",
+      "category": "lifeview",
+      "axis": "lv_anchor",
+      "negLabel": "向外建构",
+      "posLabel": "向内自洽"
+    },
+    {
+      "id": "val_moral",
+      "name": "道德算法",
+      "volume": "vol4",
+      "category": "value",
+      "axis": "val_moral",
+      "negLabel": "结果优先",
+      "posLabel": "原则底线"
+    },
+    {
+      "id": "val_boundary",
+      "name": "边界重心",
+      "volume": "vol4",
+      "category": "value",
+      "axis": "val_boundary",
+      "negLabel": "归属稳定",
+      "posLabel": "自由独立"
+    },
+    {
+      "id": "val_standard",
+      "name": "评判标尺",
+      "volume": "vol4",
+      "category": "value",
+      "axis": "val_standard",
+      "negLabel": "效率务实",
+      "posLabel": "真诚公平"
+    },
+    {
+      "id": "cog_global",
+      "name": "全局抽象",
+      "volume": "vol5",
+      "category": "cognitive",
+      "axis": "cog_global",
+      "negLabel": "细节实证",
+      "posLabel": "全局抽象"
+    },
+    {
+      "id": "cog_diverge",
+      "name": "发散破局",
+      "volume": "vol5",
+      "category": "cognitive",
+      "axis": "cog_diverge",
+      "negLabel": "收敛风控",
+      "posLabel": "发散破局"
+    },
+    {
+      "id": "cog_logic",
+      "name": "逻辑抽离",
+      "volume": "vol5",
+      "category": "cognitive",
+      "axis": "cog_logic",
+      "negLabel": "直觉共振",
+      "posLabel": "逻辑抽离"
+    },
+    {
+      "id": "cog_ambiguity",
+      "name": "高模糊容忍",
+      "volume": "vol5",
+      "category": "cognitive",
+      "axis": "cog_ambiguity",
+      "negLabel": "确定性偏好",
+      "posLabel": "高模糊容忍"
+    },
+    {
+      "id": "cog_independent",
+      "name": "独立反叛思考",
+      "volume": "vol5",
+      "category": "cognitive",
+      "axis": "cog_independent",
+      "negLabel": "共识校准",
+      "posLabel": "独立反叛"
+    },
+    {
+      "id": "cog_speed",
+      "name": "快决策迭代",
+      "volume": "vol5",
+      "category": "cognitive",
+      "axis": "cog_speed",
+      "negLabel": "慢决策求全",
+      "posLabel": "快决策迭代"
+    },
+    {
+      "id": "mot_autonomy",
+      "name": "主权引擎",
+      "volume": "vol6",
+      "category": "motive",
+      "axis": "mot_autonomy"
+    },
+    {
+      "id": "mot_mastery",
+      "name": "跨越引擎",
+      "volume": "vol6",
+      "category": "motive",
+      "axis": "mot_mastery"
+    },
+    {
+      "id": "mot_belonging",
+      "name": "羁绊引擎",
+      "volume": "vol6",
+      "category": "motive",
+      "axis": "mot_belonging"
+    },
+    {
+      "id": "mot_security",
+      "name": "秩序引擎",
+      "volume": "vol6",
+      "category": "motive",
+      "axis": "mot_security"
+    },
+    {
+      "id": "mot_purpose",
+      "name": "意义引擎",
+      "volume": "vol6",
+      "category": "motive",
+      "axis": "mot_purpose"
+    },
+    {
+      "id": "mot_hedonism",
+      "name": "丰盈引擎",
+      "volume": "vol6",
+      "category": "motive",
+      "axis": "mot_hedonism"
+    },
+    {
+      "id": "att_anxiety",
+      "name": "依恋焦虑轴",
+      "volume": "vol7",
+      "category": "attachment",
+      "axis": "att_anxiety"
+    },
+    {
+      "id": "att_avoidance",
+      "name": "依恋回避轴",
+      "volume": "vol7",
+      "category": "attachment",
+      "axis": "att_avoidance"
+    },
+    {
+      "id": "def_intellectual",
+      "name": "理智化防御",
+      "volume": "vol7",
+      "category": "defense",
+      "axis": "def_intellectual"
+    },
+    {
+      "id": "def_detach",
+      "name": "情感隔离防御",
+      "volume": "vol7",
+      "category": "defense",
+      "axis": "def_detach"
+    },
+    {
+      "id": "def_sublimate",
+      "name": "升华转化防御",
+      "volume": "vol7",
+      "category": "defense",
+      "axis": "def_sublimate"
+    },
+    {
+      "id": "def_attack",
+      "name": "先发反击防御",
+      "volume": "vol7",
+      "category": "defense",
+      "axis": "def_attack"
+    },
+    {
+      "id": "def_fawn",
+      "name": "讨好安抚防御",
+      "volume": "vol7",
+      "category": "defense",
+      "axis": "def_fawn"
+    },
+    {
+      "id": "def_project",
+      "name": "反向投射防御",
+      "volume": "vol7",
+      "category": "defense",
+      "axis": "def_project"
+    },
+    {
+      "id": "jung_te",
+      "name": "外倾思维",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_te"
+    },
+    {
+      "id": "jung_ti",
+      "name": "内倾思维",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_ti"
+    },
+    {
+      "id": "jung_fe",
+      "name": "外倾情感",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_fe"
+    },
+    {
+      "id": "jung_fi",
+      "name": "内倾情感",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_fi"
+    },
+    {
+      "id": "jung_ne",
+      "name": "外倾直觉",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_ne"
+    },
+    {
+      "id": "jung_ni",
+      "name": "内倾直觉",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_ni"
+    },
+    {
+      "id": "jung_se",
+      "name": "外倾感觉",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_se"
+    },
+    {
+      "id": "jung_si",
+      "name": "内倾感觉",
+      "volume": "vol9",
+      "category": "jung",
+      "axis": "jung_si"
+    },
+    {
+      "id": "dd_order",
+      "name": "秩序倾向",
+      "volume": "vol10",
+      "category": "alignment",
+      "axis": "dd_order",
+      "negLabel": "混沌",
+      "posLabel": "秩序"
+    },
+    {
+      "id": "dd_good",
+      "name": "良善倾向",
+      "volume": "vol10",
+      "category": "alignment",
+      "axis": "dd_good",
+      "negLabel": "自利",
+      "posLabel": "良善"
+    },
+    {
+      "id": "phil_stoic",
+      "name": "斯多葛底色",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_stoic"
+    },
+    {
+      "id": "phil_existential",
+      "name": "存在主义",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_existential"
+    },
+    {
+      "id": "phil_absurd",
+      "name": "荒诞主义",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_absurd"
+    },
+    {
+      "id": "phil_cynic",
+      "name": "犬儒底色",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_cynic"
+    },
+    {
+      "id": "phil_pragmatic",
+      "name": "实用主义",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_pragmatic"
+    },
+    {
+      "id": "phil_epicurean",
+      "name": "伊壁鸠鲁",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_epicurean"
+    },
+    {
+      "id": "phil_nihilism",
+      "name": "虚无底色",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_nihilism"
+    },
+    {
+      "id": "phil_humanist",
+      "name": "人本浪漫",
+      "volume": "vol11",
+      "category": "philosophy",
+      "axis": "phil_humanist"
+    },
+    {
+      "id": "mft_care",
+      "name": "道德·关爱",
+      "volume": "vol11",
+      "category": "moralfound",
+      "axis": "mft_care"
+    },
+    {
+      "id": "mft_fairness",
+      "name": "道德·公平",
+      "volume": "vol11",
+      "category": "moralfound",
+      "axis": "mft_fairness"
+    },
+    {
+      "id": "mft_loyalty",
+      "name": "道德·忠诚",
+      "volume": "vol11",
+      "category": "moralfound",
+      "axis": "mft_loyalty"
+    },
+    {
+      "id": "mft_authority",
+      "name": "道德·权威",
+      "volume": "vol11",
+      "category": "moralfound",
+      "axis": "mft_authority"
+    },
+    {
+      "id": "mft_sanctity",
+      "name": "道德·圣洁",
+      "volume": "vol11",
+      "category": "moralfound",
+      "axis": "mft_sanctity"
+    },
+    {
+      "id": "mft_liberty",
+      "name": "道德·自由",
+      "volume": "vol11",
+      "category": "moralfound",
+      "axis": "mft_liberty"
+    },
+    {
+      "id": "enn_1",
+      "name": "1号·完美者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_1"
+    },
+    {
+      "id": "enn_2",
+      "name": "2号·给予者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_2"
+    },
+    {
+      "id": "enn_3",
+      "name": "3号·成就者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_3"
+    },
+    {
+      "id": "enn_4",
+      "name": "4号·独特者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_4"
+    },
+    {
+      "id": "enn_5",
+      "name": "5号·观察者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_5"
+    },
+    {
+      "id": "enn_6",
+      "name": "6号·忠诚者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_6"
+    },
+    {
+      "id": "enn_7",
+      "name": "7号·活跃者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_7"
+    },
+    {
+      "id": "enn_8",
+      "name": "8号·挑战者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_8"
+    },
+    {
+      "id": "enn_9",
+      "name": "9号·调停者",
+      "volume": "vol12",
+      "category": "enneagram",
+      "axis": "enn_9"
+    },
+    {
+      "id": "inst_sp",
+      "name": "自保本能",
+      "volume": "vol12",
+      "category": "instinct",
+      "axis": "inst_sp"
+    },
+    {
+      "id": "inst_sx",
+      "name": "一对一冲动",
+      "volume": "vol12",
+      "category": "instinct",
+      "axis": "inst_sx"
+    },
+    {
+      "id": "inst_so",
+      "name": "社交本能",
+      "volume": "vol12",
+      "category": "instinct",
+      "axis": "inst_so"
+    },
+    {
+      "id": "schema_abandonment",
+      "name": "被抛弃图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_abandonment"
+    },
+    {
+      "id": "schema_deprivation",
+      "name": "情感剥夺图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_deprivation"
+    },
+    {
+      "id": "schema_defect",
+      "name": "缺陷羞耻图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_defect"
+    },
+    {
+      "id": "schema_mistrust",
+      "name": "不信任图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_mistrust"
+    },
+    {
+      "id": "schema_isolation",
+      "name": "社交疏离图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_isolation"
+    },
+    {
+      "id": "schema_std",
+      "name": "严苛标准图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_std"
+    },
+    {
+      "id": "schema_sacrifice",
+      "name": "自我牺牲图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_sacrifice"
+    },
+    {
+      "id": "schema_approval",
+      "name": "寻求认可图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_approval"
+    },
+    {
+      "id": "schema_entitlement",
+      "name": "权利夸大图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_entitlement"
+    },
+    {
+      "id": "schema_negativity",
+      "name": "灾难预期图式",
+      "volume": "vol13",
+      "category": "schema",
+      "axis": "schema_negativity"
+    },
+    {
+      "id": "money_avoid",
+      "name": "金钱回避",
+      "volume": "vol14",
+      "category": "money",
+      "axis": "money_avoid"
+    },
+    {
+      "id": "money_worship",
+      "name": "金钱崇拜",
+      "volume": "vol14",
+      "category": "money",
+      "axis": "money_worship"
+    },
+    {
+      "id": "money_status",
+      "name": "金钱地位",
+      "volume": "vol14",
+      "category": "money",
+      "axis": "money_status"
+    },
+    {
+      "id": "money_vigilance",
+      "name": "金钱警觉",
+      "volume": "vol14",
+      "category": "money",
+      "axis": "money_vigilance"
+    },
+    {
+      "id": "time_past_neg",
+      "name": "消极过去时间观",
+      "volume": "vol14",
+      "category": "time",
+      "axis": "time_past_neg"
+    },
+    {
+      "id": "time_past_pos",
+      "name": "积极过去时间观",
+      "volume": "vol14",
+      "category": "time",
+      "axis": "time_past_pos"
+    },
+    {
+      "id": "time_present_hed",
+      "name": "享乐当下时间观",
+      "volume": "vol14",
+      "category": "time",
+      "axis": "time_present_hed"
+    },
+    {
+      "id": "time_present_fate",
+      "name": "宿命当下时间观",
+      "volume": "vol14",
+      "category": "time",
+      "axis": "time_present_fate"
+    },
+    {
+      "id": "time_future",
+      "name": "未来导向时间观",
+      "volume": "vol14",
+      "category": "time",
+      "axis": "time_future"
+    },
+    {
+      "id": "tki_competing",
+      "name": "竞争型",
+      "volume": "vol15",
+      "category": "conflict",
+      "axis": "tki_competing"
+    },
+    {
+      "id": "tki_collaborating",
+      "name": "协作型",
+      "volume": "vol15",
+      "category": "conflict",
+      "axis": "tki_collaborating"
+    },
+    {
+      "id": "tki_compromising",
+      "name": "妥协型",
+      "volume": "vol15",
+      "category": "conflict",
+      "axis": "tki_compromising"
+    },
+    {
+      "id": "tki_avoiding",
+      "name": "回避型",
+      "volume": "vol15",
+      "category": "conflict",
+      "axis": "tki_avoiding"
+    },
+    {
+      "id": "tki_accommodating",
+      "name": "迁就型",
+      "volume": "vol15",
+      "category": "conflict",
+      "axis": "tki_accommodating"
+    },
+    {
+      "id": "pac_parent",
+      "name": "父母自我态",
+      "volume": "vol15",
+      "category": "pac",
+      "axis": "pac_parent"
+    },
+    {
+      "id": "pac_adult",
+      "name": "成人自我态",
+      "volume": "vol15",
+      "category": "pac",
+      "axis": "pac_adult"
+    },
+    {
+      "id": "pac_child",
+      "name": "儿童自我态",
+      "volume": "vol15",
+      "category": "pac",
+      "axis": "pac_child"
+    },
+    {
+      "id": "hsp_sensory",
+      "name": "感官高敏",
+      "volume": "vol16",
+      "category": "neuro",
+      "axis": "hsp_sensory"
+    },
+    {
+      "id": "hsp_emotional",
+      "name": "情绪高敏",
+      "volume": "vol16",
+      "category": "neuro",
+      "axis": "hsp_emotional"
+    },
+    {
+      "id": "hss_novelty",
+      "name": "新奇寻求",
+      "volume": "vol16",
+      "category": "neuro",
+      "axis": "hss_novelty"
+    },
+    {
+      "id": "hss_intensity",
+      "name": "强度寻求",
+      "volume": "vol16",
+      "category": "neuro",
+      "axis": "hss_intensity"
+    }
+  ],
+  "pressureStyles": [
+    {
+      "id": "burst",
+      "name": "爆发攻击型",
+      "desc": "压力瞬间外化为怒火与攻击，先掀桌再后悔。"
+    },
+    {
+      "id": "cutoff",
+      "name": "彻底断联型",
+      "desc": "拔掉所有连接，消失、沉默、把自己关起来。"
+    },
+    {
+      "id": "cold",
+      "name": "冰冷黑化型",
+      "desc": "情绪归零，只算输赢，用冷静把对方请出局。"
+    },
+    {
+      "id": "collapse",
+      "name": "自我坍塌型",
+      "desc": "把攻击转向自己，陷入自责、失眠与耗竭。"
+    }
+  ],
+  "values": [
+    {
+      "id": "freedom",
+      "name": "自由",
+      "desc": "时间与身体由自己说了算"
+    },
+    {
+      "id": "dignity",
+      "name": "尊严",
+      "desc": "不被轻视、不被定义"
+    },
+    {
+      "id": "wealth",
+      "name": "财富",
+      "desc": "资源厚度与选择权"
+    },
+    {
+      "id": "intimacy",
+      "name": "亲密",
+      "desc": "被深深理解与偏爱"
+    },
+    {
+      "id": "security",
+      "name": "安全",
+      "desc": "退路稳固、风险可控"
+    },
+    {
+      "id": "breakthrough",
+      "name": "突破",
+      "desc": "打破天花板、拿到结果"
+    },
+    {
+      "id": "fairness",
+      "name": "公平",
+      "desc": "规则一致、不双标"
+    },
+    {
+      "id": "ease",
+      "name": "松弛",
+      "desc": "不必紧绷的呼吸感"
+    }
+  ]
+}

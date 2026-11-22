@@ -1,0 +1,1727 @@
+/* ============================================================
+   ReportView.js — 全息报告
+   模块 1 灵魂封面 / 2 双面镜 / 3 可视化 / 4 跨卷与双态
+   模块 5 分卷档案 / 6 使用说明书 / 7 导出工作室
+   ============================================================ */
+
+import { el, go, round, clamp, toast, downloadText, formatDate } from '../core/utils.js';
+import {
+  mirrorFor, topGifts, topShadows, buildHolographicReport, reportDepth,
+} from '../core/synthesizer.js';
+import { tierOf, maskTierOf, layeredScores } from '../core/scoring.js';
+import { butterflySvg } from '../viz/butterflySvg.js';
+import { radarSvg, maskRadar } from '../viz/radarSvg.js';
+import { spectrumSvg } from '../viz/spectrumSvg.js';
+import { quadrantSvg, attachmentStyle } from '../viz/quadrantSvg.js';
+import { triadSvg } from '../viz/triadSvg.js';
+import { jungStackSvg, jungTypeHint } from '../viz/jungStackSvg.js';
+import { matrixSvg, alignmentOf, neuroOf, ALIGNMENT_QUADRANTS, NEURO_QUADRANTS } from '../viz/matrixSvg.js';
+import {
+  downloadPoster, downloadMarkdown, copyMarkdown, copyAIPrompt, buildAIPrompt as buildAIPromptLocal,
+} from './Exporter.js';
+import {
+  exportJSON, encodeSoulCode, initialSnapshotOf, retakeVolume, hasInitialSnapshot,
+} from '../core/storage.js';
+import { confirmDialog } from './Dialogs.js';
+import { openSoulDialog } from './Dialogs.js';
+
+const meanOf = (ids, map) => {
+  const vals = ids.map((i) => map[i]).filter((v) => Number.isFinite(v));
+  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+};
+
+/* ------------------------------------------------------------
+   主题色读取
+   ------------------------------------------------------------ */
+
+function themeColors() {
+  const cs = getComputedStyle(document.documentElement);
+  const g = (k) => cs.getPropertyValue(k).trim();
+  return {
+    text: g('--text-primary'),
+    sub: g('--text-secondary'),
+    faint: g('--text-tertiary'),
+    border: g('--border'),
+    gold: g('--gold'),
+    card: g('--bg-card'),
+    page: g('--bg-page'),
+    vol1: g('--vol1'),
+    vol2: g('--vol2'),
+    vol3: g('--vol3'),
+    vol4: g('--vol4'),
+    vol5: g('--vol5'),
+    vol6: g('--vol6'),
+    vol7: g('--vol7'),
+    vol8: g('--vol8'),
+    vol9: g('--vol9'),
+    vol10: g('--vol10'),
+    vol11: g('--vol11'),
+    vol12: g('--vol12'),
+    vol13: g('--vol13'),
+    vol14: g('--vol14'),
+    vol15: g('--vol15'),
+    vol16: g('--vol16'),
+  };
+}
+
+/* ------------------------------------------------------------
+   小工具
+   ------------------------------------------------------------ */
+
+function sec(no, title, hint) {
+  return el('div', { class: 'rsec__head' }, [
+    el('span', { class: 'rsec__no', text: no }),
+    el('h2', { text: title }),
+    hint ? el('p', { text: hint }) : null,
+  ]);
+}
+
+function gauge(label, value, note) {
+  return el('div', { class: 'gauge' }, [
+    el('div', { class: 'gauge__label', text: label }),
+    el('div', { class: 'gauge__value' }, [String(value), note ? el('small', { text: note }) : null]),
+  ]);
+}
+
+/* ------------------------------------------------------------
+   双面镜卡片（可翻转）
+   ------------------------------------------------------------ */
+
+function mirrorCard(m) {
+  const card = el('button', {
+    class: 'mirror-card',
+    type: 'button',
+    style: { '--mc': m.side === 'high' ? 'var(--gold)' : 'var(--vol2)' },
+    'aria-label': `${m.name} 双面镜，点击翻转`,
+  });
+
+  const inner = el('div', { class: 'mirror-card__inner' });
+
+  const front = el('div', { class: 'mirror-face mirror-face--front' }, [
+    el('div', { class: 'mirror-face__top' }, [
+      el('span', { class: 'mirror-face__tag', text: 'GIFT · 优势面' }),
+      el('span', { class: 'mirror-face__score', text: `${round(m.score, 0)}` }),
+    ]),
+    el('h3', { text: m.gift_title }),
+    el('div', { class: 'mirror-face__dim', text: `${m.name} · ${m.tier.name}` }),
+    el('div', { class: 'mirror-face__body', text: m.gift_desc }),
+    el('div', { class: 'mirror-face__foot', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 12a8 8 0 1 1 2.4 5.7"/><path d="M4 17v-5h5"/></svg><span>点击翻转 · 查看劣势面与炼金处方</span>' }),
+  ]);
+
+  const back = el('div', { class: 'mirror-face mirror-face--back' }, [
+    el('div', { class: 'mirror-face__top' }, [
+      el('span', { class: 'mirror-face__tag', text: 'SHADOW · 劣势面' }),
+      el('span', { class: 'mirror-face__score', text: m.label }),
+    ]),
+    el('h3', { text: m.shadow_title }),
+    el('div', { class: 'mirror-face__dim', text: '能量过载时的显影' }),
+    el('div', { class: 'mirror-face__body', text: m.shadow_desc }),
+    el('div', { class: 'mirror-face__foot' }, [
+      el('div', { class: 'alchemy', html: `<b>炼金处方</b><br>${m.alchemy_tip}` }),
+    ]),
+  ]);
+
+  inner.appendChild(front);
+  inner.appendChild(back);
+  card.appendChild(inner);
+
+  card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+
+  return card;
+}
+
+/* ------------------------------------------------------------
+   维度明细表
+   ------------------------------------------------------------ */
+
+function dimTable(dims, MIRRORS) {
+  const rows = dims
+    .filter((d) => MIRRORS[d.id])
+    .map((d) => ({ ...d, m: MIRRORS[d.id] }));
+
+  const table = el('table', { class: 'dim-table' });
+
+  table.appendChild(el('thead', {}, [
+    el('tr', {}, [
+      el('th', { text: '维度' }),
+      el('th', { text: '分数' }),
+      el('th', { text: '' }),
+      el('th', { text: '档位' }),
+      el('th', { text: '当前显影' }),
+    ]),
+  ]));
+
+  const tbody = el('tbody');
+  rows.forEach((r) => {
+    const tier = tierOf(r.score);
+    const m = mirrorFor(r.id, r.score, MIRRORS);
+    const bar = el('div', { class: 'score-bar', style: { '--mc': m?.side === 'high' ? 'var(--gold)' : 'var(--vol2)' } }, [
+      (() => { const i = el('i'); i.style.width = `${clamp(r.score, 0, 100)}%`; return i; })(),
+    ]);
+
+    tbody.appendChild(el('tr', {}, [
+      el('td', {}, [
+        el('div', { class: 'dim-table__name', text: m?.name || r.id }),
+        el('div', { style: { fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.06em' }, text: m?.side === 'high' ? '高分侧' : '低分侧' }),
+      ]),
+      el('td', { class: 'dim-table__score', text: `${round(r.score, 0)}` }),
+      el('td', { style: { width: '38%' } }, [bar]),
+      el('td', {}, [
+        el('span', { class: 'tier-badge', dataset: { t: String(tier.id) }, text: tier.name }),
+      ]),
+      el('td', { style: { fontSize: '11.5px', color: 'var(--text-secondary)' }, text: m ? (m.side === 'high' ? m.gift_title : m.label) : '' }),
+    ]));
+  });
+
+  table.appendChild(tbody);
+  return table;
+}
+
+/* ------------------------------------------------------------
+   报告内导航
+   ------------------------------------------------------------ */
+
+function reportNav(items) {
+  const nav = el('div', { class: 'report-nav' });
+  items.forEach((it, i) => {
+    nav.appendChild(el('button', {
+      class: i === 0 ? 'is-on' : '',
+      type: 'button',
+      text: it.label,
+      onclick: (e) => {
+        nav.querySelectorAll('button').forEach((b) => b.classList.remove('is-on'));
+        e.currentTarget.classList.add('is-on');
+        const target = document.getElementById(it.id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+    }));
+  });
+  return nav;
+}
+
+/* ------------------------------------------------------------
+   主渲染
+   ------------------------------------------------------------ */
+
+export function renderReport(root, ctx) {
+  const { App, DATA, volId, recompute, VOL_IDS = [] } = ctx;
+  const state = App.state;
+  const C = themeColors();
+
+  // 单卷报告
+  if (volId && DATA.volumes[volId]) {
+    renderVolumeReport(root, ctx, volId);
+    return;
+  }
+
+  // 完成度不足
+  const completed = state.completedVolumes || [];
+  if (!completed.length) {
+    root.classList.add('view');
+    root.appendChild(el('div', { class: 'empty', style: { marginTop: '70px' } }, [
+      el('h3', { text: '还没有可以查看的档案' }),
+      el('p', { text: '完成任意一卷，即可获得该卷的独立深度报告；完成三卷以上，跨卷读心引擎会自动激活。' }),
+      el('a', { class: 'btn btn--solid', href: '#/', text: '前往卷宗大厅' }),
+    ]));
+    return;
+  }
+
+  const report = buildHolographicReport(state, DATA);
+  const depth = reportDepth(completed.length);
+  const arch = report.archetype?.best;
+
+  root.classList.add('view');
+  root.appendChild(el('div', { class: 'report', style: { '--vc': 'var(--gold)' } }));
+
+  const wrap = root.firstElementChild;
+  const nickname = state.nickname || '';
+
+  /* ============ 模块 1 · 灵魂封面 ============ */
+  const cover = el('div', { class: 'report-cover' });
+  cover.appendChild(el('div', { class: 'cover-top' }, [
+    el('div', { class: 'cover-vol' }, [
+      el('span', { text: 'THE HUMAN ATLAS' }),
+      el('span', { style: { opacity: 0.5 }, text: '·' }),
+      el('span', { text: `${depth.name} · ${completed.length}/${VOL_IDS.length}` }),
+    ]),
+    el('div', { style: { fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-tertiary)' }, text: formatDate(state.updatedAt) }),
+  ]));
+
+  cover.appendChild(el('h1', { class: 'cover-title', text: arch ? arch.name : '你的人性档案' }));
+
+  if (nickname) {
+    cover.appendChild(el('div', {
+      style: { fontSize: '11px', letterSpacing: '0.2em', color: 'var(--text-tertiary)', marginBottom: '16px' },
+      text: `${nickname} · 私人档案`,
+    }));
+  }
+
+  if (arch) {
+    cover.appendChild(el('div', { class: 'cover-keywords' }, arch.keywords.map((k) => el('span', { class: 'kw', text: k }))));
+    cover.appendChild(el('p', { class: 'cover-verdict', text: arch.verdict }));
+  }
+
+  const lightDark = computeLightDark(report.scores);
+  const maskV = Number.isFinite(state.maskIndex) ? Math.round(state.maskIndex) : '—';
+  const maskTier = Number.isFinite(state.maskIndex) ? maskTierOf(state.maskIndex) : null;
+
+  cover.appendChild(el('div', { class: 'gauges' }, [
+    gauge('光暗能量比', lightDark),
+    gauge('社会面具厚度', maskV, maskTier ? ` · ${maskTier.name}` : ''),
+    gauge('测评完成度', `${completed.length}`, ` / ${VOL_IDS.length} 卷`),
+    gauge('跨卷规则命中', `${report.cross.length}`, ` / ${DATA.crossRules.length}`),
+  ]));
+
+  if (maskTier) {
+    cover.appendChild(el('p', {
+      style: {
+        marginTop: '16px', fontSize: '11.5px', lineHeight: '1.9', color: 'var(--text-tertiary)',
+      },
+      text: `${maskTier.name} · ${maskTier.desc}`,
+    }));
+  }
+
+  wrap.appendChild(cover);
+
+  /* ============ 章节导航 ============ */
+  const sections = [
+    { id: 'r-dash', label: '可视化仪表盘' },
+    { id: 'r-mirror', label: '双面镜' },
+    { id: 'r-cross', label: '跨卷读心' },
+    { id: 'r-dual', label: '双态推演' },
+    { id: 'r-archives', label: '分卷档案' },
+    { id: 'r-manual', label: '使用说明书' },
+    { id: 'r-export', label: '导出' },
+  ];
+  wrap.appendChild(reportNav(sections));
+
+  /* ============ 模块 3 · 可视化仪表盘 ============ */
+  const dash = el('section', { class: 'rsec', id: 'r-dash' });
+  dash.appendChild(sec('01', '多维可视化', '所有图表均由原生 SVG 绘制，无第三方图表库'));
+
+  // 蝶形图
+  const vol1 = DATA.volumes.vol1;
+  if (vol1 && completed.includes('vol1')) {
+    const bcard = el('div', { class: 'chart-card' });
+    bcard.appendChild(el('div', { class: 'chart-card__head' }, [
+      el('h3', { text: '七美德 × 七原罪 · 双翼蝶形' }),
+      el('span', { class: 'chart-card__note', text: '中轴为 50，左右展开幅度即该极的显影强度' }),
+    ]));
+    const bb = el('div', { class: 'chart-card__body' });
+    bb.appendChild(butterflySvg(report.scores, {
+      width: 760,
+      colorVirtue: C.vol2,
+      colorSin: C.vol1,
+      colorText: C.text,
+      colorMuted: C.faint,
+      colorBorder: C.border,
+      bg: C.card,
+    }));
+    bcard.appendChild(bb);
+    dash.appendChild(bcard);
+    dash.appendChild(el('div', { style: { height: '18px' } }));
+  }
+
+  // 雷达 + 光谱
+  const grid2 = el('div', { class: 'chart-grid-2' });
+
+  const radarAxes = [
+    { id: 'big5_open', label: '探索', color: C.vol2 },
+    { id: 'big5_order', label: '秩序' },
+    { id: 'big5_industry', label: '韧性' },
+    { id: 'big5_assert', label: '表达' },
+    { id: 'big5_compassion', label: '共情' },
+    { id: 'big5_rumination', label: '反刍' },
+    { id: 'big5_alert', label: '警觉' },
+    { id: 'big5_social', label: '社交' },
+  ].filter((a) => Number.isFinite(report.scores[a.id]));
+
+  if (radarAxes.length >= 4) {
+    const rcard = el('div', { class: 'chart-card' });
+    rcard.appendChild(el('div', { class: 'chart-card__head' }, [
+      el('h3', { text: '大五人格 · 八维轮廓' }),
+      el('span', { class: 'chart-card__note', text: 'Vol.2' }),
+    ]));
+    const rb = el('div', { class: 'chart-card__body' });
+    rb.appendChild(radarSvg(radarAxes.map((a) => ({ ...a, value: report.scores[a.id] })), {
+      width: 520,
+      colorText: C.text,
+      colorMuted: C.faint,
+      colorBorder: C.border,
+      bg: C.card,
+      series: [{
+        name: 'Big Five',
+        values: radarAxes.map((a) => report.scores[a.id]),
+        color: C.vol2,
+        fillOpacity: 0.12,
+      }],
+      showValues: true,
+    }));
+    rcard.appendChild(rb);
+    grid2.appendChild(rcard);
+  }
+
+  // 三观光谱
+  const polarDims = [
+    { id: 'wv_nature', name: '人性预设', neg: '审慎防备', pos: '善意信任' },
+    { id: 'wv_causal', name: '因果归因', neg: '顺应随机', pos: '长期掌控' },
+    { id: 'wv_social', name: '社会逻辑', neg: '现实博弈', pos: '契约规则' },
+    { id: 'lv_happiness', name: '幸福取向', neg: '体验主义', pos: '实现主义' },
+    { id: 'lv_suffering', name: '苦难态度', neg: '拒绝内耗', pos: '意义转化' },
+    { id: 'lv_anchor', name: '存在锚点', neg: '向外建构', pos: '向内自洽' },
+  ].filter((d) => Number.isFinite(report.scores[d.id]));
+
+  if (polarDims.length) {
+    const scard = el('div', { class: 'chart-card' });
+    scard.appendChild(el('div', { class: 'chart-card__head' }, [
+      el('h3', { text: '三观双极光谱' }),
+      el('span', { class: 'chart-card__note', text: 'Vol.4 · 中轴为 50' }),
+    ]));
+    const sb = el('div', { class: 'chart-card__body' });
+    const list = el('div', { class: 'spec-list' });
+    polarDims.forEach((d) => {
+      const row = el('div', { class: 'spec-item' }, [
+        el('div', { class: 'spec-item__name', text: d.name }),
+        (() => {
+          const box = el('div', { class: 'spec-svg' });
+          box.appendChild(spectrumSvg({
+            id: d.id,
+            name: d.name,
+            negLabel: d.neg,
+            posLabel: d.pos,
+            value: report.scores[d.id],
+            color: C.gold,
+          }, {
+            width: 520,
+            colorText: C.text,
+            colorMuted: C.faint,
+            colorBorder: C.border,
+            bg: C.card,
+            negColor: C.vol2,
+            posColor: C.vol1,
+          }));
+          return box;
+        })(),
+      ]);
+      list.appendChild(row);
+    });
+    sb.appendChild(list);
+    scard.appendChild(sb);
+    grid2.appendChild(scard);
+  }
+
+  // 面具虚实叠层雷达（需已完成 Vol.8）
+  if (completed.includes('vol8')) {
+    const layers = layeredScores(state, DATA);
+    if (layers.keys.length >= 4) {
+      const picks = layers.keys
+        .slice()
+        .sort((a, b) => Math.abs(layers.surface[a] - layers.depth[a]) - Math.abs(layers.surface[b] - layers.depth[b]))
+        .reverse()
+        .slice(0, 8);
+
+      const lcard = el('div', { class: 'chart-card' });
+      lcard.appendChild(el('div', { class: 'chart-card__head' }, [
+        el('h3', { text: '面具虚实叠层' }),
+        el('span', { class: 'chart-card__note', text: `撕裂度 ${layers.gMirror} · 差异最大的八条轴` }),
+      ]));
+      const lb = el('div', { class: 'chart-card__body' });
+      lb.appendChild(maskRadar(
+        picks.map((d) => ({
+          id: d,
+          label: DATA.dimMap[d]?.name.slice(0, 4) || d,
+          value: layers.depth[d],
+          masked: layers.surface[d],
+        })),
+        {
+          width: 520,
+          colorText: C.text,
+          colorMuted: C.faint,
+          colorBorder: C.border,
+          bg: C.card,
+          surfaceColor: C.gold,
+          depthColor: C.vol1,
+          labelSize: 10.5,
+        },
+      ));
+      lb.appendChild(el('div', { class: 'chart-legend' }, [
+        el('span', { style: { color: C.gold }, html: '<i class="dash"></i>表显自评' }),
+        el('span', { style: { color: C.vol1 }, html: '<i></i>暗线底色' }),
+      ]));
+      lb.appendChild(el('p', {
+        style: { fontSize: '12px', lineHeight: '1.95', color: 'var(--text-secondary)', marginTop: '12px' },
+        text: '虚线是你温和状态下的自评轮廓，实线是你在高压与暗箱情境下露出的底色。两层之间被撑开的面积，就是面具的厚度。',
+      }));
+      lcard.appendChild(lb);
+      grid2.appendChild(lcard);
+    }
+  }
+
+  // 依恋四象限
+  if (completed.includes('vol7')) {
+    const an = report.scores.att_anxiety;
+    const av = report.scores.att_avoidance;
+    const style = attachmentStyle(an, av);
+    const qcard = el('div', { class: 'chart-card' });
+    qcard.appendChild(el('div', { class: 'chart-card__head' }, [
+      el('h3', { text: `依恋坐标 · ${style.name}` }),
+      el('span', { class: 'chart-card__note', text: 'Vol.7' }),
+    ]));
+    const qb = el('div', { class: 'chart-card__body' });
+    qb.appendChild(quadrantSvg({ anxiety: an, avoidance: av }, {
+      width: 460,
+      color: C.vol7,
+      colorText: C.text,
+      colorMuted: C.faint,
+      colorBorder: C.border,
+      bg: C.card,
+      safeColor: C.vol2,
+    }));
+    qb.appendChild(el('p', {
+      style: { fontSize: '12.5px', lineHeight: '1.95', color: 'var(--text-secondary)', marginTop: '14px' },
+      text: style.desc,
+    }));
+    qcard.appendChild(qb);
+    grid2.appendChild(qcard);
+  }
+
+  // 思维棱镜光谱
+  const cogDims = [
+    { id: 'cog_global', name: '全局 / 细节', neg: '细节实证', pos: '全局抽象' },
+    { id: 'cog_diverge', name: '发散 / 收敛', neg: '收敛风控', pos: '发散破局' },
+    { id: 'cog_logic', name: '逻辑 / 直觉', neg: '直觉共振', pos: '逻辑抽离' },
+    { id: 'cog_ambiguity', name: '模糊 / 确定', neg: '确定性偏好', pos: '高模糊容忍' },
+    { id: 'cog_independent', name: '独立 / 共识', neg: '共识校准', pos: '独立反叛' },
+    { id: 'cog_speed', name: '快 / 慢决策', neg: '慢决策求全', pos: '快决策迭代' },
+  ].filter((d) => Number.isFinite(report.scores[d.id]));
+
+  if (cogDims.length) {
+    const ccard = el('div', { class: 'chart-card' });
+    ccard.appendChild(el('div', { class: 'chart-card__head' }, [
+      el('h3', { text: '思维棱镜 · 六道棱面' }),
+      el('span', { class: 'chart-card__note', text: 'Vol.5' }),
+    ]));
+    const cb = el('div', { class: 'chart-card__body' });
+    const list = el('div', { class: 'spec-list' });
+    cogDims.forEach((d) => {
+      const row = el('div', { class: 'spec-item' }, [
+        el('div', { class: 'spec-item__name', text: d.name }),
+        (() => {
+          const box = el('div', { class: 'spec-svg' });
+          box.appendChild(spectrumSvg({
+            id: d.id, name: d.name, negLabel: d.neg, posLabel: d.pos,
+            value: report.scores[d.id], color: C.vol5,
+          }, {
+            width: 520, colorText: C.text, colorMuted: C.faint, colorBorder: C.border,
+            bg: C.card, negColor: C.faint, posColor: C.vol5,
+          }));
+          return box;
+        })(),
+      ]);
+      list.appendChild(row);
+    });
+    cb.appendChild(list);
+    ccard.appendChild(cb);
+    grid2.appendChild(ccard);
+  }
+
+  // 欲望引擎雷达
+  const motAxes = [
+    { id: 'mot_autonomy', label: '主权' },
+    { id: 'mot_mastery', label: '跨越' },
+    { id: 'mot_belonging', label: '羁绊' },
+    { id: 'mot_security', label: '秩序' },
+    { id: 'mot_purpose', label: '意义' },
+    { id: 'mot_hedonism', label: '丰盈' },
+  ].filter((a) => Number.isFinite(report.scores[a.id]));
+
+  if (motAxes.length >= 4) {
+    const mcard = el('div', { class: 'chart-card' });
+    mcard.appendChild(el('div', { class: 'chart-card__head' }, [
+      el('h3', { text: '六大欲望引擎' }),
+      el('span', { class: 'chart-card__note', text: 'Vol.6 · 含 100 点筹码分配' }),
+    ]));
+    const mb = el('div', { class: 'chart-card__body' });
+    mb.appendChild(radarSvg(motAxes.map((a) => ({ ...a, value: report.scores[a.id] })), {
+      width: 520,
+      colorText: C.text, colorMuted: C.faint, colorBorder: C.border, bg: C.card,
+      series: [{
+        name: 'Motors',
+        values: motAxes.map((a) => report.scores[a.id]),
+        color: C.gold,
+        fillOpacity: 0.12,
+      }],
+      showValues: true,
+      labelSize: 11,
+    }));
+    mcard.appendChild(mb);
+    grid2.appendChild(mcard);
+  }
+
+  dash.appendChild(grid2);
+  wrap.appendChild(dash);
+
+  /* ============ 模块 2 · 双面镜 ============ */
+  const mirrorSec = el('section', { class: 'rsec', id: 'r-mirror' });
+  mirrorSec.appendChild(sec('02', '优势面 × 劣势面 · 双面镜', '点击任一卡片翻转，查看同一股力量的反面与炼金处方'));
+
+  const giftBlock = el('div', { style: { marginBottom: '12px', fontSize: '10.5px', letterSpacing: '0.18em', color: 'var(--gold)' }, text: 'SIGNATURE GIFTS · 王牌天赋' });
+  mirrorSec.appendChild(giftBlock);
+
+  const giftGrid = el('div', { class: 'mirror-grid' });
+  (report.gifts || []).slice(0, 4).forEach((g) => giftGrid.appendChild(mirrorCard(g)));
+  mirrorSec.appendChild(giftGrid);
+
+  if (report.shadows?.length) {
+    mirrorSec.appendChild(el('div', { style: { margin: '30px 0 14px', fontSize: '10.5px', letterSpacing: '0.18em', color: 'var(--vol1)' }, text: 'SHADOW ALERTS · 阴影预警' }));
+    const shadowGrid = el('div', { class: 'mirror-grid' });
+    report.shadows.slice(0, 3).forEach((s) => shadowGrid.appendChild(mirrorCard(s)));
+    mirrorSec.appendChild(shadowGrid);
+  }
+
+  wrap.appendChild(mirrorSec);
+
+  /* ============ 模块 4a · 跨卷读心 ============ */
+  const crossSec = el('section', { class: 'rsec', id: 'r-cross' });
+  crossSec.appendChild(sec('03', '跨卷化学反应', `已触发 ${report.cross.length} / ${DATA.crossRules.length} 条黄金规则`));
+
+  if (completed.length < 3) {
+    crossSec.appendChild(el('div', { class: 'empty' }, [
+      el('h3', { text: '还差一点' }),
+      el('p', { text: `跨卷读心需要至少完成 3 卷。你目前完成 ${completed.length} 卷，再完成 ${3 - completed.length} 卷即可激活。` }),
+      el('a', { class: 'btn', href: '#/', text: '继续启封' }),
+    ]));
+  } else if (!report.cross.length) {
+    crossSec.appendChild(el('div', { class: 'empty' }, [
+      el('h3', { text: '这一组组合很罕见' }),
+      el('p', { text: '你目前的维度组合没有命中任何预设的跨卷规则。这通常意味着你的各项特质分布相对均衡，没有形成极端拉扯的结构。' }),
+    ]));
+  } else {
+    report.cross.forEach((c) => {
+      const card = el('div', { class: 'cross-card' });
+      card.appendChild(el('div', { class: 'cross-card__top' }, [
+        el('h3', { text: c.title }),
+        el('span', { class: 'cross-card__tag', text: c.tag }),
+        el('span', { class: 'cross-card__id', text: c.id }),
+      ]));
+      card.appendChild(el('p', { class: 'cross-card__insight', text: c.insight }));
+      card.appendChild(el('div', {
+        class: 'cross-card__advice',
+        html: `<b>行动建议</b>${c.advice}`,
+      }));
+      const hits = el('div', { class: 'dim-hits' });
+      (c.hits || []).forEach((h) => {
+        const name = h.name || DATA.dimMap[h.dim]?.name || h.dim;
+        hits.appendChild(el('span', { class: 'dim-hit', text: `${name} ${round(h.score, 0)}` }));
+      });
+      card.appendChild(hits);
+      crossSec.appendChild(card);
+    });
+  }
+  wrap.appendChild(crossSec);
+
+  /* ============ 模块 4b · 双态推演 ============ */
+  const dualSec = el('section', { class: 'rsec', id: 'r-dual' });
+  dualSec.appendChild(sec('04', '顺境舒展 × 高压退行', completed.length >= 5 ? '压力显影已解锁' : '完成 5 卷可精确校准'));
+
+  const dual = report.dual;
+  const dsGrid = el('div', { class: 'dual-state' });
+
+  const giftBox = el('div', { class: 'dual-state--gift' });
+  giftBox.appendChild(el('h4', { html: '<i></i><span>顺境 · 舒展态</span>' }));
+  giftBox.appendChild(el('p', { text: dual.flourish }));
+  dsGrid.appendChild(giftBox);
+
+  const shadowBox = el('div', { class: 'dual-state--shadow' });
+  shadowBox.appendChild(el('h4', { html: '<i></i><span>高压 · 退行态</span>' }));
+  shadowBox.appendChild(el('p', { text: dual.underPressure }));
+  dsGrid.appendChild(shadowBox);
+
+  dualSec.appendChild(dsGrid);
+
+  if (dual.style) {
+    dualSec.appendChild(el('div', { style: { marginTop: '16px', display: 'grid', gap: '12px' } }, [
+      el('div', { class: 'cross-card' }, [
+        el('div', { class: 'cross-card__top' }, [
+          el('h3', { text: `退行方向 · ${dual.style.name}` }),
+          el('span', { class: 'cross-card__tag', text: 'Vol.8 高压剧场' }),
+        ]),
+        el('p', { class: 'cross-card__insight', text: dual.style.pattern }),
+        el('div', { class: 'cross-card__advice', html: `<b>触发点</b>${dual.style.trigger}<br><br><b>刹车处方</b>${dual.style.brake}` }),
+      ]),
+    ]));
+  }
+  wrap.appendChild(dualSec);
+
+  /* ============ 模块 5 · 分卷档案 ============ */
+  const archSec = el('section', { class: 'rsec', id: 'r-archives' });
+  archSec.appendChild(sec('05', '分卷深度档案', `${completed.length} / ${VOL_IDS.length} 卷已归档 · 共 ${DATA.dimOrder.length} 个维度`));
+
+  completed.forEach((vid) => {
+    const vol = DATA.volumes[vid];
+    if (!vol) return;
+    const dims = (vol.dimensions || [])
+      .filter((d) => Number.isFinite(report.scores[d]))
+      .map((d) => ({ id: d, score: report.scores[d] }));
+
+    const box = el('div', {
+      style: {
+        marginBottom: '26px',
+        padding: '22px 24px',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
+        background: 'var(--bg-card)',
+        borderLeft: `2px solid ${vol.theme_color}`,
+      },
+    });
+
+    const head = el('div', {
+      style: { display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '14px', flexWrap: 'wrap' },
+    }, [
+      el('span', { style: { fontSize: '10px', letterSpacing: '0.2em', color: vol.theme_color }, text: `VOL.${String(vol.index).padStart(2, '0')}` }),
+      el('h3', { style: { fontSize: '17px', letterSpacing: '0.1em' }, text: vol.title }),
+      el('span', { style: { fontSize: '11px', color: 'var(--text-tertiary)', letterSpacing: '0.06em' }, text: vol.subtitle }),
+      el('a', {
+        href: `#/report/${vid}`,
+        style: { marginLeft: 'auto', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--text-secondary)' },
+        text: '查看单卷报告 →',
+      }),
+    ]);
+    box.appendChild(head);
+    box.appendChild(dimTable(dims, DATA.mirrors));
+    archSec.appendChild(box);
+  });
+
+  if (completed.length < 8) {
+    archSec.appendChild(el('div', { class: 'empty' }, [
+      el('h3', { text: `还有 ${8 - completed.length} 卷未启封` }),
+      el('p', { text: '每一卷都会补上一块此前缺失的拼图。全部完成时，60 维图谱才会真正闭合。' }),
+      el('a', { class: 'btn', href: '#/', text: '前往卷宗大厅' }),
+    ]));
+  }
+  wrap.appendChild(archSec);
+
+  /* ============ 模块 6 · 使用说明书 ============ */
+  const manualSec = el('section', { class: 'rsec', id: 'r-manual' });
+  manualSec.appendChild(sec('06', '人生使用说明书', '基于当前已测维度的生态位推演'));
+
+  const mg = el('div', { class: 'manual-grid' });
+
+  const mk = (title, items, icon) => {
+    const c = el('div', { class: 'manual-card' });
+    c.appendChild(el('div', { class: 'manual-card__ico', html: icon }));
+    c.appendChild(el('h4', { text: title }));
+    if (Array.isArray(items) && items.length) {
+      const ul = el('ul');
+      items.forEach((t) => ul.appendChild(el('li', { text: t })));
+      c.appendChild(ul);
+    } else {
+      c.appendChild(el('p', { text: '完成更多卷宗后，这里会自动补全。' }));
+    }
+    return c;
+  };
+
+  mg.appendChild(mk('最契合的事业生态位', report.manual.occupation, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>'));
+  mg.appendChild(mk('灵魂同频的伴侣 / 挚友', report.manual.partner, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9Z"/></svg>'));
+  mg.appendChild(mk('绝对避雷的人际毒药', report.manual.toxic, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M8 8l8 8M16 8l-8 8"/></svg>'));
+  mg.appendChild(mk('专属行动处方', report.manual.actions, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 3v18M5 8h14M5 16h14"/></svg>'));
+
+  if (report.manual.pressureBrake) {
+    mg.appendChild(mk('高压时刻的唯一刹车', [report.manual.pressureBrake], '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'));
+  }
+
+  if (report.values?.length) {
+    const vc = el('div', { class: 'manual-card' });
+    vc.appendChild(el('div', { class: 'manual-card__ico', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 3l2.6 6h6.4l-5.2 4 2 6.4L12 15.8 6.2 19.4l2-6.4L3 9h6.4Z"/></svg>' }));
+    vc.appendChild(el('h4', { text: '核心价值排序' }));
+    const ul = el('ul');
+    report.values.forEach((v, i) => ul.appendChild(el('li', { text: `${i + 1}. ${v.name} — ${v.desc}` })));
+    vc.appendChild(ul);
+    mg.appendChild(vc);
+  }
+
+  manualSec.appendChild(mg);
+  wrap.appendChild(manualSec);
+
+  /* ============ 模块 7 · 导出工作室 ============ */
+  const expSec = el('section', { class: 'rsec', id: 'r-export' });
+  expSec.appendChild(sec('07', '导出工作室', '四种格式，全部在本地生成'));
+
+  const expGrid = el('div', { class: 'manual-grid' });
+
+  const expCard = (title, desc, buttons) => {
+    const c = el('div', { class: 'manual-card' });
+    c.appendChild(el('h4', { text: title }));
+    c.appendChild(el('p', { text: desc }));
+    const row = el('div', { style: { display: 'flex', gap: '8px', marginTop: '14px', flexWrap: 'wrap' } });
+    buttons.forEach((b) => row.appendChild(b));
+    c.appendChild(row);
+    return c;
+  };
+
+  const reportForExport = {
+    ...report,
+    dimRows: DATA.dimOrder
+      .filter((d) => Number.isFinite(report.scores[d]))
+      .map((d) => ({
+        id: d,
+        name: DATA.dimMap[d]?.name || d,
+        volume: DATA.dimMap[d]?.volume || '',
+        score: round(report.scores[d], 0),
+        tier: tierOf(report.scores[d]),
+      })),
+  };
+
+  expGrid.appendChild(expCard(
+    '社交精简卡 · PNG',
+    '1080 × 1920 双主题海报：象牙典藏版 / 暗夜黑金版。',
+    [
+      el('button', {
+        class: 'btn btn--sm btn--solid',
+        type: 'button',
+        text: '象牙典藏版',
+        onclick: async (e) => {
+          const btn = e.currentTarget;
+          btn.textContent = '绘制中…';
+          btn.disabled = true;
+          try {
+            const name = await downloadPoster(reportForExport, {
+              long: false, theme: 'light', nickname,
+            });
+            toast(`已保存 ${name}`);
+          } catch (err) {
+            console.error(err);
+            toast('海报生成失败');
+          }
+          btn.textContent = '象牙典藏版';
+          btn.disabled = false;
+        },
+      }),
+      el('button', {
+        class: 'btn btn--sm',
+        type: 'button',
+        text: '暗夜黑金版',
+        onclick: async (e) => {
+          const btn = e.currentTarget;
+          btn.textContent = '绘制中…';
+          btn.disabled = true;
+          try {
+            const name = await downloadPoster(reportForExport, {
+              long: false, theme: 'dark', nickname,
+            });
+            toast(`已保存 ${name}`);
+          } catch (err) {
+            console.error(err);
+            toast('海报生成失败');
+          }
+          btn.textContent = '暗夜黑金版';
+          btn.disabled = false;
+        },
+      }),
+    ],
+  ));
+
+  expGrid.appendChild(expCard(
+    '全景长图 · PNG',
+    '1080 × 2800，包含跨卷读心与价值排序的完整档案。',
+    [el('button', {
+      class: 'btn btn--sm',
+      type: 'button',
+      text: '生成长图',
+      onclick: async (e) => {
+        const btn = e.currentTarget;
+        btn.textContent = '绘制中…';
+        btn.disabled = true;
+        try {
+          const name = await downloadPoster(reportForExport, {
+            long: true, theme: App.theme, nickname,
+          });
+          toast(`已保存 ${name}`);
+        } catch (err) {
+          console.error(err);
+          toast('长图生成失败');
+        }
+        btn.textContent = '生成长图';
+        btn.disabled = false;
+      },
+    })],
+  ));
+
+  expGrid.appendChild(expCard(
+    '杂志级白皮书 · PDF',
+    'A4 分页排版，含全部矢量图表。在打印面板中选择「存储为 PDF」。',
+    [el('button', {
+      class: 'btn btn--sm',
+      type: 'button',
+      text: '打印 / 导出 PDF',
+      onclick: () => {
+        setTimeout(() => window.print(), 200);
+      },
+    })],
+  ));
+
+  expGrid.appendChild(expCard(
+    '结构化复盘笔记 · MD',
+    '可直接导入 Notion / Obsidian，或作为长期心理背景提示词。',
+    [
+      el('button', {
+        class: 'btn btn--sm',
+        type: 'button',
+        text: '下载',
+        onclick: () => {
+          const name = downloadMarkdown(reportForExport, { nickname });
+          toast(`已保存 ${name}`);
+        },
+      }),
+      el('button', {
+        class: 'btn btn--sm btn--ghost',
+        type: 'button',
+        text: '复制',
+        onclick: () => copyMarkdown(reportForExport, { nickname }),
+      }),
+    ],
+  ));
+
+  expGrid.appendChild(expCard(
+    '灵魂存档 · HA4 短码',
+    '仅含得分向量、面具指数与价值排序，可用于跨设备与双人对比。',
+    [el('button', {
+      class: 'btn btn--sm',
+      type: 'button',
+      text: '生成存档码',
+      onclick: () => {
+        openSoulDialog(encodeSoulCode(state, DATA.dimOrder), state);
+      },
+    })],
+  ));
+
+  expGrid.appendChild(expCard(
+    'AI 深度精读密文',
+    '一键复制结构化分析师 Prompt（全维得分 + Z 尖峰 + 面具三分量 + 三道犹豫题原文），粘给任意大模型即可开始 30 分钟深谈。',
+    [
+      el('button', {
+        class: 'btn btn--sm btn--solid',
+        type: 'button',
+        text: '复制密文',
+        onclick: () => copyAIPrompt(reportForExport, {
+          nickname,
+          answersByVolume: state.answersByVolume || {},
+          telemetry: state.telemetry || {},
+          volumes: DATA.volumes,
+          mask: state.maskDetail || null,
+          topValues: report.values || [],
+        }),
+      }),
+      el('button', {
+        class: 'btn btn--sm btn--ghost',
+        type: 'button',
+        text: '下载 .md',
+        onclick: () => {
+          const text = buildAIPromptLocal(reportForExport, {
+            nickname,
+            answersByVolume: state.answersByVolume || {},
+            telemetry: state.telemetry || {},
+            volumes: DATA.volumes,
+            mask: state.maskDetail || null,
+            topValues: report.values || [],
+          });
+          downloadText(`human-atlas-ai-prompt-${Date.now()}.md`, text, 'text/markdown;charset=utf-8');
+          toast('密文已下载');
+        },
+      }),
+    ],
+  ));
+
+  expGrid.appendChild(expCard(
+    '完整备份 · JSON',
+    '包含每题作答与遥测数据，可用于跨年演化对比。',
+    [el('button', {
+      class: 'btn btn--sm btn--ghost',
+      type: 'button',
+      text: '下载 JSON',
+      onclick: () => {
+        const json = exportJSON(state);
+        downloadText(`human-atlas-backup-${Date.now()}.json`, json, 'application/json;charset=utf-8');
+        toast('备份已下载');
+      },
+    })],
+  ));
+
+  expSec.appendChild(expGrid);
+
+  // 打印页脚
+  expSec.appendChild(el('div', {
+    class: 'print-colophon',
+    text: 'THE HUMAN ATLAS · 本报告由本地浏览器生成，所有作答均未离开你的设备',
+  }));
+
+  wrap.appendChild(expSec);
+
+  /* ---------- 底部 ---------- */
+  wrap.appendChild(el('div', { class: 'report-actions' }, [
+    el('a', { class: 'btn btn--ghost', href: '#/', text: '← 返回卷宗大厅' }),
+    el('a', { class: 'btn btn--ghost', href: '#/compare', text: '双人对比' }),
+    el('button', {
+      class: 'btn btn--ghost',
+      type: 'button',
+      text: '重新计算',
+      onclick: () => { recompute({ silent: false }); go('#/report'); toast('已重新计算'); },
+    }),
+  ]));
+}
+
+/* ------------------------------------------------------------
+   单卷报告
+   ------------------------------------------------------------ */
+
+function renderVolumeReport(root, ctx, volId) {
+  const { App, DATA, VOL_IDS } = ctx;
+  const state = App.state;
+  const vol = DATA.volumes[volId];
+  const P = themeColors();
+  const ans = state.answersByVolume?.[volId] || {};
+
+  const dims = (vol.dimensions || [])
+    .map((d) => ({ id: d, score: state.computedScores?.[d] }))
+    .filter((d) => Number.isFinite(d.score));
+
+  const mirrors = {};
+  dims.forEach((d) => {
+    const m = mirrorFor(d.id, d.score, DATA.mirrors);
+    if (m) mirrors[d.id] = m;
+  });
+
+  const giftList = topGifts(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
+  const shadowList = topShadows(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
+
+  root.classList.add('view');
+  const wrap = el('div', { class: 'report', style: { '--vc': vol.theme_color } });
+  root.appendChild(wrap);
+
+  /* ---------- 封面 ---------- */
+  const cover = el('div', { class: 'report-cover' });
+  cover.appendChild(el('div', { class: 'cover-top' }, [
+    el('div', { class: 'cover-vol' }, [
+      el('span', { text: `VOL. ${String(vol.index).padStart(2, '0')}` }),
+      el('span', { style: { opacity: 0.5 }, text: '·' }),
+      el('span', { text: vol.subtitle }),
+    ]),
+    el('div', { style: { fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-tertiary)' }, text: formatDate(state.updatedAt) }),
+  ]));
+
+  cover.appendChild(el('h1', { class: 'cover-title', text: vol.title }));
+
+  if (state.nickname) {
+    cover.appendChild(el('div', {
+      style: { fontSize: '11px', letterSpacing: '0.2em', color: 'var(--text-tertiary)', marginBottom: '16px' },
+      text: `${state.nickname} · 私人档案`,
+    }));
+  }
+
+  if (giftList.length) {
+    cover.appendChild(el('div', { class: 'cover-keywords' }, giftList.map((g) => el('span', { class: 'kw', text: g.gift_title }))));
+    cover.appendChild(el('p', {
+      class: 'cover-verdict',
+      text: `在这一卷的坐标里，你最亮的形态是「${giftList[0].gift_title}」。同时，${shadowList.length ? `「${shadowList[0].shadow_title}」是你需要留意的反面。` : '你的分布相对均衡，没有明显的极端化倾向。'}`,
+    }));
+  }
+
+  const answeredCount = vol.questions.filter((q) => ans[q.id]?.value !== undefined).length;
+  cover.appendChild(el('div', { class: 'gauges' }, [
+    gauge('本卷完成度', `${answeredCount}`, ` / ${vol.questions.length} 题`),
+    gauge('维度数', `${dims.length}`, ''),
+    gauge('社会面具厚度', Number.isFinite(state.maskIndex) ? Math.round(state.maskIndex) : '—', ''),
+    gauge('全卷进度', `${(state.completedVolumes || []).length}`, ` / ${VOL_IDS.length} 卷`),
+  ]));
+
+  wrap.appendChild(cover);
+
+  /* ---------- 本卷图谱 ---------- */
+  const chartOpt = {
+    colorText: P.text,
+    colorMuted: P.faint,
+    colorBorder: P.border,
+    bg: P.card,
+  };
+
+  const chartCard = (title, note) => {
+    const box = el('div', { class: 'chart-card', style: { marginBottom: '26px' } });
+    box.appendChild(el('div', { class: 'chart-card__head' }, [
+      el('h3', { text: title }),
+      el('span', { class: 'chart-card__note', text: note }),
+    ]));
+    const body = el('div', { class: 'chart-card__body' });
+    box.appendChild(body);
+    wrap.appendChild(box);
+    return body;
+  };
+
+  const scoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
+
+  if (volId === 'vol1') {
+    const body = chartCard('七美德 × 七原罪 · 双翼蝶形', '左翼为秩序，右翼为驱力');
+    body.appendChild(butterflySvg(scoreMap, {
+      width: 720,
+      colorVirtue: P.vol2,
+      colorSin: P.vol1,
+      ...chartOpt,
+    }));
+  }
+
+  if (volId === 'vol2') {
+    const body = chartCard('大五人格 · 十子维轮廓', 'Vol.2 · 外部自评视角');
+    body.appendChild(radarSvg(dims.map((d) => ({
+      id: d.id,
+      label: DATA.dimMap[d.id]?.name.slice(0, 4) || d.id,
+      value: d.score,
+    })), {
+      width: 520,
+      ...chartOpt,
+      series: [{ name: 'Big Five', values: dims.map((d) => d.score), color: P.vol2, fillOpacity: 0.12 }],
+      showValues: true,
+      labelSize: 10.5,
+    }));
+  }
+
+  if (volId === 'vol3') {
+    const body = chartCard('光明三角 × 黑暗三角', '两枚三角形的填充面积即该侧强度');
+    body.appendChild(triadSvg(scoreMap, {
+      width: 560,
+      colorLight: P.vol2,
+      colorDark: P.vol1,
+      ...chartOpt,
+    }));
+
+    // 认知 / 情感共情（若维度存在）
+    if (dims.some((d) => d.id === 'emp_cognitive') || dims.some((d) => d.id === 'emp_affective')) {
+      body.appendChild(el('p', {
+        style: { fontSize: '12px', lineHeight: '1.9', color: 'var(--text-secondary)', marginTop: '14px' },
+        text: '当认知共情显著高于情感共情时，通常意味着你能精准读懂他人的情绪，但不会跟着一起起伏——这是「暗黑共情者」的典型结构。',
+      }));
+    }
+  }
+
+  if (volId === 'vol4') {
+    const body = chartCard('三观 · 九维双极光谱', '中轴为 50，两端为对立极');
+    const list = el('div', { class: 'spec-list' });
+    const polar = [
+      ['wv_nature', '人性预设', '审慎防备', '善意信任'],
+      ['wv_causal', '因果归因', '顺应随机', '长期掌控'],
+      ['wv_social', '社会逻辑', '现实博弈', '契约规则'],
+      ['lv_happiness', '幸福取向', '体验主义', '实现主义'],
+      ['lv_suffering', '苦难态度', '拒绝内耗', '意义转化'],
+      ['lv_anchor', '存在锚点', '向外建构', '向内自洽'],
+      ['val_moral', '道德算法', '结果优先', '原则底线'],
+      ['val_boundary', '边界重心', '归属稳定', '自由独立'],
+      ['val_standard', '评判标尺', '效率务实', '真诚公平'],
+    ].filter(([id]) => Number.isFinite(scoreMap[id]));
+
+    polar.forEach(([id, name, neg, pos]) => {
+      const row = el('div', { class: 'spec-item' }, [
+        el('div', { class: 'spec-item__name', text: name }),
+        (() => {
+          const box = el('div', { class: 'spec-svg' });
+          box.appendChild(spectrumSvg({
+            id, name, negLabel: neg, posLabel: pos,
+            value: scoreMap[id], color: P.vol4,
+          }, {
+            ...chartOpt,
+            negColor: P.faint,
+            posColor: P.vol4,
+            bg: P.card,
+          }));
+          return box;
+        })(),
+      ]);
+      list.appendChild(row);
+    });
+    body.appendChild(list);
+  }
+
+  if (volId === 'vol5') {
+    const body = chartCard('思维棱镜 · 六道棱面', '中轴为 50，两端为两种加工方式');
+    const list = el('div', { class: 'spec-list' });
+    const cog = [
+      ['cog_global', '全局 / 细节', '细节实证', '全局抽象'],
+      ['cog_diverge', '发散 / 收敛', '收敛风控', '发散破局'],
+      ['cog_logic', '逻辑 / 直觉', '直觉共振', '逻辑抽离'],
+      ['cog_ambiguity', '模糊 / 确定', '确定性偏好', '高模糊容忍'],
+      ['cog_independent', '独立 / 共识', '共识校准', '独立反叛'],
+      ['cog_speed', '快 / 慢决策', '慢决策求全', '快决策迭代'],
+    ].filter(([id]) => Number.isFinite(scoreMap[id]));
+
+    cog.forEach(([id, name, neg, pos]) => {
+      const row = el('div', { class: 'spec-item' }, [
+        el('div', { class: 'spec-item__name', text: name }),
+        (() => {
+          const box = el('div', { class: 'spec-svg' });
+          box.appendChild(spectrumSvg({
+            id, name, negLabel: neg, posLabel: pos,
+            value: scoreMap[id], color: P.vol5,
+          }, {
+            ...chartOpt,
+            negColor: P.faint,
+            posColor: P.vol5,
+            bg: P.card,
+          }));
+          return box;
+        })(),
+      ]);
+      list.appendChild(row);
+    });
+    body.appendChild(list);
+  }
+
+  if (volId === 'vol6') {
+    const body = chartCard('六大欲望引擎', 'Vol.6 · 含 100 点筹码分配');
+    body.appendChild(radarSvg(dims.map((d) => ({
+      id: d.id,
+      label: DATA.dimMap[d.id]?.name.slice(0, 4) || d.id,
+      value: d.score,
+    })), {
+      width: 520,
+      ...chartOpt,
+      series: [{ name: 'Motors', values: dims.map((d) => d.score), color: P.gold, fillOpacity: 0.12 }],
+      showValues: true,
+      labelSize: 11,
+    }));
+
+    // 若做过筹码题，补一条条形排序
+    const budgetQ = vol.questions.find((q) => q.type === 'budget_100');
+    const budgetAns = budgetQ ? ans[budgetQ.id]?.value : null;
+    if (budgetQ && budgetAns && typeof budgetAns === 'object') {
+      const list = el('div', { class: 'spec-list', style: { marginTop: '18px' } });
+      const sorted = [...budgetQ.items]
+        .map((it) => ({ ...it, pts: Number(budgetAns[it.key] ?? 0) }))
+        .sort((a, b) => b.pts - a.pts);
+      sorted.forEach((it) => {
+        const row = el('div', { class: 'spec-item' }, [
+          el('div', { class: 'spec-item__name', text: it.label }),
+          (() => {
+            const box = el('div', { class: 'spec-svg' });
+            box.appendChild(spectrumSvg({
+              id: it.key,
+              name: it.label,
+              negLabel: '0 点',
+              posLabel: '100 点',
+              value: it.pts,
+              color: P.gold,
+            }, {
+              ...chartOpt,
+              negColor: P.faint,
+              posColor: P.gold,
+              bg: P.card,
+            }));
+            return box;
+          })(),
+        ]);
+        list.appendChild(row);
+      });
+      body.appendChild(el('div', {
+        style: { fontSize: '10px', letterSpacing: '0.18em', color: 'var(--text-tertiary)', margin: '20px 0 12px' },
+        text: '筹码实际分配',
+      }));
+      body.appendChild(list);
+    }
+  }
+
+  if (volId === 'vol7') {
+    const an = scoreMap.att_anxiety;
+    const av = scoreMap.att_avoidance;
+    const style = attachmentStyle(an, av);
+    const body = chartCard(`依恋坐标 · ${style.name}`, 'X 轴回避，Y 轴焦虑');
+    body.appendChild(quadrantSvg({ anxiety: an, avoidance: av }, {
+      width: 440,
+      color: P.vol7,
+      ...chartOpt,
+      safeColor: P.vol2,
+    }));
+    body.appendChild(el('p', {
+      style: { fontSize: '12.5px', lineHeight: '1.95', color: 'var(--text-secondary)', marginTop: '14px' },
+      text: style.desc,
+    }));
+
+    // 六大防御机制横向光谱
+    const defs = [
+      ['def_intellectual', '理智化'],
+      ['def_detach', '情感隔离'],
+      ['def_sublimate', '升华转化'],
+      ['def_attack', '先发反击'],
+      ['def_fawn', '讨好安抚'],
+      ['def_project', '反向投射'],
+    ].filter(([id]) => Number.isFinite(scoreMap[id]));
+
+    if (defs.length) {
+      const list = el('div', { class: 'spec-list', style: { marginTop: '18px' } });
+      defs.forEach(([id, name]) => {
+        const row = el('div', { class: 'spec-item' }, [
+          el('div', { class: 'spec-item__name', text: name }),
+          (() => {
+            const box = el('div', { class: 'spec-svg' });
+            box.appendChild(spectrumSvg({
+              id, name, negLabel: '很少使用', posLabel: '几乎默认',
+              value: scoreMap[id], color: P.vol7,
+            }, {
+              ...chartOpt,
+              negColor: P.faint,
+              posColor: P.vol7,
+              bg: P.card,
+            }));
+            return box;
+          })(),
+        ]);
+        list.appendChild(row);
+      });
+      body.appendChild(el('div', {
+        style: { fontSize: '10px', letterSpacing: '0.18em', color: 'var(--text-tertiary)', margin: '20px 0 12px' },
+        text: '六大防御机制使用倾向',
+      }));
+      body.appendChild(list);
+    }
+  }
+
+  if (volId === 'vol8') {
+    // 面具虚实叠层：本卷整体作答 vs 前七卷明线
+    const maskV = Number.isFinite(state.maskIndex) ? round(state.maskIndex, 0) : null;
+    const body = chartCard('高压剧场 · 面具校准', maskV === null ? 'Vol.8' : `面具厚度 ${maskV}`);
+
+    const pressure = state.pressureStyle;
+    if (pressure && pressure.distribution) {
+      const list = el('div', { class: 'spec-list' });
+      const names = {
+        burst: '爆发火 · 攻击外化',
+        cutoff: '断联冰 · 彻底关闭',
+        cold: '黑化刃 · 冰冷计算',
+        collapse: '坍塌雾 · 自我耗竭',
+      };
+      Object.entries(pressure.distribution)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([k, v]) => {
+          const row = el('div', { class: 'spec-item' }, [
+            el('div', { class: 'spec-item__name', text: names[k] || k }),
+            (() => {
+              const box = el('div', { class: 'spec-svg' });
+              box.appendChild(spectrumSvg({
+                id: k, name: names[k] || k,
+                negLabel: '0%', posLabel: '100%',
+                value: v, color: P.vol8,
+              }, {
+                ...chartOpt,
+                negColor: P.faint,
+                posColor: P.vol8,
+                bg: P.card,
+              }));
+              return box;
+            })(),
+          ]);
+          list.appendChild(row);
+        });
+      body.appendChild(el('div', {
+        style: { fontSize: '10px', letterSpacing: '0.18em', color: 'var(--text-tertiary)', marginBottom: '12px' },
+        text: '高压退行态分布',
+      }));
+      body.appendChild(list);
+    }
+
+    // 面具三分量
+    if (state.maskDetail) {
+      const md = state.maskDetail;
+      const parts = [
+        ['社会期许偏移', md.dsd],
+        ['犹豫修饰度', md.hlat],
+        ['镜像撕裂度', md.mirror],
+      ].filter(([, v]) => Number.isFinite(v));
+
+      if (parts.length) {
+        const list = el('div', { class: 'spec-list', style: { marginTop: '18px' } });
+        parts.forEach(([label, v]) => {
+          const row = el('div', { class: 'spec-item' }, [
+            el('div', { class: 'spec-item__name', text: label }),
+            (() => {
+              const box = el('div', { class: 'spec-svg' });
+              box.appendChild(spectrumSvg({
+                id: label, name: label, negLabel: '低', posLabel: '高',
+                value: v, color: P.vol1,
+              }, {
+                ...chartOpt,
+                negColor: P.faint,
+                posColor: P.vol1,
+                bg: P.card,
+              }));
+              return box;
+            })(),
+          ]);
+          list.appendChild(row);
+        });
+        body.appendChild(el('div', {
+          style: { fontSize: '10px', letterSpacing: '0.18em', color: 'var(--text-tertiary)', margin: '20px 0 12px' },
+          text: '面具厚度三分量',
+        }));
+        body.appendChild(list);
+      }
+    }
+  }
+
+  /* ---------- Vol.09–Vol.16 图表 ---------- */
+  if (volId === 'vol9') {
+    const body = chartCard('荣格八维 · 认知功能栈', '前四位是剧本主角，后四位是疲倦时的接管人');
+    body.appendChild(jungStackSvg(scoreMap, {
+      ...chartOpt,
+      color: P.vol9 || P.gold,
+    }));
+    const hint = jungTypeHint(scoreMap);
+    if (hint) {
+      body.appendChild(el('p', {
+        style: { marginTop: '14px', fontSize: '11.5px', letterSpacing: '0.06em', color: 'var(--text-tertiary)' },
+        text: `你的功能栈前缀：${hint}`,
+      }));
+    }
+  }
+
+  if (volId === 'vol10') {
+    const order = scoreMap.dd_order;
+    const good = scoreMap.dd_good;
+    const q = alignmentOf(order, good);
+    const body = chartCard('阵营坐标 · 秩序 × 良善', q ? `落点：${q.name}` : '二维坐标');
+    let quadrants = ALIGNMENT_QUADRANTS;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      quadrants = ALIGNMENT_QUADRANTS.map((x) => ({ ...x }));
+    }
+    body.appendChild(matrixSvg({
+      x: order,
+      y: good,
+      xLabel: '秩序 ← → 混沌',
+      yLabel: '冷硬 ← → 善良',
+      xLo: '混沌',
+      xHi: '秩序',
+      yLo: '冷硬',
+      yHi: '善良',
+      quadrants,
+      active: q?.key,
+      pointLabel: q?.name,
+    }, {
+      ...chartOpt,
+      width: 480,
+      color: P.vol10 || P.gold,
+      ariaLabel: '秩序与良善二维坐标',
+    }));
+    if (q) {
+      const cap = el('div', { class: 'matrix-caption' });
+      cap.appendChild(el('h4', { text: q.name }));
+      cap.appendChild(el('p', { text: `${q.desc}。坐标只是语言，不是判决书——同一套原则，在顺境里是风骨，在耗竭时可能变成硬壳。` }));
+      body.appendChild(cap);
+    }
+  }
+
+  if (volId === 'vol16') {
+    const hsp = meanOf(['hsp_sensory', 'hsp_emotional'], scoreMap);
+    const hss = meanOf(['hss_novelty', 'hss_intensity'], scoreMap);
+    const q = neuroOf(hsp, hss);
+    const body = chartCard('神经边缘 · HSP × HSS', q ? `落点：${q.name}` : '二维坐标');
+    body.appendChild(matrixSvg({
+      x: hss,
+      y: hsp,
+      xLabel: '刺激寻求 ← →',
+      yLabel: '感官敏锐 ← →',
+      xLo: '低寻求',
+      xHi: '高寻求',
+      yLo: '低敏',
+      yHi: '高敏',
+      quadrants: NEURO_QUADRANTS,
+      active: q?.key,
+      pointLabel: q?.name,
+    }, {
+      ...chartOpt,
+      width: 480,
+      color: P.vol16 || P.gold,
+      ariaLabel: 'HSP 与 HSS 四象限',
+    }));
+    if (q) {
+      const cap = el('div', { class: 'matrix-caption' });
+      cap.appendChild(el('h4', { text: q.name }));
+      cap.appendChild(el('p', { text: `${q.desc}。高敏与高寻求并不互斥——很多人是「既想冲又怕吵」的矛盾体。` }));
+      body.appendChild(cap);
+    }
+
+    // 四维光谱补充
+    const list = el('div', { class: 'spec-list', style: { marginTop: '20px' } });
+    [
+      ['hsp_sensory', '感官敏锐度', '迟钝耐受', '细微信号也扎人'],
+      ['hsp_emotional', '情绪敏锐度', '情绪绝缘', '情绪穿透力强'],
+      ['hss_novelty', '新奇寻求', '熟悉即安心', '未知即兴奋'],
+      ['hss_intensity', '强度寻求', '低强度长跑', '高强度冲刺'],
+    ].filter(([id]) => Number.isFinite(scoreMap[id])).forEach(([id, name, neg, pos]) => {
+      const row = el('div', { class: 'spec-item' }, [
+        el('div', { class: 'spec-item__name', text: name }),
+        (() => {
+          const box = el('div', { class: 'spec-svg' });
+          box.appendChild(spectrumSvg({
+            id, name, negLabel: neg, posLabel: pos, value: scoreMap[id], color: P.vol16 || P.gold,
+          }, { ...chartOpt, negColor: P.faint, posColor: P.vol16 || P.gold, bg: P.card }));
+          return box;
+        })(),
+      ]);
+      list.appendChild(row);
+    });
+    body.appendChild(list);
+  }
+
+  if (volId === 'vol11' || volId === 'vol12' || volId === 'vol13' || volId === 'vol14' || volId === 'vol15') {
+    const meta = {
+      vol11: ['哲人底色 · 十四维倾向', '哲学底色 / 道德基础'],
+      vol12: ['底层执念 · 恐惧轴强度', '九型 + 三副型'],
+      vol13: ['童年剧本 · 图式烈度', '十大图式'],
+      vol14: ['财富潜意识 · 脚本与时间观', '四大脚本 / 五种时间观'],
+      vol15: ['冲突剧场 · 五种模式与三态', 'TKI + PAC'],
+    }[volId];
+    const body = chartCard(meta[0], meta[1]);
+    const list = el('div', { class: 'spec-list' });
+    dims
+      .slice()
+      .sort((a, b) => b.score - a.score)
+      .forEach((d) => {
+        const name = DATA.dimMap[d.id]?.name || d.id;
+        const row = el('div', { class: 'spec-item' }, [
+          el('div', { class: 'spec-item__name', text: name }),
+          (() => {
+            const box = el('div', { class: 'spec-svg' });
+            box.appendChild(spectrumSvg({
+              id: d.id, name, negLabel: '低', posLabel: '强', value: d.score, color: vol.theme_color,
+            }, { ...chartOpt, negColor: P.faint, posColor: vol.theme_color, bg: P.card }));
+            return box;
+          })(),
+        ]);
+        list.appendChild(row);
+      });
+    body.appendChild(list);
+  }
+
+  /* ---------- 初印象对照（仅重测后出现） ---------- */
+  const snap = initialSnapshotOf(state, volId);
+  if (snap && snap.scores) {
+    const body = chartCard('初印象 × 修正态', `封存于 ${formatDate(snap.sealedAt)}`);
+    const common = dims.filter((d) => Number.isFinite(snap.scores[d.id]));
+    if (common.length >= 3) {
+      body.appendChild(radarSvg(common.map((d) => ({
+        id: d.id,
+        label: DATA.dimMap[d.id]?.name.slice(0, 4) || d.id,
+        value: d.score,
+      })), {
+        width: 520,
+        ...chartOpt,
+        series: [
+          {
+            name: '初印象 · 本能态',
+            values: common.map((d) => snap.scores[d.id]),
+            color: P.faint, dashed: true, fillOpacity: 0.04, width: 1.1,
+          },
+          {
+            name: '修正态 · 现在',
+            values: common.map((d) => d.score),
+            color: vol.theme_color, fillOpacity: 0.12,
+          },
+        ],
+        showValues: false,
+        labelSize: 10.5,
+        ariaLabel: '初印象与修正态双层雷达',
+      }));
+    }
+
+    const drift = common
+      .map((d) => ({ id: d.id, name: DATA.dimMap[d.id]?.name || d.id, was: snap.scores[d.id], now: d.score }))
+      .map((r) => ({ ...r, delta: round(r.now - r.was, 1) }))
+      .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+
+    const list = el('div', { class: 'snapshot-list' });
+    drift.slice(0, 6).forEach((r) => {
+      const dir = r.delta > 0 ? 'up' : r.delta < 0 ? 'down' : 'flat';
+      list.appendChild(el('div', { class: 'snapshot-row' }, [
+        el('span', { class: 'snapshot-row__name', text: r.name }),
+        el('span', { class: 'snapshot-row__was', text: String(round(r.was, 0)) }),
+        el('span', { class: 'snapshot-row__arrow', text: '→' }),
+        el('span', { class: 'snapshot-row__now', text: String(round(r.now, 0)) }),
+        el('span', {
+          class: `snapshot-row__delta is-${dir}`,
+          text: `${r.delta > 0 ? '+' : ''}${r.delta}`,
+        }),
+      ]));
+    });
+    body.appendChild(list);
+    body.appendChild(el('p', {
+      style: { marginTop: '14px', fontSize: '11.5px', lineHeight: '1.9', color: 'var(--text-secondary)' },
+      text: '初印象更接近你还没开始自我观察时的本能反应；修正态里往往混进了「我希望自己是那样」的成分。两者都真实，差值本身才是重点。',
+    }));
+  }
+
+  /* ---------- 双面镜 ---------- */
+  const msec = el('section', { class: 'rsec' });
+  msec.appendChild(sec('01', '优势面 × 劣势面', '点击卡片翻转'));
+  const grid = el('div', { class: 'mirror-grid' });
+  const shown = dims.slice(0, 12);
+  shown.forEach((d) => {
+    const m = mirrors[d.id];
+    if (m) grid.appendChild(mirrorCard(m));
+  });
+  msec.appendChild(grid);
+
+  if (dims.length > shown.length) {
+    msec.appendChild(el('p', {
+      style: {
+        marginTop: '16px', fontSize: '11.5px', letterSpacing: '0.06em', color: 'var(--text-tertiary)',
+      },
+      text: `另有 ${dims.length - shown.length} 个维度的完整四面镜见下方「维度明细」表。`,
+    }));
+  }
+  wrap.appendChild(msec);
+
+  /* ---------- 维度明细 ---------- */
+  const dsec = el('section', { class: 'rsec' });
+  dsec.appendChild(sec('02', '本卷维度明细', `共 ${dims.length} 个可追踪维度`));
+  dsec.appendChild(dimTable(dims, DATA.mirrors));
+  wrap.appendChild(dsec);
+
+  /* ---------- 作答明细 ---------- */
+  const qsec = el('section', { class: 'rsec' });
+  qsec.appendChild(sec('03', '你的作答留痕', '可在下一轮重测时对照'));
+  const qbox = el('div', { style: { border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', background: 'var(--bg-card)', overflow: 'hidden' } });
+  vol.questions.forEach((q, i) => {
+    const a = ans[q.id];
+    if (!a) return;
+    const row = el('div', {
+      style: {
+        padding: '14px 18px',
+        borderBottom: i < vol.questions.length - 1 ? '1px solid var(--border-hair)' : 'none',
+        fontSize: '12px',
+        lineHeight: '1.8',
+      },
+    }, [
+      el('div', { style: { display: 'flex', gap: '10px', alignItems: 'baseline', marginBottom: '4px' } }, [
+        el('span', { style: { fontSize: '9.5px', letterSpacing: '0.16em', color: 'var(--text-tertiary)' }, text: `Q${String(i + 1).padStart(2, '0')}` }),
+        el('span', { style: { flex: 1, color: 'var(--text-primary)' }, text: q.prompt.slice(0, 52) + (q.prompt.length > 52 ? '…' : '') }),
+      ]),
+      el('div', { style: { color: 'var(--text-secondary)', paddingLeft: '32px' }, text: formatAnswer(q, a.value) }),
+    ]);
+    qbox.appendChild(row);
+  });
+  qsec.appendChild(qbox);
+  wrap.appendChild(qsec);
+
+  /* ---------- 操作 ---------- */
+  wrap.appendChild(el('div', { class: 'report-actions' }, [
+    el('a', { class: 'btn btn--ghost', href: '#/', text: '← 返回大厅' }),
+    el('button', {
+      class: 'btn btn--ghost',
+      type: 'button',
+      text: hasInitialSnapshot(state, volId) ? '重测（封存初印象）' : '重新作答此卷',
+      onclick: () => {
+        const hasSnap = hasInitialSnapshot(state, volId);
+        confirmDialog({
+          title: hasSnap ? '封存初印象并重测' : '重新作答此卷',
+          sub: hasSnap
+            ? '你的第一次作答会被封存为「初印象 · 本能态」，重测结果将与它并列展示。两者的差异往往比分数本身更有信息量。'
+            : '这会清空本卷的作答记录，重新从第一题开始。',
+          confirmText: hasSnap ? '封存并重测' : '清空并重测',
+          danger: !hasSnap,
+          onConfirm: () => {
+            retakeVolume(state, volId);
+            recompute({ silent: true });
+            toast('已清空本卷作答');
+            go(`#/quiz/${volId}`);
+          },
+        });
+      },
+    }),
+    el('a', { class: 'btn btn--ghost', href: '#/report', text: '全息报告' }),
+    el('button', {
+      class: 'btn',
+      type: 'button',
+      text: '导出本卷 PNG',
+      onclick: async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        btn.textContent = '绘制中…';
+        try {
+          const single = {
+            archetype: { best: { name: vol.title, latin: vol.subtitle, keywords: giftList.map((g) => g.gift_title), verdict: `本卷聚焦：${vol.subtitle}。这是你的人性档案中的第 ${vol.index} 卷。` } },
+            scores: Object.fromEntries(dims.map((d) => [d.id, d.score])),
+            gifts: giftList,
+            shadows: shadowList,
+            cross: [],
+            values: [],
+            dual: null,
+            manual: null,
+            mask: { value: state.maskIndex },
+            completed: state.completedVolumes,
+          };
+          const name = await downloadPoster(single, {
+            long: false, theme: App.theme, nickname: state.nickname,
+          });
+          toast(`已保存 ${name}`);
+        } catch (err) {
+          console.error(err);
+          toast('导出失败');
+        }
+        btn.disabled = false;
+        btn.textContent = '导出本卷 PNG';
+      },
+    }),
+    el('button', {
+      class: 'btn btn--gold',
+      type: 'button',
+      text: '生成存档码',
+      onclick: () => openSoulDialog(encodeSoulCode(state, DATA.dimOrder), state),
+    }),
+  ]));
+
+  wrap.appendChild(el('div', {
+    class: 'print-colophon',
+    text: `THE HUMAN ATLAS · VOL.${String(vol.index).padStart(2, '0')} · 本地生成`,
+  }));
+}
+
+/* ------------------------------------------------------------
+   辅助
+   ------------------------------------------------------------ */
+
+function formatAnswer(q, value) {
+  if (value === undefined || value === null) return '未作答';
+  if (q.type === 'forced_choice' || q.type === 'impulse_3s') {
+    const o = (q.options || []).find((x) => x.key === value);
+    return o ? `${o.key}. ${o.text}` : String(value);
+  }
+  if (q.type === 'stealth_scale') {
+    return `${value} / 7 — ${value >= 4 ? (q.scale?.right || '偏右') : (q.scale?.left || '偏左')}`;
+  }
+  if (q.type === 'budget_100') {
+    return Object.entries(value || {})
+      .filter(([, v]) => v > 0)
+      .map(([k, v]) => {
+        const it = (q.items || []).find((x) => x.key === k);
+        return `${it?.label || k} ${v}`;
+      })
+      .join(' · ') || '未分配';
+  }
+  if (q.type === 'pyramid_top3') {
+    return (value || [])
+      .map((k, i) => {
+        const it = (q.values || []).find((x) => x.key === k);
+        return `${i + 1}. ${it?.label || k}`;
+      })
+      .join(' · ');
+  }
+  return String(value);
+}
+
+function computeLightDark(scores) {
+  const lightKeys = ['light_humanism', 'light_kant', 'light_faith', 'virtue_humility', 'virtue_charity', 'virtue_kindness', 'virtue_patience', 'virtue_temperance', 'virtue_diligence', 'virtue_chastity'];
+  const darkKeys = ['dark_mach', 'dark_narc', 'dark_psycho', 'sin_pride', 'sin_greed', 'sin_envy', 'sin_wrath', 'sin_sloth', 'sin_lust', 'sin_gluttony'];
+  const l = lightKeys.map((k) => scores[k]).filter(Number.isFinite);
+  const d = darkKeys.map((k) => scores[k]).filter(Number.isFinite);
+  if (!l.length || !d.length) return '—';
+  const lm = l.reduce((a, b) => a + b, 0) / l.length;
+  const dm = d.reduce((a, b) => a + b, 0) / d.length;
+  if (dm <= 0.5) return '100 : 1';
+  const ratio = Math.max(1, Math.round((lm / dm) * 100));
+  return `${ratio} : 100`;
+}

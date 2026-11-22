@@ -1,0 +1,820 @@
+{
+  "volume_id": "vol8",
+  "index": 8,
+  "title": "高压剧场",
+  "subtitle": "暗箱投射、极端底线与面具镜像校验",
+  "theme_color": "#3F4C54",
+  "estimated_minutes": 6,
+  "intro": "这一卷是整套测评的试金石。所有情境都发生在你最不体面的那些时刻：连续失眠、被背刺、退路断掉。这里没有正确答案，只有你在没有力气伪装时会做的事情。",
+  "dimensions": [
+    "sin_pride",
+    "virtue_humility",
+    "sin_greed",
+    "virtue_charity",
+    "sin_wrath",
+    "virtue_patience",
+    "dark_mach",
+    "dark_narc",
+    "dark_psycho",
+    "light_kant",
+    "light_faith",
+    "light_humanism",
+    "big5_compliance",
+    "big5_assert",
+    "big5_alert",
+    "big5_rumination",
+    "att_anxiety",
+    "att_avoidance",
+    "def_intellectual",
+    "def_detach",
+    "def_attack",
+    "def_fawn",
+    "def_project",
+    "mot_security",
+    "mot_autonomy",
+    "mot_belonging",
+    "mot_mastery"
+  ],
+  "questions": [
+    {
+      "id": "v8_q01",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "kind": "pressure",
+      "mirror_key": "wrath_patience",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你为一场婚礼筹备了三个月，所有细节都定好了。仪式前两小时，另一半的家人临时决定把流程整个换掉，还在群里说「这是我们商量过的」。你已经连续三周没睡好。",
+      "prompt": "此刻你最可能做的事是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "当场把话说开，语气很难听，事后可能会后悔但当下必须说",
+          "style": "burst",
+          "effects": {
+            "sin_wrath": 2,
+            "virtue_patience": -1.8,
+            "def_attack": 1.8,
+            "big5_assert": 1.4
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "一句话不说，把这件事从我的责任里彻底拿掉，之后谁问都不接",
+          "style": "cutoff",
+          "effects": {
+            "sin_wrath": 0.8,
+            "def_detach": 1.8,
+            "att_avoidance": 1.6,
+            "virtue_patience": -0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "表情不变，先按新流程走完，同时开始清理这个人在往后的所有位置",
+          "style": "cold",
+          "effects": {
+            "sin_wrath": 1,
+            "dark_psycho": 1.8,
+            "dark_mach": 1.6,
+            "def_detach": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "硬撑着走完，回家之后整个人塌下来，开始怀疑是不是自己一直不行",
+          "style": "collapse",
+          "effects": {
+            "sin_wrath": -0.8,
+            "big5_rumination": 1.8,
+            "def_fawn": 1.2,
+            "big5_alert": 1.4
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v8_q02",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "kind": "pressure",
+      "mirror_key": "att_avoidance",
+      "is_sensitive": true,
+      "weight": 1.35,
+      "context": "你花了两年才肯把这件事交给一个人，结果那个人在最关键的节点上，把你的软肋当成了一次谈判筹码。",
+      "prompt": "你接下来的第一年是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "彻底关掉，不再给任何人这种权限，我也许会一直这样",
+          "style": "cutoff",
+          "effects": {
+            "att_avoidance": 2,
+            "def_detach": 1.8,
+            "light_faith": -1.4,
+            "mot_autonomy": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "会一次一次去找类似的人，直到有一个人证明他不一样",
+          "style": "burst",
+          "effects": {
+            "att_anxiety": 2,
+            "big5_rumination": 1.6,
+            "def_fawn": 0.8,
+            "att_avoidance": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "安静地重新规划，把所有关系都按风险等级重新排一遍",
+          "style": "cold",
+          "effects": {
+            "dark_mach": 1.2,
+            "covert_control": 1.6,
+            "def_intellectual": 1.4,
+            "att_avoidance": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "很长时间都缓不过来，会反复回想自己当初哪里看错了",
+          "style": "collapse",
+          "effects": {
+            "att_anxiety": 1.4,
+            "big5_rumination": 1.8,
+            "def_project": 1.2,
+            "light_faith": -1
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v8_q03",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "kind": "pressure",
+      "mirror_key": "mot_security",
+      "is_sensitive": true,
+      "weight": 1.35,
+      "context": "三件事撞在同一周：手上的事彻底黄了、银行卡因为一次误操作被冻结、老家打来电话说急需一笔钱。而你能开口的人，一个都不在。",
+      "prompt": "接下来的七十二小时，你的身体会先做哪一件事？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把所有能变现的东西列出来，一通一通电话打过去，先把窟窿堵住",
+          "style": "cold",
+          "effects": {
+            "mot_security": 1.8,
+            "cog_logic": 1.4,
+            "dark_psycho": 1.2,
+            "big5_alert": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "整个人停住，什么都不做，躺在床上看天花板，等这件事自己变轻",
+          "style": "collapse",
+          "effects": {
+            "mot_security": 1.2,
+            "big5_rumination": 1.6,
+            "def_detach": 1.2,
+            "sin_sloth": 1.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "翻遍通讯录，去找那个最不该找、但此刻唯一还能开口问的人",
+          "style": "burst",
+          "effects": {
+            "mot_belonging": 1.6,
+            "att_anxiety": 1.4,
+            "big5_compliance": 1.2,
+            "mot_autonomy": -1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "先谁也不说，把自己关起来，等想清楚一条完整的路再开口",
+          "style": "cutoff",
+          "effects": {
+            "mot_autonomy": 1.6,
+            "att_avoidance": 1.4,
+            "covert_control": 1,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v8_q04",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "pride_humility",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "一大家子在饭桌上，你正讲一件自己很熟的事。一个刚上大学的表弟打断你，说你刚才那句讲错了，而且他说得对。桌上七八个人都停下来看你。",
+      "prompt": "那一瞬间，你心里最真实的一句是——",
+      "scale": {
+        "left": "他说得对，我当场就改口，别的都是小事",
+        "right": "这个场合一旦在这儿被改口，往后我在这张桌上说的话就不作数了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "sin_pride": [
+          -2,
+          2
+        ],
+        "virtue_humility": [
+          2,
+          -2
+        ],
+        "dark_narc": [
+          -1.2,
+          1.6
+        ],
+        "big5_assert": [
+          -1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v8_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "greed_charity",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "一个你带过的新人，现在正需要你手里唯一的那个名额。给他，你要再等一年。",
+      "prompt": "你心里最诚实的那个答案是——",
+      "scale": {
+        "left": "先给自己，我这一年也等不起",
+        "right": "给他，我还能再熬一年，他可能熬不了",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "sin_greed": [
+          2,
+          -1.8
+        ],
+        "virtue_charity": [
+          -1.8,
+          2
+        ],
+        "light_humanism": [
+          -1.2,
+          1.6
+        ],
+        "mot_security": [
+          1.4,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "v8_q06",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "dark_mach",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "你已经确认了那个人的把柄，只要在合适的场合放出去，你能一次解决掉三年的麻烦。你也在想，这样做之后自己会变成什么样。",
+      "prompt": "你更接近的状态是——",
+      "scale": {
+        "left": "会算准时机用出去，能用一次解决三年的事没理由不用",
+        "right": "会留着，但大概率永远不会用，我不想变成需要用它的人",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "dark_mach": [
+          2,
+          -2
+        ],
+        "light_kant": [
+          -1.6,
+          1.8
+        ],
+        "covert_control": [
+          1.6,
+          -1.2
+        ],
+        "light_humanism": [
+          -1.2,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v8_q07",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "att_anxiety",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "凌晨两点，你发现自己被一个重要的人从一个小群里移出去了。没有任何解释。",
+      "prompt": "接下来的十分钟你会做的事是——",
+      "scale": {
+        "left": "先睡，明天再说，这件事不值得我现在处理",
+        "right": "马上开始翻聊天记录，找出自己哪句话说错了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "att_anxiety": [
+          -2,
+          2
+        ],
+        "big5_rumination": [
+          -1.6,
+          2
+        ],
+        "def_fawn": [
+          -1,
+          1.4
+        ],
+        "def_project": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v8_q08",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "att_avoidance",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "有人在你最狼狈的那个晚上，什么都没有问，直接来了。他就站在门口，手里拎着东西。",
+      "prompt": "你的第一反应是——",
+      "scale": {
+        "left": "让他进来，那一刻我很需要有人在",
+        "right": "本能地想说我没事，先把门关一半",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "att_avoidance": [
+          -2,
+          2
+        ],
+        "mot_belonging": [
+          1.6,
+          -1.2
+        ],
+        "def_detach": [
+          -1.2,
+          1.4
+        ],
+        "big5_compassion": [
+          1.2,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "v8_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "def_fawn",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "一个掌握你评价的人在饭桌上开了一个让你很难堪的玩笑，全桌都在笑，包括你不太熟的人。",
+      "prompt": "你的身体会先做哪一件事？",
+      "scale": {
+        "left": "跟着笑一下，把这个场面接过去",
+        "right": "表情会变，会让他知道这句话不合适",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "def_fawn": [
+          2,
+          -1.8
+        ],
+        "big5_compliance": [
+          1.6,
+          -1.4
+        ],
+        "big5_assert": [
+          -1.4,
+          1.6
+        ],
+        "sin_wrath": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v8_q10",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "def_intellectual",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "你刚刚失去了一个对你意义非常大的东西。它不会回来了。房间里很安静。",
+      "prompt": "一个小时之后，你的状态更接近——",
+      "scale": {
+        "left": "在脑子里把它拆成几个阶段，理解它为什么会发生",
+        "right": "什么都想不了，只是坐在那，感觉像被抽走了一块",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "def_intellectual": [
+          2,
+          -2
+        ],
+        "def_detach": [
+          1.4,
+          -1.2
+        ],
+        "big5_compassion": [
+          -1.2,
+          1.6
+        ],
+        "big5_rumination": [
+          -0.4,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v8_q11",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "big5_compliance",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "你已经很累了，但一个你不想得罪的人又提出了一个新的要求，这件事本可以明天做。",
+      "prompt": "对话停在那里，最后从你嘴里出去的那句更接近——",
+      "scale": {
+        "left": "好的，我现在就弄",
+        "right": "明天一早给你，今晚我做不了了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "big5_compliance": [
+          1.8,
+          -1.8
+        ],
+        "def_fawn": [
+          1.4,
+          -1.2
+        ],
+        "big5_assert": [
+          -1.2,
+          1.6
+        ],
+        "att_anxiety": [
+          0.8,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v8_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "light_kant",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "有一个可以让整件事翻盘的机会，代价是要在一个不重要的细节上说一句不完整的话，没有人会发现。",
+      "prompt": "你会——",
+      "scale": {
+        "left": "会说，这个细节不重要，结果更重要",
+        "right": "不会说，一旦开了这个口，之后所有事都会松",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "light_kant": [
+          -2,
+          2
+        ],
+        "val_moral": [
+          -1.8,
+          1.8
+        ],
+        "dark_mach": [
+          1.6,
+          -1.4
+        ],
+        "cog_ambiguity": [
+          1.2,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v8_q13",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "mot_security",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "你有一个可以立刻离开现在生活方式的窗口，只有三天。走了就没有退路，留下就再等三年。",
+      "prompt": "你更可能——",
+      "scale": {
+        "left": "留，我的人生不能没有一条退路",
+        "right": "走，退路本身就是一种慢性消耗",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_security": [
+          2,
+          -1.8
+        ],
+        "mot_autonomy": [
+          -1.8,
+          2
+        ],
+        "big5_alert": [
+          1.4,
+          -1.2
+        ],
+        "dark_psycho": [
+          -0.8,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "v8_q14",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "def_attack",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "有人在公开场合把你的一次失败描述成了你的性格问题，措辞很体面，但意思很清楚。",
+      "prompt": "你的第一秒是——",
+      "scale": {
+        "left": "当场就接回去，把他的话原样拆开",
+        "right": "表面没动，回去之后在心里把这个人划掉",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "def_attack": [
+          1.8,
+          -1.6
+        ],
+        "def_detach": [
+          -1.4,
+          1.8
+        ],
+        "sin_wrath": [
+          1.2,
+          -0.6
+        ],
+        "big5_assert": [
+          1.2,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "v8_q15",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "kind": "pressure",
+      "mirror_key": "def_detach",
+      "is_sensitive": true,
+      "weight": 1.35,
+      "context": "你被最信任的两个人同时瞒了一件事，这件事已经持续了半年，而今天他们决定一起告诉你。",
+      "prompt": "你听完之后的第一个动作是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "把两个人一起赶出去，把门关上，把手机也关掉",
+          "style": "cutoff",
+          "effects": {
+            "def_detach": 2,
+            "att_avoidance": 1.6,
+            "light_faith": -1.4,
+            "sin_wrath": 0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "当场把话全部说完，一句不留，可能说得非常狠",
+          "style": "burst",
+          "effects": {
+            "sin_wrath": 1.8,
+            "def_attack": 1.8,
+            "big5_assert": 1.2,
+            "big5_compassion": -0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "非常平静地把每一件事的时间点问清楚，像是在整理一份材料",
+          "style": "cold",
+          "effects": {
+            "def_intellectual": 1.8,
+            "def_detach": 1.4,
+            "cog_logic": 1,
+            "dark_psycho": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "说不出话，先回房间，过了很久才发现自己在发抖",
+          "style": "collapse",
+          "effects": {
+            "big5_rumination": 1.8,
+            "att_anxiety": 1.4,
+            "def_fawn": 0.6,
+            "def_attack": -1.2
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v8_q16",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "kind": "pressure",
+      "mirror_key": "dark_narc",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "你在这件事上一个人扛了两年，最难的部分全是你做的。今天它成了，所有公开的说法里都没有你的名字。",
+      "prompt": "你最可能做的事是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "找一个合适的场合，把关键细节讲出来，让别人知道是谁做的",
+          "style": "burst",
+          "effects": {
+            "dark_narc": 1.8,
+            "sin_pride": 1.4,
+            "big5_assert": 1.6,
+            "virtue_humility": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "不说了，但会在心里记很久，之后不再交付出这个量级的力气",
+          "style": "cutoff",
+          "effects": {
+            "dark_narc": 0.6,
+            "def_detach": 1.6,
+            "mot_mastery": -1.2,
+            "big5_rumination": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "开始重新安排下一件事的资源，让自己成为那个无法被绕过的人",
+          "style": "cold",
+          "effects": {
+            "dark_narc": 1.2,
+            "covert_control": 1.8,
+            "dark_mach": 1.4,
+            "mot_mastery": 1.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "一个人待了很久，开始怀疑是不是自己本来就没那么重要",
+          "style": "collapse",
+          "effects": {
+            "dark_narc": 0.8,
+            "big5_rumination": 1.8,
+            "big5_alert": 1.2,
+            "virtue_humility": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v8_q17",
+      "type": "forced_choice",
+      "stealth_mode": "pressure",
+      "layer": "stealth",
+      "kind": "pressure",
+      "mirror_key": "def_attack",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "你被一个曾经公开羞辱过你的人，现在反过来请求帮忙，姿态放得很低，而这件事确实只有你能做。",
+      "prompt": "你会怎么处理？",
+      "options": [
+        {
+          "key": "A",
+          "text": "帮，但要让他清楚记住是我帮的，而且只有这一次",
+          "style": "cold",
+          "effects": {
+            "dark_mach": 1.4,
+            "covert_control": 1.4,
+            "dark_narc": 0.8,
+            "light_humanism": 0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "不帮。把当初他说的那句话原样还给他，一个字都不用多加",
+          "style": "burst",
+          "effects": {
+            "sin_wrath": 1.8,
+            "def_attack": 1.6,
+            "light_humanism": -1.2,
+            "virtue_patience": -1.2
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "不接，也不回，把他放进一个再也不会被打开的抽屉",
+          "style": "cutoff",
+          "effects": {
+            "def_detach": 1.8,
+            "sin_wrath": 0.4,
+            "att_avoidance": 1.2,
+            "light_humanism": -0.6
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "帮了。一边帮一边在心里算这已经是第几次，帮完那天晚上一句话都不想说",
+          "style": "collapse",
+          "effects": {
+            "light_humanism": 0.6,
+            "virtue_patience": -0.4,
+            "def_fawn": 1.6,
+            "big5_rumination": 1.4
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v8_q18",
+      "type": "stealth_scale",
+      "stealth_mode": "mirror",
+      "layer": "stealth",
+      "mirror_key": "mot_autonomy",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "context": "所有人都劝你留下来，条件优厚、前途清晰、所有人都会说你做了正确的选择。只有你自己知道，每天早上醒来那三分钟的沉默正在变长。",
+      "prompt": "你最后会——",
+      "scale": {
+        "left": "留下，那些沉默会慢慢变成生活本来的样子",
+        "right": "走，宁可承担一段很长时间的混乱",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "mot_autonomy": [
+          -2,
+          2
+        ],
+        "mot_security": [
+          1.4,
+          -1.6
+        ],
+        "val_boundary": [
+          -1.4,
+          1.8
+        ],
+        "lv_anchor": [
+          0.6,
+          -1
+        ]
+      }
+    }
+  ]
+}

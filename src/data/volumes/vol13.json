@@ -1,0 +1,867 @@
+{
+  "volume_id": "vol13",
+  "index": 13,
+  "title": "童年剧本",
+  "subtitle": "十大隐形人生陷阱与早期图式",
+  "theme_color": "#5E5066",
+  "estimated_minutes": 5,
+  "intro": "这一卷不追究谁对谁错。有些台词在你还没学会说话时就被念过，后来它们学会了自己播放，在深夜、在饭桌上、在对方晚回消息的那半小时里。十八个普通场景只做一件事：把那段还在自动重播的旧录音找出来，听清它究竟在说什么。",
+  "dimensions": [
+    "schema_abandonment",
+    "schema_deprivation",
+    "schema_defect",
+    "schema_mistrust",
+    "schema_isolation",
+    "schema_std",
+    "schema_sacrifice",
+    "schema_approval",
+    "schema_entitlement",
+    "schema_negativity"
+  ],
+  "questions": [
+    {
+      "id": "v13_q01",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "schema_sacrifice",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "周六早上，伴侣把两天的行程排得满满当当，兴致很高地问你「都准备好了吧」——而你其实只想在家躺着。",
+      "scale": {
+        "left": "当场说实话，把行程砍掉一半，哪怕他会有点失望",
+        "right": "笑着答应下来，把自己的状态压到最下面，两天全程配合",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "schema_sacrifice": [
+          -1.8,
+          2
+        ],
+        "def_fawn": [
+          -1,
+          1.2
+        ],
+        "val_boundary": [
+          1.2,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "v13_q02",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "schema_deprivation",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "深夜十一点半，你刚经历完一件很难受的事。手机握在手里，通讯录翻了两屏。",
+      "scale": {
+        "left": "真有一两个人，我会直接打过去，把话说明白",
+        "right": "翻到最后还是锁了屏，说了也只是被敷衍两句",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "schema_deprivation": [
+          -1.8,
+          2
+        ],
+        "att_avoidance": [
+          -1,
+          1.2
+        ],
+        "mot_belonging": [
+          -1,
+          0.9
+        ]
+      }
+    },
+    {
+      "id": "v13_q03",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "schema_mistrust",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "一起合租过两年的阿哲开口借一笔钱，大约是你两个月工资，说三个月后还，没提利息，也没提借条。",
+      "prompt": "转账页面停在输入金额那一格，你心里那杆秤最后偏向哪一边？",
+      "options": [
+        {
+          "key": "A",
+          "text": "借，不设期限也不要借条。他开这个口已经很难，这两年我信得过",
+          "effects": {
+            "schema_mistrust": -2,
+            "light_humanism": 1.2,
+            "virtue_kindness": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "借，但分两次给。先给一半看他怎么处理这件事，剩下的再谈",
+          "effects": {
+            "schema_mistrust": 1.7,
+            "covert_control": 1.4,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "直说自己也有压力，能拿出一个不心疼的数，剩下的明说没有",
+          "effects": {
+            "schema_mistrust": -1.7,
+            "val_boundary": 1.4,
+            "def_intellectual": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "嘴上先应着，回头用「最近手头也紧」把这件事慢慢拖过去",
+          "effects": {
+            "schema_mistrust": 1.8,
+            "def_fawn": 1,
+            "covert_control": 1.2
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v13_q04",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "schema_entitlement",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "六个人吃完饭，账单里有一瓶六百八的红酒，是其中两个人点的，你一口没喝。服务员把账单放在桌子中间。",
+      "prompt": "你把账单拿过来，一眼看见那瓶自己一口没喝的红酒，心里那个念头是：",
+      "options": [
+        {
+          "key": "A",
+          "text": "把那瓶酒单独划出来记在那两人头上，剩下的平摊，谁也不欠谁",
+          "effects": {
+            "schema_entitlement": -1.7,
+            "val_boundary": 1.2,
+            "light_kant": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "什么也不提，按人头平摊，几十块钱的事不值得让一桌人尴尬",
+          "effects": {
+            "schema_entitlement": -1.7,
+            "big5_compliance": 1.2,
+            "virtue_kindness": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "照单平摊，心里却记了一笔：我一口没喝，凭什么替别人买单",
+          "effects": {
+            "schema_entitlement": 1.7,
+            "big5_rumination": 1.4,
+            "def_detach": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "既然规则是平摊，就按规则用一次，顺手给自己加杯想试的酒",
+          "effects": {
+            "schema_entitlement": 1.9,
+            "sin_greed": 1.3,
+            "light_kant": -1
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v13_q05",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "schema_approval",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "年夜饭桌上，你姑姑端着酒杯说：「你看你表弟，房子都买了，你也该定下来了。」",
+      "prompt": "一桌人的笑意还没落下来，你嘴里先出去的那句话，骨子里是什么味道？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把话岔开，给她夹一筷子菜，说大过年的，先聊点高兴的事",
+          "effects": {
+            "schema_approval": 1.8,
+            "def_fawn": 1.2,
+            "big5_compliance": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "顺着她的话说表弟确实厉害，再平静地讲自己在按什么节奏走",
+          "effects": {
+            "schema_approval": -1.6,
+            "val_boundary": 1.4,
+            "virtue_humility": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "笑着把这两年的成绩报一遍给她听，让全桌都知道你也没闲着",
+          "effects": {
+            "schema_approval": 2,
+            "sin_pride": 1.3,
+            "schema_std": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "低头吃饭，一晚上都在想自己哪里不如人，散场后在车里坐很久",
+          "effects": {
+            "schema_approval": 1.7,
+            "schema_std": 1.3,
+            "big5_rumination": 1.2
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v13_q06",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "stealth",
+      "mirror_key": "schema_abandonment",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "周三下午，对方发来一句「晚上回来我们谈谈」，之后再没有别的消息。",
+      "prompt": "到晚上推门之前，你脑子里跑得最快的是哪一幕？",
+      "options": [
+        {
+          "key": "A",
+          "text": "把这半年的事过了一遍，先找出自己最可能做错的那三件",
+          "effects": {
+            "schema_abandonment": 1.9,
+            "big5_rumination": 1.4,
+            "def_fawn": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "有点慌，但马上告诉自己：谈就谈，最坏的结果我已经想清楚",
+          "effects": {
+            "schema_abandonment": 1.6,
+            "schema_negativity": 1.4,
+            "big5_alert": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "C",
+          "text": "照常把手上的事做完，等晚上听他说，没发生的事想也没用",
+          "effects": {
+            "schema_abandonment": -1.9,
+            "big5_alert": -0.9,
+            "mot_autonomy": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "心里先凉了一下，然后开始默默算：如果分开，房子怎么分",
+          "effects": {
+            "schema_abandonment": 1.6,
+            "schema_mistrust": 1.4,
+            "def_detach": 1.2
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v13_q07",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "schema_isolation",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "你和一个朋友聊了大半年要一起做的副业。上个星期他开业了，你是从别人转发的海报上看到的。合伙人不是你。",
+      "prompt": "那张海报你已经点开过第三次了。",
+      "options": [
+        {
+          "key": "A",
+          "text": "点了个赞，然后告诉自己往后这类事不用再等，也别多想",
+          "effects": {
+            "schema_isolation": 1.8,
+            "def_detach": 1.2,
+            "att_avoidance": 1
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "B",
+          "text": "心里有点难受，但第二天照常约他吃饭，一个字都不问",
+          "effects": {
+            "schema_isolation": -1.6,
+            "mot_belonging": 1.2,
+            "big5_compassion": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "直接问他当时是怎么想的，不猜也不憋着，语气还挺轻松",
+          "effects": {
+            "schema_isolation": -1.9,
+            "val_boundary": 1.4,
+            "mot_belonging": 1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "把这个人的分档往下调了一格，不说破，但往后有钱的事不会再找他",
+          "effects": {
+            "schema_isolation": 1.7,
+            "def_detach": 1.3,
+            "schema_mistrust": 0.9
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v13_q08",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "schema_negativity",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "凌晨两点，你摸到脖子上有个小硬块——不疼，也不会自己消掉。今晚剩下的几个小时，你打算怎么过完？",
+      "scale": {
+        "left": "搜索框已经打开，最坏的那种病从头看到尾，天亮前没合眼",
+        "right": "记在备忘录里，白天去挂个号，今晚先把觉睡完",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "schema_negativity": [
+          2,
+          -1.8
+        ],
+        "big5_alert": [
+          1.4,
+          -1.2
+        ],
+        "big5_rumination": [
+          1.3,
+          -0.9
+        ]
+      }
+    },
+    {
+      "id": "v13_q09",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "stealth",
+      "mirror_key": "schema_std",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "你爸在电话里说，隔壁老张的儿子今年带父母去了趟欧洲，说完停了一下，然后问你最近忙不忙，语气很轻。",
+      "scale": {
+        "left": "顺着他的话聊两句，说说自己这半年过得怎么样",
+        "right": "挂了电话就开始算自己还差多少，一晚上都不太想说话",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "schema_std": [
+          -1.6,
+          2
+        ],
+        "schema_approval": [
+          -1,
+          1.2
+        ],
+        "big5_rumination": [
+          -0.8,
+          1.1
+        ]
+      }
+    },
+    {
+      "id": "v13_q10",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "schema_abandonment",
+      "is_sensitive": true,
+      "weight": 1.25,
+      "context": "凌晨的急诊，你一个人挂着水。第一瓶快见底了，走廊里只有推车的轮子声。",
+      "prompt": "护士把表推过来，指了指第一栏：「紧急联系人，后面那格写关系。」",
+      "options": [
+        {
+          "key": "A",
+          "text": "一个不算太熟的朋友。他不会觉得我麻烦，也不会问太多",
+          "effects": {
+            "schema_abandonment": 1.9,
+            "schema_deprivation": 1.2,
+            "def_fawn": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "家里人。填完就发定位过去，说清楚我在几楼几床",
+          "effects": {
+            "schema_abandonment": -1.8,
+            "mot_belonging": 1.2,
+            "att_anxiety": -0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "空着交了回去。这种事我自己能处理，不必半夜叫醒谁",
+          "effects": {
+            "schema_abandonment": 1.7,
+            "att_avoidance": 1.4,
+            "def_detach": 1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "一个一定会来的人，然后在等他的四十分钟里把音量开到最大",
+          "effects": {
+            "schema_abandonment": 1.6,
+            "att_anxiety": 1.4,
+            "big5_alert": 1
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v13_q11",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "schema_deprivation",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "在一起三年，纪念日那天他加班到十点，进门时手里拎着一袋便利店的关东煮，说「今天太忙了，明天补」。",
+      "prompt": "你接过那袋东西，心里浮起来的念头更接近下面哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "说没关系，热了一起吃。那点落差我自己消化掉就好",
+          "effects": {
+            "schema_deprivation": 1.7,
+            "schema_sacrifice": 1,
+            "def_fawn": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "告诉他我今天想要的不只是关东煮，并且说清楚想要什么",
+          "effects": {
+            "schema_deprivation": -1.8,
+            "val_boundary": 1.4,
+            "light_kant": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "什么也不说，接下来一周都淡淡的，等他自己发现哪里不对",
+          "effects": {
+            "schema_deprivation": 1.8,
+            "schema_mistrust": 1,
+            "covert_control": 0.8
+          },
+          "social_desirability": 0
+        },
+        {
+          "key": "D",
+          "text": "其实没觉得缺什么，两个人在厨房吃完，还觉得这样也挺好",
+          "effects": {
+            "schema_deprivation": -1.7,
+            "mot_belonging": 1.2,
+            "big5_compassion": 1.2
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v13_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "schema_entitlement",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "三个月前买的耳机坏了，保修刚过十四天。店员语气很客气，说按规定只能自费修。",
+      "scale": {
+        "left": "我在这家店买了五年，就为了这十四天跟我讲规定？",
+        "right": "算了，规定写在那里，这十四天我自己认",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "schema_entitlement": [
+          2,
+          -1.8
+        ],
+        "val_boundary": [
+          1.4,
+          -1
+        ],
+        "big5_compliance": [
+          -1,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v13_q13",
+      "type": "forced_choice",
+      "stealth_mode": "mirror",
+      "layer": "explicit",
+      "mirror_key": "schema_defect",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "context": "小学三年级那次家长会，老师当着所有人的面念了你的名字和名次。你妈回家的路上一直没说话。",
+      "prompt": "这个画面留到今天，长成了你身上的一种反应：",
+      "options": [
+        {
+          "key": "A",
+          "text": "记得很清楚，那种脸热到现在还会在我开口发言前冒出来",
+          "effects": {
+            "schema_defect": 2,
+            "big5_rumination": 1.4,
+            "schema_approval": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "记得，但我已经不拿她那把尺子量自己，那是她的焦虑",
+          "effects": {
+            "schema_defect": -1.7,
+            "val_boundary": 1.4,
+            "schema_std": -1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "细节已经模糊了，只知道我到现在都怕被人当众点评一句",
+          "effects": {
+            "schema_defect": 1.7,
+            "schema_approval": 1.2,
+            "big5_alert": 1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "记得。而且我对自己孩子那张成绩单，比我妈当年还在意",
+          "effects": {
+            "schema_defect": 1.6,
+            "schema_std": 1.4,
+            "covert_control": 0.9
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v13_q14",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "schema_mistrust",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "一位共事多年的朋友拉你合伙做点事，合同是他自己拟的，递过来时说「我们之间不用这么麻烦」。",
+      "prompt": "你把那份合同翻到最后一页，其实在翻之前就知道自己会不会签。",
+      "options": [
+        {
+          "key": "A",
+          "text": "签。他敢把话说成这样，说明他压根没给自己留后手",
+          "effects": {
+            "schema_mistrust": -1.8,
+            "light_humanism": 1.4,
+            "virtue_kindness": 0.9
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "笑着签，同时找个懂行的朋友把条款过一遍，该改的直接提",
+          "effects": {
+            "schema_mistrust": 1.6,
+            "def_intellectual": 1.4,
+            "covert_control": 0.9
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "越熟越要把话说在前面，坐下来把分成和退出谈清楚再落笔",
+          "effects": {
+            "schema_mistrust": -1.6,
+            "val_boundary": 1.4,
+            "light_kant": 1.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "嘴上应着，回头找个理由拖着不签，事归事，人归人",
+          "effects": {
+            "schema_mistrust": 1.9,
+            "def_fawn": 1,
+            "dark_mach": 0.8
+          },
+          "social_desirability": 0
+        }
+      ]
+    },
+    {
+      "id": "v13_q15",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "schema_isolation",
+      "is_sensitive": true,
+      "weight": 1.2,
+      "context": "部门聚餐，你坐在长桌最靠里的位置。一整顿饭你都在听，散场时有人说了句「下次再约」。",
+      "prompt": "回去的路上，这件事会以什么方式留在你身上？",
+      "options": [
+        {
+          "key": "A",
+          "text": "有点闷。到家把这顿饭从头到尾复盘一遍，想自己哪句说错了",
+          "effects": {
+            "schema_isolation": 1.8,
+            "big5_rumination": 1.4,
+            "schema_defect": 0.9
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "没觉得是事。本来就不是一路人，明天照常上班，该笑就笑",
+          "effects": {
+            "schema_isolation": 1.7,
+            "def_detach": 1.3,
+            "att_avoidance": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "第二天主动约了桌上聊得最来的同事喝咖啡，把这条线接上",
+          "effects": {
+            "schema_isolation": -1.9,
+            "mot_belonging": 1.4,
+            "val_boundary": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "散场时多留了十分钟，帮着把账结了、酒拎回去，反正顺路",
+          "effects": {
+            "schema_isolation": -1.7,
+            "schema_sacrifice": 1.3,
+            "big5_compliance": 1.2
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v13_q16",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "stealth",
+      "mirror_key": "schema_defect",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "洗完澡，镜子上全是雾。你抬手抹开一块，正好是自己的脸。",
+      "scale": {
+        "left": "盯着看很久，把每一处松、每一处不对称都挑出来",
+        "right": "看一眼就走，镜子里没什么值得多看的",
+        "sdHigh": "right"
+      },
+      "effects": {
+        "schema_defect": [
+          2,
+          -1.6
+        ],
+        "big5_rumination": [
+          1.2,
+          -0.9
+        ],
+        "schema_std": [
+          1,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v13_q17",
+      "type": "pyramid_top3",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "schema_values",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "小时候那个房间早就拆了。缺的东西没法补，可你现在还在替它付账。",
+      "prompt": "如果时间能倒回去，你最想先补上哪三样，按先后排出来。",
+      "values": [
+        {
+          "key": "steady",
+          "label": "一个会一直留在原地的大人",
+          "effects": {
+            "schema_abandonment": 1.6,
+            "mot_belonging": 1,
+            "att_anxiety": 0.8
+          }
+        },
+        {
+          "key": "ask",
+          "label": "有人认真问过一句「你今天怎么样」",
+          "effects": {
+            "schema_deprivation": 1.6,
+            "big5_compassion": 0.8,
+            "mot_belonging": 0.8
+          }
+        },
+        {
+          "key": "accept",
+          "label": "不用表现好也能被留下的那种接纳",
+          "effects": {
+            "schema_defect": 1.6,
+            "schema_approval": 0.8,
+            "virtue_humility": 0.6
+          }
+        },
+        {
+          "key": "word",
+          "label": "一个说话算话的大人",
+          "effects": {
+            "schema_mistrust": 1.6,
+            "light_kant": 0.8,
+            "val_moral": 0.6
+          }
+        },
+        {
+          "key": "room",
+          "label": "一个不用装也能待着的房间",
+          "effects": {
+            "schema_isolation": 1.6,
+            "def_detach": 0.6,
+            "mot_belonging": 0.8
+          }
+        },
+        {
+          "key": "enough",
+          "label": "有人说过「你已经够好了」",
+          "effects": {
+            "schema_std": 1.6,
+            "schema_approval": 0.8,
+            "big5_compassion": 0.6
+          }
+        },
+        {
+          "key": "hold",
+          "label": "有人先照顾过我一次",
+          "effects": {
+            "schema_sacrifice": 1.6,
+            "big5_compassion": 0.8,
+            "mot_belonging": 0.6
+          }
+        },
+        {
+          "key": "allow",
+          "label": "被允许无理取闹一次",
+          "effects": {
+            "schema_entitlement": 1.6,
+            "sin_pride": 0.8,
+            "mot_autonomy": 0.6
+          }
+        }
+      ]
+    },
+    {
+      "id": "v13_q18",
+      "type": "budget_100",
+      "stealth_mode": "budget",
+      "layer": "explicit",
+      "mirror_key": "schema_energy",
+      "is_sensitive": true,
+      "weight": 1.3,
+      "context": "有些力气每天都在花，却从来不进日程表，也不算在任何一项支出里。",
+      "prompt": "现在把这一百点「隐形力气」分下去——你会看清自己其实在养什么。",
+      "items": [
+        {
+          "key": "alert",
+          "label": "提前预演最坏的那种结局",
+          "dim": "schema_negativity",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "prove",
+          "label": "反复确认自己有没有被讨厌",
+          "dim": "schema_approval",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "exit",
+          "label": "在每段关系里先留好退路",
+          "dim": "schema_mistrust",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "caretake",
+          "label": "先照顾别人的情绪再轮到自己",
+          "dim": "schema_sacrifice",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "polish",
+          "label": "把已经够好的东西再改一遍",
+          "dim": "schema_std",
+          "base": 0,
+          "gain": 1
+        },
+        {
+          "key": "cover",
+          "label": "遮住自己觉得不够好的那部分",
+          "dim": "schema_defect",
+          "base": 0,
+          "gain": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,781 @@
+{
+  "volume_id": "vol5",
+  "index": 5,
+  "title": "思维棱镜",
+  "subtitle": "认知风格与决策算法的六道棱面",
+  "theme_color": "#3B4D70",
+  "estimated_minutes": 4,
+  "intro": "这一卷不测量情绪，也不评判道德。它只测绘你大脑处理信息、做判断、解决难题的那台机器——你怎样把混乱的世界压缩成一个可以行动的结论。",
+  "dimensions": [
+    "cog_global",
+    "cog_diverge",
+    "cog_logic",
+    "cog_ambiguity",
+    "cog_independent",
+    "cog_speed"
+  ],
+  "questions": [
+    {
+      "id": "v5_q01",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_global",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "接到一个全新领域的任务，你把书翻开的第一个动作是——",
+      "scale": {
+        "left": "先读目录和结论，把这件事的骨架搞清楚",
+        "right": "直接从第一个具体案例开始，边做边建立理解",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_global": [
+          2,
+          -2
+        ],
+        "big5_open": [
+          1,
+          -0.8
+        ],
+        "cog_speed": [
+          -0.6,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v5_q02",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "cog_diverge",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "家里一位长辈的病已经反复三年，常规办法都试过了，全家开始陷入疲惫，谁都不再提「接下来怎么办」。",
+      "prompt": "你更愿意把接下来的力气放在——",
+      "options": [
+        {
+          "key": "A",
+          "text": "先列出十条从来没人试过的路子，哪怕八条最后是荒唐的",
+          "effects": {
+            "cog_diverge": 2,
+            "big5_open": 1.4,
+            "cog_global": 0.8,
+            "cog_speed": -0.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "把所有可能的风险点排一遍，先把最坏的那个堵上",
+          "effects": {
+            "cog_diverge": -1.8,
+            "big5_alert": 1.6,
+            "big5_order": 1.2,
+            "cog_ambiguity": -1.2
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "找一个完全不懂医的朋友聊一次，看他怎么理解这件事",
+          "effects": {
+            "cog_diverge": 1.6,
+            "big5_open": 1.6,
+            "light_humanism": 0.6,
+            "cog_independent": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "先承认这条路走不通，然后认真讨论要不要换一种活法",
+          "effects": {
+            "cog_diverge": -0.8,
+            "dark_psycho": 1.4,
+            "cog_speed": 1.2,
+            "mot_mastery": -0.6
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v5_q03",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_logic",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "两个候选人条件几乎一样，但你心里对其中一个有说不清的好感。你的实际处理是——",
+      "scale": {
+        "left": "把好感放到一边，回到可比较的维度上做决定",
+        "right": "相信那点说不清，它通常捕捉到了数据没覆盖的东西",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_logic": [
+          1.8,
+          -1.8
+        ],
+        "cog_speed": [
+          -0.8,
+          1
+        ],
+        "big5_compassion": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v5_q04",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_ambiguity",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "你打算换一座城市生活，两个月过去了，仍有三分之一的变量没定：住哪、做什么、要不要先斩后奏。家里人希望你月底给一个明确说法。你的状态更接近——",
+      "options": [
+        {
+          "key": "A",
+          "text": "先给一份带明确分支的图，把那三成写成可选路径，先往前走",
+          "effects": {
+            "cog_ambiguity": 1.8,
+            "cog_speed": 1,
+            "big5_order": -0.4,
+            "cog_global": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "会很不舒服，没有确定的前提我很难给出任何承诺",
+          "effects": {
+            "cog_ambiguity": -1.8,
+            "big5_order": 1.6,
+            "big5_alert": 1.2,
+            "cog_speed": -1.2
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "去找能拍板的人，先把那三成压下来，再谈路线",
+          "effects": {
+            "cog_ambiguity": -1.4,
+            "big5_assert": 1.4,
+            "covert_control": 1,
+            "cog_logic": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "索性先做一个小实验，用真实反馈把那三成自己削掉",
+          "effects": {
+            "cog_ambiguity": 1.4,
+            "cog_speed": 1.6,
+            "cog_diverge": 1,
+            "big5_industry": 0.8
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v5_q05",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_independent",
+      "is_sensitive": true,
+      "weight": 0.85,
+      "prompt": "一个圈子里公认的「正确做法」，你隐约觉得有问题，但你说不出完整的理由。你通常——",
+      "scale": {
+        "left": "先照做，多数人这么做总有它的道理",
+        "right": "会先按自己的判断试一次，哪怕要独自承担后果",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_independent": [
+          -1.8,
+          2
+        ],
+        "big5_compliance": [
+          1.6,
+          -1.4
+        ],
+        "sin_pride": [
+          -0.6,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v5_q06",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "cog_speed",
+      "is_sensitive": false,
+      "weight": 1.2,
+      "context": "一个重要机会，今天下午六点前必须决定，跳进去是三个月的重投入。你现在掌握的信息大概占到六成。",
+      "prompt": "看到那条消息后的第一反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "先答应下来，六成就够了，剩下的边做边补，不必等万事齐备",
+          "effects": {
+            "cog_speed": 2,
+            "cog_ambiguity": 1.4,
+            "dark_psycho": 0.8,
+            "big5_alert": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "立刻开始要把剩下那四成尽量敲出来，即使要拖到最后一刻",
+          "effects": {
+            "cog_speed": -1.6,
+            "big5_order": 1.4,
+            "big5_alert": 1,
+            "cog_logic": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先找两三个判断力可靠的人各问一圈，问完再自己定下来",
+          "effects": {
+            "cog_speed": -0.8,
+            "cog_independent": -0.6,
+            "big5_compliance": 1,
+            "light_faith": 1
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "心里已经有一个答案，但还是会拖到最后十分钟才回",
+          "effects": {
+            "cog_speed": -1,
+            "sin_sloth": 1.2,
+            "big5_rumination": 1,
+            "cog_logic": 0.4
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v5_q07",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "cog_global",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "两个人在同一场线下活动结束后，被问「怎么样」。一个人先说了三个具体细节，另一个人先说了这场活动的核心问题是什么。",
+      "prompt": "你觉得这两个人里，谁更可能在半年后走得更高？",
+      "options": [
+        {
+          "key": "A",
+          "text": "说细节的那位，他对真实发生的事有手感",
+          "effects": {
+            "cog_global": -1.8,
+            "cog_logic": 1.2,
+            "big5_order": 1.2,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "说核心问题的那位，他能把经验变成可复用的判断",
+          "effects": {
+            "cog_global": 1.8,
+            "cog_diverge": 1,
+            "mot_mastery": 1.2,
+            "big5_open": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "不好说，这两个能力在不同阶段各有各的用",
+          "effects": {
+            "cog_global": 0.4,
+            "cog_ambiguity": 1.4,
+            "big5_compliance": 0.6,
+            "cog_logic": 0.4
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v5_q08",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_diverge",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一轮头脑风暴结束，桌上通常留下的是——",
+      "scale": {
+        "left": "很多张写着荒唐点子的纸，我们的问题是想不出",
+        "right": "两条能落地的方案，我们的问题是不够多",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_diverge": [
+          1.8,
+          -1.8
+        ],
+        "big5_open": [
+          1.2,
+          -0.8
+        ],
+        "cog_logic": [
+          -0.6,
+          1
+        ]
+      }
+    },
+    {
+      "id": "v5_q09",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "cog_logic",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "两种错误，你更能容忍自己犯哪一种？",
+      "options": [
+        {
+          "key": "A",
+          "text": "分析完全正确，但漏掉了那个说不清、却真正决定成败的感受",
+          "effects": {
+            "cog_logic": 1.8,
+            "cog_global": 0.6,
+            "big5_compassion": -1,
+            "light_humanism": -0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "感受全对了，但没做任何量化验证，最后被一个具体数字推翻",
+          "effects": {
+            "cog_logic": -1.8,
+            "cog_ambiguity": 1.2,
+            "big5_alert": -0.8,
+            "light_humanism": 1
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v5_q10",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_ambiguity",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一次旅行，你更愿意选择哪种方式？",
+      "scale": {
+        "left": "大致定好，剩下的到那看情况，喜欢被意外带走",
+        "right": "每一段都排好，不喜欢把时间交给不确定",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_ambiguity": [
+          2,
+          -2
+        ],
+        "big5_order": [
+          -1.6,
+          1.8
+        ],
+        "big5_open": [
+          1,
+          -0.8
+        ]
+      }
+    },
+    {
+      "id": "v5_q11",
+      "type": "forced_choice",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "cog_independent",
+      "is_sensitive": true,
+      "weight": 1.35,
+      "context": "整个行业都在往一个方向跑，几乎所有聪明人都在说这是对的，但一些最基础的事实你还没法用现有说法解释。",
+      "prompt": "你猜那些最后真正做成了的人，当时更可能在做什么？",
+      "options": [
+        {
+          "key": "A",
+          "text": "先跟着跑，等方向明朗了再加速，不浪费力气去反抗",
+          "effects": {
+            "cog_independent": -1.8,
+            "big5_compliance": 1.4,
+            "mot_security": 1.2,
+            "cog_speed": 0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "一边看着主流，一边在没人看的角落里默默做另一套",
+          "effects": {
+            "cog_independent": 1.8,
+            "cog_diverge": 1.4,
+            "covert_control": 0.8,
+            "mot_autonomy": 1
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "公开提出疑问，哪怕会被当成不懂行的人",
+          "effects": {
+            "cog_independent": 1.4,
+            "big5_assert": 1.6,
+            "sin_pride": 0.8,
+            "light_kant": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "把两边都押一点，反正站在哪边都不该押满",
+          "effects": {
+            "cog_independent": -0.6,
+            "cog_ambiguity": 1.2,
+            "dark_mach": 1.2,
+            "big5_alert": 0.8
+          },
+          "social_desirability": 1
+        }
+      ]
+    },
+    {
+      "id": "v5_q12",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_speed",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "面对一个需要立刻回应的机会，你的犹豫通常发生在——",
+      "scale": {
+        "left": "几乎不犹豫，先接住再说，错了再改",
+        "right": "越想越多，往往等我想清楚的时候窗口已经关了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_speed": [
+          1.8,
+          -1.8
+        ],
+        "sin_sloth": [
+          -1,
+          1.4
+        ],
+        "big5_rumination": [
+          -1,
+          1.4
+        ],
+        "big5_alert": [
+          -0.8,
+          1.2
+        ]
+      }
+    },
+    {
+      "id": "v5_q13",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_global",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "context": "一件事上，你妈和你伴侣给出的意见完全相反：一位说你考虑得太远、不落地；另一位说你太计较眼前、缺高度。",
+      "prompt": "你的真实反应是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "两边说的都对，我大概是站在中间那种人，谁的话都得听一半",
+          "effects": {
+            "cog_global": 1.2,
+            "big5_open": 1.2,
+            "virtue_humility": 1.4,
+            "big5_industry": 0.6
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "B",
+          "text": "先判断谁的说法更接近事实，另一个可能只是立场不同",
+          "effects": {
+            "cog_global": 0.6,
+            "cog_independent": 1.6,
+            "cog_logic": 1.2,
+            "virtue_humility": 0.2
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "不管谁怎么说，我更相信自己做出来的结果最终会说明一切。",
+          "effects": {
+            "cog_global": 0.8,
+            "sin_pride": 1.4,
+            "mot_autonomy": 1.2,
+            "big5_compliance": -1
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "D",
+          "text": "干脆分别问清他们真实的顾虑，把衡量的标准先对齐",
+          "effects": {
+            "cog_logic": 1.4,
+            "covert_control": 1,
+            "big5_compliance": 0.6,
+            "big5_order": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v5_q14",
+      "type": "stealth_scale",
+      "stealth_mode": "projection",
+      "layer": "explicit",
+      "mirror_key": "cog_diverge",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "一个极度聪明但想法天马行空、常常不落地的同事，你内心对他更接近——",
+      "scale": {
+        "left": "很喜欢和他待在一起，他能打开我没想到的地方",
+        "right": "聊起来有意思，但真做事我不会带上他",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_diverge": [
+          1.6,
+          -1.6
+        ],
+        "cog_logic": [
+          -0.8,
+          1.2
+        ],
+        "big5_open": [
+          1,
+          -0.6
+        ]
+      }
+    },
+    {
+      "id": "v5_q15",
+      "type": "impulse_3s",
+      "stealth_mode": "impulse",
+      "layer": "explicit",
+      "mirror_key": "cog_logic",
+      "is_sensitive": false,
+      "weight": 1.2,
+      "context": "谈了一半的合作方突然停顿了一下，语气有一点点变，说的内容没有任何问题。",
+      "prompt": "那个停顿出现的瞬间，你更可能——",
+      "options": [
+        {
+          "key": "A",
+          "text": "立刻捕捉到了，并且会绕着这个停顿再探一探",
+          "effects": {
+            "cog_logic": -1.4,
+            "big5_compassion": 1.4,
+            "cog_independent": 0.6,
+            "covert_control": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "没太注意，我主要在处理他说的内容本身",
+          "effects": {
+            "cog_logic": 1.6,
+            "big5_compassion": -0.8,
+            "cog_global": 0.8,
+            "big5_alert": -0.8
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "C",
+          "text": "注意到了，但当场不会碰，留到后面再验证",
+          "effects": {
+            "cog_logic": 0.6,
+            "covert_control": 1.4,
+            "big5_alert": 1,
+            "def_intellectual": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "D",
+          "text": "会把这个停顿存下来，它比后面的内容更值得记",
+          "effects": {
+            "cog_logic": -0.6,
+            "big5_compassion": 1,
+            "big5_rumination": 1.2,
+            "light_humanism": 0.8
+          },
+          "social_desirability": 2
+        }
+      ]
+    },
+    {
+      "id": "v5_q16",
+      "type": "forced_choice",
+      "stealth_mode": "ipsative",
+      "layer": "explicit",
+      "mirror_key": "cog_independent",
+      "is_sensitive": true,
+      "weight": 1.4,
+      "prompt": "当你的判断和一群你尊敬的人完全相反，你身体里的第一反应指向哪边？",
+      "options": [
+        {
+          "key": "A",
+          "text": "按自己的判断走，错了我认，但不试我不会安心",
+          "effects": {
+            "cog_independent": 1.8,
+            "mot_autonomy": 1.6,
+            "big5_assert": 1.2,
+            "big5_compliance": -1.4
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "B",
+          "text": "先按大家的走，同时留一条自己的小路，看哪边先有结果",
+          "effects": {
+            "cog_independent": 0.8,
+            "cog_ambiguity": 1.2,
+            "covert_control": 1.4,
+            "dark_mach": 0.8
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "C",
+          "text": "把判断交出去，这么多人都这么想，我大概率漏了什么",
+          "effects": {
+            "cog_independent": -1.8,
+            "big5_compliance": 1.8,
+            "virtue_humility": 1.2,
+            "big5_alert": 0.6
+          },
+          "social_desirability": 3
+        }
+      ]
+    },
+    {
+      "id": "v5_q17",
+      "type": "stealth_scale",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_speed",
+      "is_sensitive": false,
+      "weight": 0.85,
+      "prompt": "你已经写了一半的东西，突然发现一开始的框架就不对。你的习惯是——",
+      "scale": {
+        "left": "推倒重来，越早越好，沉没成本不算成本",
+        "right": "会在原框架上打补丁，重写太疼了",
+        "sdHigh": "left"
+      },
+      "effects": {
+        "cog_speed": [
+          1.4,
+          -1.4
+        ],
+        "dark_psycho": [
+          1,
+          -0.6
+        ],
+        "big5_order": [
+          -0.6,
+          1
+        ],
+        "cog_global": [
+          0.8,
+          -0.4
+        ]
+      }
+    },
+    {
+      "id": "v5_q18",
+      "type": "forced_choice",
+      "stealth_mode": "normalization",
+      "layer": "explicit",
+      "mirror_key": "cog_ambiguity",
+      "is_sensitive": false,
+      "weight": 1.4,
+      "prompt": "一件事你只做到 70 分，就可以交出去了，但你隐约觉得还有更好的解法。你的实际选择是——",
+      "options": [
+        {
+          "key": "A",
+          "text": "交出去，70 分已经够用，剩下的 30 分也许根本没人需要",
+          "effects": {
+            "cog_ambiguity": 1.2,
+            "cog_speed": 1.6,
+            "mot_hedonism": 0.6,
+            "big5_industry": -0.4
+          },
+          "social_desirability": 1
+        },
+        {
+          "key": "B",
+          "text": "再花点时间追那个解法，不追出来我会一直惦记着这件事",
+          "effects": {
+            "cog_ambiguity": -1.2,
+            "big5_industry": 1.6,
+            "mot_mastery": 1.4,
+            "sin_pride": 0.8
+          },
+          "social_desirability": 3
+        },
+        {
+          "key": "C",
+          "text": "先交出去，同时把那个念头记在本子上，等有空了再说",
+          "effects": {
+            "cog_ambiguity": 0.4,
+            "big5_order": 1.4,
+            "cog_speed": 0.8,
+            "covert_control": 0.6
+          },
+          "social_desirability": 2
+        },
+        {
+          "key": "D",
+          "text": "心里一直有个更好的版本，但也就一直放在那儿，没动",
+          "effects": {
+            "cog_ambiguity": 1.6,
+            "big5_industry": -1.2,
+            "sin_sloth": 1.4,
+            "cog_speed": -0.8
+          },
+          "social_desirability": 0
+        }
+      ]
+    }
+  ]
+}

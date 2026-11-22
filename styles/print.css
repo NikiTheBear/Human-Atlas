@@ -1,0 +1,259 @@
+/* ============================================================
+   The Human Atlas · print.css
+   A4 杂志级白皮书排版 —— 强制分页不截断
+   ============================================================ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 20mm;
+}
+
+@media print {
+  :root {
+    --bg-page: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-raise: #ffffff;
+    --bg-inset: #f7f5f0;
+    --bg-veil: #ffffff;
+    --text-primary: #1a1c1a;
+    --text-secondary: #454946;
+    --text-tertiary: #7d817c;
+    --border: #d9d4c8;
+    --border-strong: #bfb9a9;
+    --border-hair: rgba(26, 28, 26, 0.12);
+    --gold: #8a6f3c;
+    --gold-soft: #b09669;
+    --gold-wash: #f3eee3;
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --tier-1: #8c4a32;
+    --tier-2: #5c6b45;
+    --tier-3: #9c7a3c;
+    --tier-4: #3f6355;
+    --vol1: #8c4a32;
+    --vol2: #4a6b5d;
+    --vol3: #9c7a3c;
+    --vol4: #2a5c55;
+    --vol5: #3b4d70;
+    --vol6: #b5653d;
+    --vol7: #6d5472;
+    --vol8: #3f4c54;
+    --vol9: #2f5266;
+    --vol10: #7a4b3a;
+    --vol11: #4d5d4e;
+    --vol12: #7d4e57;
+    --vol13: #5e5066;
+    --vol14: #8a6d3b;
+    --vol15: #9a5643;
+    --vol16: #3b6b6e;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html, body {
+    background: #fff !important;
+    background-image: none !important;
+    color: #1a1c1a;
+    font-size: 10.5pt;
+    line-height: 1.75;
+  }
+
+  body::after { display: none !important; }
+
+  /* chrome off */
+  .masthead,
+  .report-nav,
+  .report-actions,
+  .quiz__foot,
+  .toast-stack,
+  .scrim,
+  .colophon,
+  .no-print,
+  .theme-toggle,
+  .btn,
+  .mirror-face__foot {
+    display: none !important;
+  }
+
+  #app, .page, .page--narrow {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .report { padding-top: 0 !important; }
+
+  /* ---------------- 封面 ---------------- */
+  .report-cover {
+    break-after: page;
+    page-break-after: always;
+    border: 0 !important;
+    border-bottom: 1px solid #d9d4c8 !important;
+    border-radius: 0 !important;
+    padding: 0 0 18pt !important;
+    margin-bottom: 0 !important;
+    min-height: 0;
+  }
+
+  .report-cover::before { display: none !important; }
+
+  .cover-title {
+    font-size: 30pt !important;
+    line-height: 1.35 !important;
+    margin-bottom: 12pt !important;
+  }
+
+  .cover-verdict { font-size: 11pt !important; line-height: 1.95 !important; }
+
+  .gauges {
+    border: 1px solid #d9d4c8 !important;
+    background: #d9d4c8 !important;
+    break-inside: avoid;
+  }
+
+  .gauge { padding: 10pt 12pt !important; background: #fff !important; }
+  .gauge__value { font-size: 20pt !important; }
+
+  /* ---------------- 章节 ---------------- */
+  .rsec {
+    break-inside: auto;
+    margin-bottom: 20pt !important;
+    scroll-margin-top: 0 !important;
+    /* main.css 里为了滚动性能设了 content-visibility: auto，
+       打印时必须强制展开，否则 A4 分页会漏掉未渲染的区块。 */
+    content-visibility: visible !important;
+  }
+
+  .rsec__head {
+    break-after: avoid;
+    page-break-after: avoid;
+    margin-bottom: 12pt !important;
+    padding-bottom: 6pt !important;
+  }
+
+  .rsec__head h2 { font-size: 15pt !important; }
+
+  .rsec__head p { display: none !important; }
+
+  /* 大章节强制换页（section 之间干净分页） */
+  .rsec {
+    page-break-inside: auto;
+  }
+
+  /* 卡片类不跨页 */
+  .mirror-card,
+  .chart-card,
+  .cross-card,
+  .manual-card,
+  .archetype-plate,
+  .dual-state,
+  .warn-card,
+  .res-card,
+  .cmp-verdict,
+  .cmp-slot,
+  .notice {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* 双面镜：打印时铺平，不做翻转 */
+  .mirror-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10pt !important;
+  }
+
+  .mirror-card {
+    perspective: none !important;
+    min-height: 0 !important;
+    cursor: default;
+    break-inside: avoid;
+  }
+
+  .mirror-card__inner {
+    transform: none !important;
+    min-height: 0 !important;
+    display: grid !important;
+    gap: 8pt;
+  }
+
+  .mirror-face {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    padding: 12pt !important;
+    box-shadow: none !important;
+    min-height: 0;
+  }
+
+  .mirror-face--back { background: #f7f5f0 !important; }
+  .mirror-face h3 { font-size: 12pt !important; }
+  .mirror-face__body, .alchemy { font-size: 9pt !important; line-height: 1.7 !important; }
+
+  .chart-card { padding: 12pt !important; }
+  .chart-card h3 { font-size: 11pt !important; }
+  .chart-grid-2 { grid-template-columns: 1fr !important; gap: 10pt !important; }
+
+  .cross-card { padding: 10pt 12pt !important; margin-bottom: 8pt !important; }
+  .cross-card h3 { font-size: 12.5pt !important; }
+  .cross-card__insight { font-size: 9.5pt !important; line-height: 1.8 !important; }
+  .cross-card__advice { font-size: 9pt !important; padding: 8pt 10pt !important; }
+
+  .manual-grid { grid-template-columns: 1fr 1fr !important; gap: 8pt !important; }
+  .manual-card { padding: 10pt 12pt !important; }
+  .manual-card p, .manual-card ul { font-size: 9pt !important; line-height: 1.75 !important; }
+
+  .archetype-plate { padding: 18pt 14pt !important; }
+  .archetype-plate h2 { font-size: 22pt !important; }
+  .archetype-plate p { font-size: 10.5pt !important; }
+
+  .dual-state { grid-template-columns: 1fr 1fr !important; }
+  .dual-state > div { padding: 12pt 14pt !important; }
+  .dual-state p { font-size: 9.5pt !important; line-height: 1.8 !important; }
+
+  /* 表格 */
+  .dim-table { font-size: 9pt !important; }
+  .dim-table thead { display: table-header-group; }
+  .dim-table tr { break-inside: avoid; page-break-inside: avoid; }
+  .dim-table td { padding: 5pt 8pt 5pt 0 !important; }
+  .dim-table th { font-size: 7.5pt !important; padding-bottom: 5pt !important; }
+  .score-bar { background: #e8e4da !important; }
+
+  /* 长图/图表保持清晰 */
+  svg { shape-rendering: geometricPrecision; }
+
+  .page-break {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* 军规：打印时去掉所有 overflow 裁剪，防止 SVG 被切断 */
+  .chart-card__body,
+  .report-cover {
+    overflow: visible !important;
+  }
+
+  /* 页脚水印 */
+  .print-colophon {
+    display: block !important;
+    margin-top: 16pt;
+    padding-top: 8pt;
+    border-top: 1px solid #d9d4c8;
+    font-size: 7.5pt;
+    letter-spacing: 0.14em;
+    color: #7d817c;
+    text-align: center;
+  }
+
+  a[href]::after { content: ''; }
+}
+
