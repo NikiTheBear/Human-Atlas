@@ -1,15 +1,15 @@
 {
   "name": "human-atlas",
   "private": true,
-  "version": "3.0.0",
+  "version": "5.2.2",
   "description": "人性全息图谱 The Human Atlas — 分卷潜行式多维深度测评系统（纯前端 / 零依赖）",
   "type": "module",
   "scripts": {
-    "start": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node serve.js",
-    "dev": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node serve.js",
-    "data": "node scripts/merge-volume-fragments.js && node scripts/build-data.js",
-    "single": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node scripts/build-single.js",
-    "build": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node scripts/build-single.js && node scripts/build.js",
+    "start": "node serve.js",
+    "dev": "node serve.js",
+    "data": "node scripts/build-data.js",
+    "single": "node scripts/build-single.js",
+    "build": "node scripts/build-single.js && node scripts/build.js",
     "test": "node tests/verify-scoring.js && node tests/verify-engine.js",
     "check": "node tests/verify-engine.js",
     "test:scoring": "node tests/verify-scoring.js",
@@ -20,9 +20,17 @@
     "test:all": "node tests/verify-scoring.js && node tests/verify-engine.js && node tests/monte-carlo-audit.js 2000",
     "audit": "node tests/audit.mjs 10000",
     "audit:quick": "node tests/audit.mjs 1000",
-    "build:pages": "node scripts/merge-volume-fragments.js && node scripts/build-data.js && node scripts/build-single.js && node scripts/build.js",
+    "build:pages": "node scripts/build-single.js && node scripts/build.js",
     "test:v52": "node tests/audit-v52.mjs",
-    "studio": "node local-studio/server.mjs"
+    "studio": "node local-studio/server.mjs",
+    "test:render": "node tests/render-smoke.mjs",
+    "test:render:live": "node tests/render-smoke.mjs --url=https://nikithebear.github.io/Human-Atlas",
+    "predata": "node scripts/merge-volume-fragments.js",
+    "pretest": "node scripts/merge-volume-fragments.js && node scripts/build-data.js",
+    "prebuild": "node scripts/merge-volume-fragments.js && node scripts/build-data.js",
+    "prestart": "node scripts/merge-volume-fragments.js && node scripts/build-data.js",
+    "prebuild:pages": "node scripts/merge-volume-fragments.js && node scripts/build-data.js",
+    "presingle": "node scripts/merge-volume-fragments.js && node scripts/build-data.js"
   },
   "engines": {
     "node": ">=18"

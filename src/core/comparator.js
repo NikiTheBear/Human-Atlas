@@ -189,28 +189,108 @@ export function compareStates(a, b, DATA) {
   const isExpressPair = (common.length === 0 || isExpressOnly(a) || isExpressOnly(b))
     && dims.length >= MIN_COMPARABLE_DIMS;
 
+  /* 同一份存档码自比：分数低不是 bug，是「张力类生态位需要差异」的设计结果。
+     UI 据此显示一条说明，免得用户以为系统坏了。 */
+  const isSelfPair = (() => {
+    const aS = a.computedScores || {};
+    const bS = b.computedScores || {};
+    if (!dims.length) return false;
+    for (const d of dims) {
+      if (Math.abs((aS[d] ?? 0) - (bS[d] ?? 0)) > 0.01) return false;
+    }
+    return true;
+  })();
+
   const res = resonance(a, b, dims, DATA);
   const comp = complement(a, b, dims, DATA);
   const coll = collisions(a, b, dims, DATA);
   const reson = resonances(a, b, dims, DATA);
 
-  const sync = res?.value ?? 50;
-  const tension = comp?.value ?? 50;
-  let overall = sync * 0.58 + tension * 0.42;
+  /* ---- 合成总契合度 ----
+     旧实现：`const sync = res?.value ?? 50;` —— 用 50 顶替「没有数据」。
+     问题是 resonance() 只在 coreDims（22 个）里找、complement() 只在
+     complementDims（20 个）里找，而 dims 是全部可比维度（最多 127）。
+     于是出现一个很危险的错配：
 
-  // 高严重度碰撞扣分，但不至于归零（冲突本身就是关系的一部分）
-  const highHits = coll.filter((c) => c.severity === 'high').length;
-  const midHits = coll.filter((c) => c.severity === 'mid').length;
-  const penalty = Math.min(20, highHits * 5.5 + midHits * 2.5);
-  overall = clamp(overall - penalty, 20, 100);
+       双方在 12 个维度上分别是 80 / 20（完全相反）
+       真正进了 resonance 的只有 2 个维度
+       UI 却显示「12 个可比维度」
+       overall 靠 2 个维度定级，另外 10 个维度白算
 
-  const grade = overall >= 84
-    ? { id: 'S', name: '深度共振', desc: '你们的核心价值与节奏高度接近，同时保留了足够的性格张力。' }
-    : overall >= 72
-      ? { id: 'A', name: '稳固互补', desc: '有共同的地基，也有彼此没有的部分；多数分歧可以靠沟通穿过。' }
-      : overall >= 60
-        ? { id: 'B', name: '需要校准', desc: '基础是好的，但有几处结构性的差异，需要明确的规则来承接。' }
-        : { id: 'C', name: '张力偏高', desc: '你们的核心逻辑差异明显，靠近需要更多耐心与更少的假设。' };
+     这跟 v5.2.1 在报告页修掉的「?? 50 伪造假点」是同一个毛病 ——
+     报告页已经不伪造了，比较页还在伪造。
+
+     现在改成：
+       1. 只在真的有核心轴时才算 overall，缺失就返回 null 并说明原因
+       2. 顺手给出 basis（实际参与计算的维度数 / 覆盖比例），供 UI 披露
+       3. 覆盖过低时给 confidence 降级，等级文案据此加限定词 */
+  const syncRaw = res?.value ?? null;
+  const tensionRaw = comp?.value ?? null;
+  const syncDims = res?.dims?.length ?? 0;
+  const compDims = comp?.rows?.length ?? 0;
+  const hasSync = Number.isFinite(syncRaw);
+  const hasTension = Number.isFinite(tensionRaw);
+
+  /* 两轴全缺 → 无法定级。宁可说「算不出」，也不拿 50 顶。 */
+  let overall = null;
+  let basis = null;
+
+  if (hasSync || hasTension) {
+    /* 只有一轴时，按该轴单轴结算，不做 50/50 补半 */
+    const syncW = hasSync && hasTension ? 0.58 : (hasSync ? 1 : 0);
+    const tensionW = hasSync && hasTension ? 0.42 : (hasTension ? 1 : 0);
+    const syncV = hasSync ? syncRaw : 0;
+    const tensionV = hasTension ? tensionRaw : 0;
+    overall = syncV * syncW + tensionV * tensionW;
+
+    // 高严重度碰撞扣分，但不至于归零（冲突本身就是关系的一部分）
+    const highHits = coll.filter((c) => c.severity === 'high').length;
+    const midHits = coll.filter((c) => c.severity === 'mid').length;
+    const penalty = Math.min(20, highHits * 5.5 + midHits * 2.5);
+    overall = clamp(overall - penalty, 20, 100);
+
+    /* 覆盖率 = 真正进了两轴计算的维度 / 全部可比维度。
+       低于 0.5 时，这个总分只能当方向参考，不能当结论。 */
+    const usedDims = new Set([...(res?.dims || []), ...(comp?.rows || []).map((r) => r.dim)]);
+    const coverage = dims.length ? usedDims.size / dims.length : 0;
+    basis = {
+      comparable: dims.length,     // 可比维度总数（UI 原来说的那个数）
+      syncDims,                    // 进了共振计算的
+      compDims,                    // 进了互补计算的
+      usedDims: usedDims.size,     // 去重后实际参与定级的
+      coverage: round(coverage, 2),
+      hasSync,
+      hasTension,
+      axes: (hasSync && hasTension) ? 'both' : (hasSync ? 'sync-only' : 'tension-only'),
+      /* high：两轴齐全且覆盖 ≥70%；mid：≥40%；low：单轴或覆盖 <40%
+         低置信度时等级文案会带「方向性」限定词，不让用户当铁结论。 */
+      confidence: !(hasSync && hasTension) || coverage < 0.4
+        ? 'low'
+        : (coverage < 0.7 ? 'mid' : 'high'),
+    };
+  }
+
+  const grade = overall === null
+    ? {
+      id: '—',
+      name: '核心轴数据不足',
+      desc: '你们共同的维度里，没有任何一条落在价值观共振轴或性格互补轴上，暂时无法给出总契合度。'
+        + '多完成一两卷（尤其是 Vol.2 性格底色、Vol.4 三观罗盘）之后再回来。',
+    }
+    : overall >= 84
+      ? { id: 'S', name: '深度共振', desc: '你们的核心价值与节奏高度接近，同时保留了足够的性格张力。' }
+      : overall >= 72
+        ? { id: 'A', name: '稳固互补', desc: '有共同的地基，也有彼此没有的部分；多数分歧可以靠沟通穿过。' }
+        : overall >= 60
+          ? { id: 'B', name: '需要校准', desc: '基础是好的，但有几处结构性的差异，需要明确的规则来承接。' }
+          : { id: 'C', name: '张力偏高', desc: '你们的核心逻辑差异明显，靠近需要更多耐心与更少的假设。' };
+
+  /* 置信度低时，别让用户把方向性结论当铁板钉钉 */
+  if (basis && basis.confidence === 'low' && overall !== null) {
+    grade.caveat = basis.hasSync && basis.hasTension
+      ? `仅有 ${basis.usedDims}/${basis.comparable} 条维度落在核心轴上，这个等级只能当方向参考。`
+      : `只有${basis.axes === 'sync-only' ? '价值观共振' : '性格互补'}一条轴有数据，这个等级参考价值有限。`;
+  }
 
   // 维度对照表
   const rows = sortBy(
@@ -228,11 +308,13 @@ export function compareStates(a, b, DATA) {
     common,
     dims,
     isExpressPair,
+    isSelfPair,
     sync: res,
     complement: comp,
     collisions: coll,
     resonances: reson,
-    overall: round(overall, 1),
+    overall: overall === null ? null : round(overall, 1),
+    basis,
     grade,
     topGaps: rows.slice(0, 5),
     topMatches: rows.slice(-5).reverse(),

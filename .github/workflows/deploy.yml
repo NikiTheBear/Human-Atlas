@@ -27,6 +27,8 @@ jobs:
         run: npm test
       - name: Gate — 蒙特卡洛审计
         run: node tests/audit.mjs 2000
+      - name: Gate — v5.2 专项（空态门禁 / 导入融合 / 逐维显微镜）
+        run: node tests/audit-v52.mjs
 
   build:
     name: Build static bundle
@@ -44,6 +46,12 @@ jobs:
           echo "### 构建产物" >> $GITHUB_STEP_SUMMARY
           du -h human-atlas.html | awk '{print "单文件：" $1}' >> $GITHUB_STEP_SUMMARY
           du -sh dist | awk '{print "dist/：" $1}' >> $GITHUB_STEP_SUMMARY
+      - name: Gate — 渲染冒烟（真浏览器验 DOM）
+        run: |
+          # 用 runner 自带的 Chrome；找不到就 SKIP（脚本自己处理）
+          export CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          echo "CHROME_PATH=${CHROME_PATH:-（未找到，脚本会 SKIP）}"
+          node tests/render-smoke.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -205,6 +205,58 @@ function reportNav(items) {
 }
 
 /* ------------------------------------------------------------
+   板块折叠（v5.2.3）
+   ------------------------------------------------------------ */
+
+/**
+ * 长板块默认收起。
+ *
+ * 实测全息报告总高 10385px / 视口 728px ≈ 14.3 屏，
+ * 其中「分卷深度档案」单块就占 15630px（8 卷时），
+ * 首屏之后有大段内容把用户往下推，却没有任何可折叠。
+ *
+ * 只折叠三块低优先级板块（分卷档案 / 使用说明书 / 导出），
+ * 双面镜、跨卷、沙盒、议会这些「主菜」保持展开 ——
+ * 默认折叠会把核心价值藏起来。
+ */
+function foldableSection(section, { summary, defaultOpen = false } = {}) {
+  const body = el('div', { class: 'rfold__body' });
+  /* 把所有已挂到 section 上的子节点搬进 body（保留 __head 标题） */
+  const head = section.querySelector('.rsec__head');
+  const moving = [];
+  for (const node of Array.from(section.children)) {
+    if (node !== head) moving.push(node);
+  }
+  moving.forEach((n) => body.appendChild(n));
+
+  const btn = el('button', {
+    class: 'rfold__toggle',
+    type: 'button',
+    'aria-expanded': defaultOpen ? 'true' : 'false',
+  }, [
+    el('span', { class: 'rfold__label', text: summary }),
+    el('span', { class: 'rfold__chev', text: '⌄' }),
+  ]);
+
+  const wrap = el('div', { class: `rfold${defaultOpen ? ' is-open' : ''}` }, [
+    btn,
+    el('div', { class: 'rfold__inner' }, [body]),
+  ]);
+
+  btn.addEventListener('click', () => {
+    const open = wrap.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  if (head) head.appendChild(btn);
+  else section.insertBefore(wrap, section.firstChild);
+  if (head) section.appendChild(wrap);
+  else { /* wrap 已插入 */ }
+
+  return section;
+}
+
+/* ------------------------------------------------------------
    图表解锁占位条
    ------------------------------------------------------------ */
 
@@ -1044,6 +1096,7 @@ export function renderReport(root, ctx) {
       el('a', { class: 'btn', href: '#/', text: '前往卷宗大厅' }),
     ]));
   }
+  foldableSection(archSec, { summary: '展开分卷深度档案' });
   wrap.appendChild(archSec);
 
   /* ============ 模块 6 · 使用说明书 ============ */
@@ -1086,6 +1139,7 @@ export function renderReport(root, ctx) {
   }
 
   manualSec.appendChild(mg);
+  foldableSection(manualSec, { summary: '展开人生使用说明书' });
   wrap.appendChild(manualSec);
 
   /* ============ 模块 7 · 导出工作室 ============ */
@@ -1300,6 +1354,7 @@ export function renderReport(root, ctx) {
     text: 'THE HUMAN ATLAS · 本报告由本地浏览器生成，所有作答均未离开你的设备',
   }));
 
+  foldableSection(expSec, { summary: '展开导出工作室' });
   wrap.appendChild(expSec);
 
   /* ---------- 底部 ---------- */
@@ -1313,6 +1368,33 @@ export function renderReport(root, ctx) {
       onclick: () => { recompute({ silent: false }); go('#/report'); toast('已重新计算'); },
     }),
   ]));
+
+  wrap.appendChild(disclaimer());
+}
+
+/* ------------------------------------------------------------
+   免责声明
+   ------------------------------------------------------------ */
+
+/**
+ * 这不是诊断工具。
+ *
+ * 报告里有「图式」「暗黑三角」「依恋类型」这类带临床色彩的词，
+ * 虽然措辞一直克制，但如果没有一句明确边界，用户可能把它当成评估结论。
+ * 心理测评类产品的标准做法是显式声明，这里补上。
+ */
+function disclaimer() {
+  return el('div', { class: 'report-disclaimer' }, [
+    el('b', { text: '关于这份报告的边界' }),
+    el('p', {
+      text: '它是一面镜子，不是一份诊断。所有结论来自你在这个工具里的作答，'
+        + '用于自我探索与关系理解，不构成医疗建议，也不能替代专业心理咨询或精神科评估。',
+    }),
+    el('p', {
+      text: '如果你正在经历持续的情绪困扰、睡眠问题，或关系中的痛苦已经影响到日常生活，'
+        + '请优先寻求持证心理咨询师或精神科医生的帮助 —— 那比任何一份自动生成的报告都更有用。',
+    }),
+  ]);
 }
 
 /* ------------------------------------------------------------
@@ -2070,6 +2152,11 @@ function renderVolumeReport(root, ctx, volId) {
   wrap.appendChild(el('div', {
     class: 'print-colophon',
     text: `THE HUMAN ATLAS · VOL.${String(vol.index).padStart(2, '0')} · 本地生成`,
+  }));
+
+  wrap.appendChild(el('p', {
+    class: 'report-disclaimer is-lite',
+    text: '本报告用于自我探索，不是心理诊断，不构成医疗建议，也不能替代专业心理咨询。',
   }));
 }
 

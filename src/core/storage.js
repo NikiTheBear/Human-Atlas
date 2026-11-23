@@ -62,8 +62,10 @@ export function load() {
   const parsed = raw ? safeParse(raw, null) : null;
   if (!parsed || typeof parsed !== 'object') return emptyState();
 
-  const state = { ...emptyState(), ...parsed };
-  state.version = SCHEMA_VERSION;
+  /* 先迁移（语义层），再做形状纠偏（结构层）—— 顺序不能反，
+     否则新版字段在被读到之前就被 sanitize 成默认值了。 */
+  const migrated = migrate({ ...emptyState(), ...parsed });
+  const state = { ...emptyState(), ...migrated };
 
   // 结构纠偏：任何字段形态不合规即重置为安全默认值
   if (!Array.isArray(state.completedVolumes)) state.completedVolumes = [];
@@ -486,6 +488,46 @@ export function sealInitialSnapshot(state, volumeId, dimIds) {
 
 export function initialSnapshotOf(state, volumeId) {
   return state.initialSnapshot?.[volumeId] || null;
+}
+
+/* ------------------------------------------------------------
+   Schema 迁移（v5.2.3）
+   ------------------------------------------------------------ */
+
+/**
+ * 旧版 load() 只做「形状纠偏」，然后无条件 `state.version = SCHEMA_VERSION`。
+ * 这意味着：如果某个字段的语义变了（比如 maskIndex 从 0–100 改成 0–1），
+ * 老存档会被静默读成错误值，而且版本号已经被改写成新版，再也认不出它是老档。
+ *
+ * 这里补一张迁移表：按 state.version 逐级跑，每步只做「语义」转换，
+ * 形状纠偏交给后面的 sanitize。
+ *
+ * 目前 3.0 → 4.0 只是加字段（vol9–16、topValues、initialSnapshot），
+ * 形状纠偏已经能覆盖，所以迁移函数是空操作 —— 但表先建好，
+ * 下次真动结构时不必再想「迁移逻辑该放哪」。
+ */
+const MIGRATIONS = {
+  /* '3.0': (state) => { ... 语义转换 ... return state; } */
+};
+
+function migrate(state) {
+  const from = String(state?.version || '3.0');
+  const to = SCHEMA_VERSION;
+  if (from === to) return state;
+
+  const chain = Object.keys(MIGRATIONS).sort();
+  let cur = { ...state };
+  for (const ver of chain) {
+    /* 只跑「比当前版本新」的迁移步骤 */
+    if (ver <= from) continue;
+    try {
+      cur = MIGRATIONS[ver](cur) || cur;
+    } catch {
+      /* 迁移失败时宁可丢掉这一档的语义转换，也不让整个存档打不开 */
+    }
+  }
+  cur.version = to;
+  return cur;
 }
 
 /** 清空某卷作答（保留初印象快照），用于「封存初印象并重测」

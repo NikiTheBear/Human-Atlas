@@ -559,6 +559,178 @@ const lab = read('src/components/LabView.js');
 });
 
 /* ============================================================
+   11 · 1.1 overall 严格化（不再用 ?? 50 兜底）
+   ============================================================ */
+hr('11 · 总契合度严格化（禁用 ?? 50 伪造定级）');
+
+const cmpSrc = read('src/core/comparator.js');
+/* 剥掉注释再断言：源码里那段「旧实现：res?.value ?? 50」是说明性引述，
+   不是真代码，不能算违规。 */
+const cmpCode = cmpSrc
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+
+check('不再有 sync ?? 50 的兜底', !/res\?\.value \?\? 50\b/.test(cmpCode),
+  (cmpCode.match(/res\?\.value[^;]*/g) || []).join(' | '));
+check('不再有 comp ?? 50 的兜底', !/comp\?\.value \?\? 50\b/.test(cmpCode));
+check('overall 允许为 null', /let overall = null/.test(cmpSrc));
+check('只有一轴时按单轴结算', /const syncW = hasSync && hasTension \? 0\.58/.test(cmpSrc));
+check('输出 basis（参与计算的维度披露）', /basis = \{/.test(cmpSrc));
+check('basis 含 comparable / usedDims / coverage / confidence',
+  ['comparable:', 'usedDims:', 'coverage:', 'confidence:'].every((k) => cmpSrc.includes(k)));
+check('低置信度时给 caveat', /basis\.confidence === 'low'/.test(cmpSrc));
+check('自比标记 isSelfPair', /const isSelfPair = /.test(cmpSrc));
+
+/* UI 必须披露 basis */
+check('对比页显示「定级依据」', /定级依据/.test(cmp));
+check('对比页显示 coverage 文案', /条维度落在核心轴上/.test(cmp));
+check('对比页显示自比说明', /你贴的是同一份存档码/.test(cmp));
+check('basis 样式存在', css.includes('.cmp-basis'));
+check('caveat 样式存在', css.includes('.cmp-caveat'));
+
+/* ============================================================
+   12 · 1.5 非诊断声明
+   ============================================================ */
+hr('12 · 非诊断声明（心理测评产品必备边界）');
+
+check('全息报告有免责区块', /function disclaimer\(\)/.test(report));
+check('写明「不是诊断」', /不是一份诊断/.test(report));
+check('写明不构成医疗建议', /不构成医疗建议/.test(report));
+check('写明不能替代专业帮助', /不能替代专业心理咨询/.test(report));
+check('单卷报告也有精简版', /report-disclaimer is-lite/.test(report));
+check('免责样式存在', css.includes('.report-disclaimer'));
+check('README 首屏也有声明', /这不是心理诊断工具/.test(read('README.md')));
+
+/* ============================================================
+   13 · 1.4 版本号对齐 + 缓存指纹
+   ============================================================ */
+hr('13 · 版本号对齐与资源指纹');
+
+{
+  const pkg = JSON.parse(read('package.json'));
+  check('package.json 版本形如 x.y.z', /^\d+\.\d+\.\d+$/.test(pkg.version), pkg.version);
+  check('版本号与最新 tag 一致（v 前缀去掉）', `v${pkg.version}` === 'v5.2.2', `v${pkg.version}`);
+}
+
+const buildSrc = read('scripts/build.js');
+check('build.js 给资源加内容指纹', /资源指纹/.test(buildSrc));
+check('指纹覆盖 css 与 js', /css\|js\|mjs/.test(buildSrc));
+check('404.html 与 index.html 同步指纹',
+  /fs\.copyFileSync\(path\.join\(DIST, 'index\.html'\), path\.join\(DIST, '404\.html'\)\);/.test(buildSrc));
+
+/* ============================================================
+   14 · 1.3 渲染冒烟测试存在且可跑
+   ============================================================ */
+hr('14 · 渲染层冒烟测试（防「数据对但看不见」）');
+
+{
+  const smokePath = path.join(ROOT, 'tests/render-smoke.mjs');
+  const hasSmoke = fs.existsSync(smokePath);
+  check('tests/render-smoke.mjs 存在', hasSmoke);
+
+  if (hasSmoke) {
+    const smoke = read('tests/render-smoke.mjs');
+    check('断言 .rsec 数量为 9', /rsec === 9/.test(smoke) || /有 9 个报告板块/.test(smoke));
+    check('断言正文长度（防空壳）', /textLen.*>= 4000|正文 ≥ 4000/.test(smoke));
+    check('断言板块高度不等于 720 占位值', /every\(\(h\) => h === 720\)/.test(smoke));
+    check('覆盖全部主要路由',
+      ['#/hub', '#/guide', '#/compare', '#/express', '#/johari', '#/squad']
+        .every((r) => smoke.includes(r)));
+    check('支持 --url 直测远端', /--url=/.test(smoke));
+    check('找不到浏览器时 SKIP 而非失败', /skipped: true/.test(smoke));
+  }
+
+  const pkg = JSON.parse(read('package.json'));
+  check('npm run test:render 已注册', Boolean(pkg.scripts['test:render']));
+  check('npm run test:render:live 已注册', Boolean(pkg.scripts['test:render:live']));
+
+  const ci = read('.github/workflows/deploy.yml');
+  check('CI 跑 audit-v52', /audit-v52\.mjs/.test(ci));
+  check('CI 跑渲染冒烟', /render-smoke\.mjs/.test(ci));
+}
+
+/* ============================================================
+   15 · 可访问性（金色对比度 / skip link / 焦点）
+   ============================================================ */
+hr('15 · 可访问性（对比度与键盘可达）');
+
+function relLum(hexStr) {
+  const h = hexStr.replace('#', '');
+  const ch = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const f = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * f(ch[0]) + 0.7152 * f(ch[1]) + 0.0722 * f(ch[2]);
+}
+function contrast(a, b) {
+  const la = relLum(a); const lb = relLum(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+{
+  const tokens = read('styles/tokens.css');
+  const goldLight = (tokens.match(/--gold:\s*(#[0-9a-fA-F]{6})/) || [])[1];
+  const goldDark = (tokens.match(/--gold:\s*(#[0-9a-fA-F]{6})[\s\S]*?--gold:\s*(#[0-9a-fA-F]{6})/) || [])[2];
+
+  check('浅色 gold 与页面对比度 ≥ 4.5（AA 正文）',
+    Boolean(goldLight) && contrast(goldLight, '#faf8f4') >= 4.5,
+    goldLight ? `${goldLight} → ${contrast(goldLight, '#faf8f4').toFixed(2)}` : '未取到');
+  check('浅色 gold 与卡片底对比度 ≥ 4.5',
+    Boolean(goldLight) && contrast(goldLight, '#ffffff') >= 4.5,
+    goldLight ? contrast(goldLight, '#ffffff').toFixed(2) : '未取到');
+  check('深色 gold 与页面对比度 ≥ 4.5',
+    Boolean(goldDark) && contrast(goldDark, '#0b0c0e') >= 4.5,
+    goldDark ? `${goldDark} → ${contrast(goldDark, '#0b0c0e').toFixed(2)}` : '未取到');
+  check('text-tertiary 浅色达 AA',
+    contrast('#6e736e', '#faf8f4') >= 4.5, contrast('#6e736e', '#faf8f4').toFixed(2));
+}
+
+const mainSrc = read('src/main.js');
+check('有 skip link（跳到主内容）', /skip-link|跳到主内容/.test(mainSrc) || /skip-link/.test(read('index.html')));
+check('焦点样式 ≥ 2px', /outline:\s*[2-9]px/.test(css), (css.match(/outline:\s*\d+px/g) || []).join(','));
+
+/* ============================================================
+   16 · 报告页折叠与生成物出库
+   ============================================================ */
+hr('16 · 报告页折叠与构建产物管理');
+
+check('存在 foldableSection', /function foldableSection/.test(report));
+check('三块默认折叠（分卷档案/说明书/导出）',
+  (report.match(/foldableSection\(/g) || []).length >= 3,
+  `${(report.match(/foldableSection\(/g) || []).length} 处`);
+check('折叠用 grid-template-rows 0fr→1fr', /grid-template-rows:\s*0fr/.test(css));
+check('折叠按钮带 aria-expanded', /class: 'rfold__toggle'[\s\S]{0,120}aria-expanded/.test(report));
+
+{
+  const gi = read('.gitignore');
+  check('.gitignore 排除 bundle.js', /src\/data\/bundle\.js/.test(gi));
+  check('.gitignore 排除 bundle.compact.js', /bundle\.compact\.js/.test(gi));
+  check('.gitignore 排除 human-atlas.html', /^human-atlas\.html$/m.test(gi));
+
+  const pkg = JSON.parse(read('package.json'));
+  check('pretest 会自动生成 bundle', /build-data/.test(pkg.scripts.pretest || ''));
+  check('prebuild 会自动生成 bundle', /build-data/.test(pkg.scripts.prebuild || ''));
+  check('prebuild:pages 会自动生成 bundle', /build-data/.test(pkg.scripts['prebuild:pages'] || ''));
+}
+
+/* ============================================================
+   17 · Schema 迁移与字体降级
+   ============================================================ */
+hr('17 · Schema 迁移与字体降级');
+
+{
+  const st = read('src/core/storage.js');
+  check('有 MIGRATIONS 迁移表', /const MIGRATIONS = \{/.test(st));
+  check('有 migrate() 函数', /function migrate\(state\)/.test(st));
+  check('load() 先迁移再纠偏', /const migrated = migrate\(/.test(st));
+  check('不再无条件覆盖 version（已由 migrate 处理）',
+    /cur\.version = to/.test(st));
+
+  const html = read('index.html');
+  check('字体 URL 带 display=swap', /display=swap/.test(html));
+  check('tokens.css 有中文 fallback 栈',
+    /Songti SC|Source Han Serif SC/.test(read('styles/tokens.css')));
+}
+
+/* ============================================================
    汇总
    ============================================================ */
 hr('汇总');
@@ -566,7 +738,7 @@ if (fail) {
   console.log(`  失败 ${fail} 项：`);
   failures.forEach((f, i) => console.log(`   ${i + 1}. ${f}`));
 } else {
-  console.log(`  全部 10 项检查通过 · ${pass} 条断言 · 0 失败`);
+  console.log(`  全部 17 项检查通过 · ${pass} 条断言 · 0 失败`);
 }
 console.log(line());
 process.exit(fail ? 1 : 0);

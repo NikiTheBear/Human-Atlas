@@ -10,7 +10,12 @@
       content="人性全息图谱：十六卷分卷式潜行心理测评。双面镜视角、跨卷读心、社会面具厚度测算，纯前端本地运算。"
     />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%23A8894F' stroke-width='1'/%3E%3Cpath d='M16 6v20M7 16h18' stroke='%23A8894F' stroke-width='0.8'/%3E%3Ccircle cx='16' cy='16' r='4.4' fill='none' stroke='%231E2220' stroke-width='1'/%3E%3C/svg%3E" />
-    <!-- 字体异步加载：国内可直连镜像，不阻塞首屏，断网时自动降级到本地字体 -->
+    <!-- 字体异步加载：国内可直连镜像，不阻塞首屏。
+         - display=swap 让文字立刻用 fallback 渲染，字体到了再换，不会白屏
+         - 镜像不可达时（断网 / 第三方故障）自动落到下面的系统字体栈，
+           中文仍是宋体/黑体体系，不会退化成默认的 Times
+         - preconnect 只有真正用得上时才连，失败也只是多一次 DNS，
+           不影响正文渲染 -->
     <link rel="preconnect" href="https://fonts.loli.net" crossorigin />
     <link
       rel="stylesheet"
@@ -18,6 +23,9 @@
       media="print"
       onload="this.media='all'"
     />
+    <!-- 兜底的 --font-serif / --font-sans 系统家族写在 styles/tokens.css 里
+         （Noto Serif SC → 思源宋体 → Songti SC → Georgia），
+         这里不重复定义，避免两处字体栈不一致。 -->
     <link rel="stylesheet" href="styles/tokens.css" />
     <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/print.css" media="print" />

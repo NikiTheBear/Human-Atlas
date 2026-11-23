@@ -94,10 +94,15 @@ html[data-theme='light'] {
   --border-hair: rgba(23, 25, 24, 0.075);
   --hairline: 1px;
 
-  /* 拉丝古铜金 */
-  --gold: #9a7b45;
+  /* 拉丝古铜金
+     浅色主题下 #9a7b45 对 --bg-page(#faf8f4) 的对比度只有 3.74，
+     而它被用在 19 处 10–11px 小字上（卷号、kicker、板块序号），
+     WCAG AA 正文要求 4.5。调到 #866a38 后：bg-page 4.79 / tint 4.59 / card 5.08，三处都过 4.5，
+     视觉上仍是古铜金，只是略深一档。
+     深色主题的 --gold(#d4b47b) 本来就有 9.89，不用动。 */
+  --gold: #866a38;
   --gold-soft: #c5a875;
-  --gold-wash: rgba(154, 123, 69, 0.10);
+  --gold-wash: rgba(134, 106, 56, 0.10);
 
   --accent: var(--gold);
   --accent-contrast: #ffffff;

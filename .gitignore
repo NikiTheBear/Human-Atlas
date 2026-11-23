@@ -32,3 +32,9 @@ scripts/build-audit-pack.mjs
 
 # 本地私有商业解读工作台（严禁推送公开仓库）
 local-studio/
+
+# 构建生成物（v5.2.3 起出库：由 pretest / prebuild 钩子与 CI 现场生成）
+src/data/bundle.js
+src/data/bundle.compact.js
+human-atlas.html
+.render-smoke-profile/

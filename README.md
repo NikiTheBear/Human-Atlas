@@ -7,6 +7,8 @@
 
 不想跑构建、只想拿来用：去 [Releases](https://github.com/NikiTheBear/Human-Atlas/releases/latest) 下 `human-atlas-vX-single-file.html`，双击即开，断网可用。
 
+> **这不是心理诊断工具。** 它是一面镜子，用于自我探索与关系理解，不构成医疗建议，也不能替代专业心理咨询或精神科评估。如果你正在经历持续的情绪困扰，请优先寻求持证咨询师或精神科医生的帮助。
+
 **双季十六卷**：第一辑 · 本源八卷（152 题 / 60 维）+ 第二辑 · 破圈深水八卷（146 题 / 67 维），共 **298 个情境题、127 个可追踪维度**。
 
 任意一卷即可独立作答并生成报告；完成 ≥3 卷触发跨卷交叉读心（65 条黄金规则）；完成 ≥5 卷激活面具显影；完成核心八卷解锁 36 种复合原型与《个人人性全息白皮书》。
@@ -19,6 +21,10 @@
 | --- | --- | --- | --- |
 | **`human-atlas.html`** | **发给别人 / 自己用** | 双击即可 | 无（全部内联） |
 | `index.html` | 开发时用（改源码即时生效） | 必须 `npm start` 或双击 `启动.command` | 引用 `src/` `styles/` |
+
+> **`human-atlas.html` 与 `src/data/bundle*.js` 是构建产物，不入 git。**
+> 首次 clone 后跑一次 `npm run build`（或任意 `npm test` / `npm start`，它们有 `pre*` 钩子会自动生成）。
+> 想直接用不想构建：去 [Releases](https://github.com/NikiTheBear/Human-Atlas/releases/latest) 下现成的单文件版。
 
 `index.html` 用的是 `<script type="module" src="src/main.js">`。Chrome / Safari 在
 `file://` 协议下会拦截 ES module，页面会永久停在「正在开启档案馆」——
@@ -39,10 +45,13 @@
 ## 常用命令
 
 ```bash
-npm start        # 本地预览 index.html（http://localhost:4173）
+npm start        # 本地预览（http://localhost:4173）· 自动先生成 bundle
 npm run single   # 重新生成 human-atlas.html（单文件版）
-npm run build    # 完整构建：data → single → dist/
-npm test         # 301 项自动化验收（49 计分排雷 + 252 全链路）
+npm run build    # 完整构建：data → single → dist/（资源带 ?v= 指纹）
+npm test         # 301 项 Node 验收（49 计分排雷 + 252 全链路）
+npm run test:v52      # v5.2 专项 165 条（空态门禁 / 导入融合 / 逐维显微镜）
+npm run test:render   # 18 条渲染冒烟（真浏览器验 DOM，防「数据对但看不见」）
+npm run test:render:live   # 上面那套直接打线上站点
 ```
 
 改完题库后：

@@ -96,8 +96,37 @@ input, textarea, select {
 }
 
 :focus-visible {
-  outline: 1px solid var(--gold);
+  /* 1px 在深色底上几乎看不见，且报告页/对比页有大量可聚焦行。
+     2px + 3px 偏移是「能清楚看出焦点在哪」的下限。 */
+  outline: 2px solid var(--gold);
   outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+/* ---------- skip link ----------
+   键盘用户每页都要 Tab 过顶栏 5 个链接才能到主内容。
+   这个链接默认移出视口，聚焦时滑回来。 */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: -9999px;
+  z-index: 200;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  border: 1px solid var(--gold);
+  color: var(--text-primary);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  box-shadow: var(--shadow-md);
+  transition: left 160ms var(--ease);
+}
+
+.skip-link:focus-visible,
+.skip-link:focus {
+  left: 16px;
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 /* ---------- scrollbar ---------- */
@@ -6012,4 +6041,166 @@ html[data-theme='dark'] {
   letter-spacing: 0.2em;
   color: var(--gold);
   opacity: 0.8;
+}
+
+/* ---------- 对比页 · 定级依据披露 ---------- */
+.cmp-basis {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 12px;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-page);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+
+.cmp-basis__label {
+  color: var(--text-tertiary);
+  letter-spacing: 0.14em;
+}
+
+.cmp-basis__text {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cmp-basis__tag {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  border: 1px solid currentColor;
+  opacity: 0.75;
+}
+
+.cmp-basis.is-high .cmp-basis__tag { color: var(--vol2); }
+.cmp-basis.is-mid .cmp-basis__tag { color: var(--gold); }
+.cmp-basis.is-low .cmp-basis__tag { color: var(--vol1); }
+
+/* 低置信度时整条略提亮，让人注意到它是限定条件 */
+.cmp-basis.is-low {
+  border-color: color-mix(in srgb, var(--vol1) 30%, var(--border));
+}
+
+.cmp-caveat {
+  margin-top: 10px;
+  font-size: 11.5px;
+  line-height: 1.85;
+  color: var(--text-tertiary);
+  padding-left: 12px;
+  border-left: 2px solid var(--border-strong);
+}
+
+.cmp-caveat.is-info {
+  border-left-color: var(--gold);
+  color: var(--text-secondary);
+}
+
+/* 无法定级时，分数位置显示破折号，字号缩小避免视觉空洞 */
+.cmp-verdict__score.is-void b {
+  font-size: 34px;
+  opacity: 0.35;
+}
+
+@media (max-width: 760px) {
+  .cmp-basis { font-size: 10px; padding: 8px 11px; }
+  .cmp-basis__tag { margin-left: 0; }
+}
+
+/* ---------- 报告页 · 免责声明 ---------- */
+.report-disclaimer {
+  margin: 40px 0 24px;
+  padding: 22px 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-page);
+  font-size: 11.5px;
+  line-height: 1.95;
+  color: var(--text-tertiary);
+}
+
+.report-disclaimer b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.report-disclaimer p { margin: 0 0 8px; }
+.report-disclaimer p:last-child { margin-bottom: 0; }
+
+.report-disclaimer.is-lite {
+  margin: 22px 0 0;
+  padding: 14px 18px;
+  font-size: 11px;
+  line-height: 1.8;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .report-disclaimer { padding: 18px 18px; font-size: 11px; }
+}
+
+/* ---------- 报告页 · 板块折叠 ---------- */
+.rfold {
+  margin-top: 4px;
+}
+
+.rfold__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-page);
+  color: var(--text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 200ms var(--ease), color 200ms var(--ease);
+}
+
+.rfold__toggle:hover {
+  border-color: var(--gold);
+  color: var(--text-primary);
+}
+
+.rfold__chev {
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 240ms var(--ease);
+  opacity: 0.6;
+}
+
+.rfold.is-open .rfold__chev { transform: rotate(180deg); }
+
+/* 0fr → 1fr：与 guide-card / cmp-mpanel 同一手法，不写死 max-height */
+.rfold__inner {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 320ms var(--ease);
+}
+
+.rfold.is-open .rfold__inner { grid-template-rows: 1fr; }
+
+.rfold__body {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.rfold.is-open .rfold__body { overflow: visible; }
+
+.rfold.is-open .rfold__toggle { margin-bottom: 20px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rfold__inner { transition: none; }
 }

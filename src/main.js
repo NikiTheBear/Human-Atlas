@@ -149,6 +149,14 @@ function mountShell() {
   const app = qs('#app');
   app.innerHTML = '';
 
+  /* 键盘用户跳过顶栏直达主内容。
+     默认移出视口，聚焦时才出现 —— 不影响视觉，只在需要时存在。 */
+  app.appendChild(el('a', {
+    class: 'skip-link',
+    href: '#view-root',
+    text: '跳到主内容',
+  }));
+
   const masthead = el('header', { class: 'masthead' });
   const inner = el('div', { class: 'masthead__inner' });
 

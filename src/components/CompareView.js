@@ -338,14 +338,38 @@ function renderResult(box, A, B, { DATA, col }) {
   /* ---------- 判词 ---------- */
   const verdict = el('div', { class: 'cmp-verdict' });
 
-  verdict.appendChild(el('div', { class: 'cmp-verdict__score' }, [
-    el('b', { text: `${Math.round(res.overall)}` }),
-    el('span', { text: '契合度 %' }),
+  const hasOverall = Number.isFinite(res.overall);
+  const basis = res.basis || null;
+
+  verdict.appendChild(el('div', { class: `cmp-verdict__score${hasOverall ? '' : ' is-void'}` }, [
+    el('b', { text: hasOverall ? `${Math.round(res.overall)}` : '—' }),
+    el('span', { text: hasOverall ? '契合度 %' : '暂无法定级' }),
   ]));
 
   verdict.appendChild(el('div', {}, [
     el('h2', { text: `${res.grade.name} · ${res.grade.id} 级` }),
     el('p', { text: res.grade.desc }),
+
+    /* ---------- 计算基础披露 ----------
+       总契合度只用「价值观共振轴」与「性格互补轴」上的维度定级，
+       而这两条轴各只覆盖 20 来个维度，远小于「可比维度」总数。
+       不披露的话，用户会看到「可比维度 100」却不知道等级只由其中 15 条决定。 */
+    basis ? el('div', { class: `cmp-basis is-${basis.confidence}` }, [
+      el('span', { class: 'cmp-basis__label', text: '定级依据' }),
+      el('span', {
+        class: 'cmp-basis__text',
+        text: `${basis.usedDims} / ${basis.comparable} 条维度落在核心轴上`
+          + `（共振 ${basis.syncDims} · 互补 ${basis.compDims}）`,
+      }),
+      el('span', {
+        class: 'cmp-basis__tag',
+        text: basis.confidence === 'high' ? '覆盖充分'
+          : basis.confidence === 'mid' ? '覆盖尚可' : '覆盖偏低',
+      }),
+    ]) : null,
+
+    res.grade.caveat ? el('p', { class: 'cmp-caveat', text: res.grade.caveat }) : null,
+
     el('div', { class: 'cmp-metrics' }, [
       el('div', {}, [
         el('dt', { text: '交汇卷宗' }),
@@ -368,6 +392,15 @@ function renderResult(box, A, B, { DATA, col }) {
         el('dd', { text: `${res.collisions.length} 处` }),
       ]),
     ]),
+
+    /* ---------- 1.2 · 同一份码自比时的说明 ----------
+       「心动拉扯」61% 权重是张力轴，自己跟自己 diff=0，tension 返回 55，
+       所以自比必然低分。这是设计使然，但用户会以为系统坏了。 */
+    res.isSelfPair ? el('p', {
+      class: 'cmp-caveat is-info',
+      text: '你贴的是同一份存档码。有些生态位（心动拉扯、事业搭档、镜面宿敌）'
+        + '衡量的本来就是两个人之间的差异与张力，自己跟自己比分数必然偏低 —— 这不是算法出错。',
+    }) : null,
   ]));
   box.appendChild(verdict);
 
