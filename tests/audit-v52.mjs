@@ -599,7 +599,14 @@ check('写明不构成医疗建议', /不构成医疗建议/.test(report));
 check('写明不能替代专业帮助', /不能替代专业心理咨询/.test(report));
 check('单卷报告也有精简版', /report-disclaimer is-lite/.test(report));
 check('免责样式存在', css.includes('.report-disclaimer'));
-check('README 首屏也有声明', /这不是心理诊断工具/.test(read('README.md')));
+/* README 重写后措辞换了，改为检查「不是心理诊断」这条实质语义，
+   不绑死某一句具体文案 —— 否则每次改文案都会误伤。 */
+{
+  const readme = read('README.md');
+  check('README 首屏有非诊断声明',
+    /不是心理诊断|不构成医疗建议/.test(readme),
+    (readme.match(/.{0,12}心理诊断.{0,20}/) || [])[0] || '');
+}
 
 /* ============================================================
    13 · 1.4 版本号对齐 + 缓存指纹
