@@ -34,10 +34,10 @@
    ============================================================ */
 
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { createHash, randomBytes } from 'node:crypto';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { createServer } from 'node:http';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { createServer, request } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -91,6 +91,129 @@ function findBrowser() {
 }
 
 /* ------------------------------------------------------------
+   1.5 · 极简 WebSocket 客户端
+   ------------------------------------------------------------
+   Node 20 没有全局 WebSocket（Node 21 才加，22 才稳定）。
+   CI runner 用的是 node-version: '20'，直接 new WebSocket() 会
+   `WebSocket is not defined` —— 实测在 GitHub Actions 上炸过一次。
+   这里手写一个够用的客户端：握手 + 帧编解码 + ping/pong + 分片。
+   只用 node:http 与 node:crypto，零依赖。
+   ------------------------------------------------------------ */
+
+class MiniWs {
+  constructor(socket) {
+    this.socket = socket;
+    this.buf = Buffer.alloc(0);
+    this.frags = [];
+    this.onmessage = null;
+    this.onclose = null;
+    socket.on('data', (d) => { this.buf = Buffer.concat([this.buf, d]); this._drain(); });
+    socket.on('close', () => { if (this.onclose) this.onclose(); });
+    socket.on('error', () => { if (this.onclose) this.onclose(); });
+  }
+
+  _drain() {
+    for (;;) {
+      if (this.buf.length < 2) return;
+      const b0 = this.buf[0];
+      const b1 = this.buf[1];
+      const fin = (b0 & 0x80) !== 0;
+      const opcode = b0 & 0x0f;
+      const masked = (b1 & 0x80) !== 0;
+      let len = b1 & 0x7f;
+      let off = 2;
+      if (len === 126) {
+        if (this.buf.length < off + 2) return;
+        len = this.buf.readUInt16BE(off); off += 2;
+      } else if (len === 127) {
+        if (this.buf.length < off + 8) return;
+        len = Number(this.buf.readBigUInt64BE(off)); off += 8;
+      }
+      let maskKey = null;
+      if (masked) {
+        if (this.buf.length < off + 4) return;
+        maskKey = this.buf.subarray(off, off + 4); off += 4;
+      }
+      if (this.buf.length < off + len) return;
+      const payload = Buffer.from(this.buf.subarray(off, off + len));
+      if (maskKey) for (let i = 0; i < payload.length; i += 1) payload[i] ^= maskKey[i & 3];
+      this.buf = this.buf.subarray(off + len);
+
+      if (opcode === 0x9) { this._frame(payload, 0xA); continue; }   // ping → pong
+      if (opcode === 0xA) continue;                                  // pong
+      if (opcode === 0x8) { try { this.socket.end(); } catch { /* ignore */ } return; }
+
+      this.frags.push(payload);
+      if (fin) {
+        const full = Buffer.concat(this.frags).toString('utf8');
+        this.frags = [];
+        if (this.onmessage) this.onmessage(full);
+      }
+    }
+  }
+
+  _frame(payload, opcode) {
+    const maskKey = randomBytes(4);
+    const len = payload.length;
+    let header;
+    if (len < 126) {
+      header = Buffer.alloc(2);
+      header[0] = 0x80 | opcode;
+      header[1] = 0x80 | len;
+    } else if (len < 65536) {
+      header = Buffer.alloc(4);
+      header[0] = 0x80 | opcode;
+      header[1] = 0x80 | 126;
+      header.writeUInt16BE(len, 2);
+    } else {
+      header = Buffer.alloc(10);
+      header[0] = 0x80 | opcode;
+      header[1] = 0x80 | 127;
+      header.writeBigUInt64BE(BigInt(len), 2);
+    }
+    const body = Buffer.from(payload);
+    for (let i = 0; i < body.length; i += 1) body[i] ^= maskKey[i & 3];
+    this.socket.write(Buffer.concat([header, maskKey, body]));
+  }
+
+  send(str) { this._frame(Buffer.from(str, 'utf8'), 0x1); }
+
+  close() { try { this.socket.end(); } catch { /* ignore */ } }
+}
+
+const WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
+
+/** 连 CDP 的 ws:// 端点，返回带 send/onmessage/close 的对象 */
+function connectWs(url) {
+  const u = new URL(url);
+  const key = randomBytes(16).toString('base64');
+  return new Promise((resolve, reject) => {
+    const req = request({
+      hostname: u.hostname,
+      port: u.port,
+      path: u.pathname + u.search,
+      headers: {
+        Connection: 'Upgrade',
+        Upgrade: 'websocket',
+        'Sec-WebSocket-Key': key,
+        'Sec-WebSocket-Version': '13',
+      },
+    });
+    req.on('upgrade', (res, socket) => {
+      const expect = createHash('sha1').update(key + WS_GUID).digest('base64');
+      if (res.headers['sec-websocket-accept'] !== expect) {
+        reject(new Error('WebSocket 握手校验失败'));
+        return;
+      }
+      resolve(new MiniWs(socket));
+    });
+    req.on('error', reject);
+    req.setTimeout(15000, () => reject(new Error('WebSocket 连接超时')));
+    req.end();
+  });
+}
+
+/* ------------------------------------------------------------
    2 · 极简 CDP 客户端（不依赖 puppeteer）
    ------------------------------------------------------------ */
 
@@ -100,9 +223,9 @@ class Cdp {
     this.id = 0;
     this.pending = new Map();
     this.events = [];
-    ws.addEventListener('message', (ev) => {
+    ws.onmessage = (raw) => {
       let msg;
-      try { msg = JSON.parse(ev.data); } catch { return; }
+      try { msg = JSON.parse(raw); } catch { return; }
       if (msg.id && this.pending.has(msg.id)) {
         const { resolve, reject } = this.pending.get(msg.id);
         this.pending.delete(msg.id);
@@ -111,7 +234,7 @@ class Cdp {
       } else if (msg.method) {
         this.events.push(msg);
       }
-    });
+    };
   }
 
   send(method, params = {}, sessionId = null) {
@@ -239,6 +362,9 @@ async function launch(exe) {
     '--no-default-browser-check',
     '--disable-gpu',
     '--hide-scrollbars',
+    /* CI 容器里通常以 root 跑，且 /dev/shm 很小 —— 不加这两个会直接崩 */
+    '--no-sandbox',
+    '--disable-dev-shm-usage',
     '--user-data-dir=' + PROFILE,
     'about:blank',
   ], { stdio: ['ignore', 'pipe', 'pipe'] });
@@ -258,12 +384,15 @@ async function launch(exe) {
 
   if (!wsUrl) { proc.kill(); return null; }
 
-  /* 用 Node 20 的原生 WebSocket 连 CDP */
-  const ws = new WebSocket(wsUrl);
-  await new Promise((resolve, reject) => {
-    ws.addEventListener('open', resolve, { once: true });
-    ws.addEventListener('error', () => reject(new Error('CDP 连接失败')), { once: true });
-  });
+  /* 连 CDP：Node 20 没有全局 WebSocket，用上面的 MiniWs */
+  let ws;
+  try {
+    ws = await connectWs(wsUrl);
+  } catch (e) {
+    console.log(`  ! CDP 连接失败：${e.message}`);
+    proc.kill();
+    return null;
+  }
   const cdp = new Cdp(ws);
 
   /* 开一个新 page target 并 attach */
