@@ -5883,6 +5883,51 @@ html[data-theme='dark'] {
   border-top: 1px solid var(--border);
 }
 
+/* 卷宗分组头：只在「按 16 卷分组」模式出现。
+   用左侧短金线 + 卷号 + 卷名 + 维度计数，间隔感靠上下留白而非分割线，
+   避免和一行的 border-bottom 抢层级。 */
+.cmp-mgroup {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 20px 4px 8px;
+  position: relative;
+}
+.cmp-mgroup:first-child { padding-top: 6px; }
+
+.cmp-mgroup::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  width: 18px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.55;
+}
+
+.cmp-mgroup__no {
+  font-family: var(--font-serif);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  padding-left: 26px;
+}
+
+.cmp-mgroup__name {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.cmp-mgroup__n {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
 .cmp-mrow {
   display: grid;
   grid-template-columns: minmax(0, 176px) minmax(140px, 1fr) auto;
@@ -6132,6 +6177,9 @@ html[data-theme='dark'] {
 
   .cmp-micro__select { flex: 1 1 45%; min-width: 0; }
   .cmp-micro__search { flex: 1 1 45%; }
+
+  .cmp-mgroup { padding: 16px 2px 6px; }
+  .cmp-mgroup__name { font-size: 11px; }
 
   .cmp-mrow {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -18907,7 +18955,6 @@ function microSection({ rows, A, B, DATA, nameA, nameB }) {
 
   section.appendChild(el('div', { class: 'section-head' }, [
     el('div', { class: 'cmp-micro__title' }, [
-      el('span', { class: 'cmp-micro__no', text: '04' }),
       el('h2', { text: '全维度双人逐项显微镜' }),
     ]),
     el('div', {
@@ -19030,8 +19077,29 @@ function microSection({ rows, A, B, DATA, nameA, nameB }) {
       return;
     }
 
+    /* 「按 16 卷分组」这一档如果只排序不加组头，视觉上就是一条长列表，
+       用户根本看不出「这是 Vol.7 的了」。「分组」必须有组头才算数。
+       其余三档（同频/反差/黄金互补）是按差值排的，加了组头反而打断排序语义，
+       所以只在 group 模式插组头。 */
+    let lastVol = null;
     picked.forEach((r) => {
       const band = diffBand(r.a, r.b);
+
+      if (mode === 'group') {
+        const v = DATA.dimMap?.[r.dim]?.volume || 'other';
+        if (v !== lastVol) {
+          lastVol = v;
+          const n = Number(String(v).replace(/[^0-9]/g, ''));
+          const title = DATA.volumes?.[v]?.title || '';
+          const cnt = picked.filter((x) => (DATA.dimMap?.[x.dim]?.volume || 'other') === v).length;
+          list.appendChild(el('div', { class: 'cmp-mgroup', 'data-vol': v }, [
+            el('span', { class: 'cmp-mgroup__no', text: n ? `Vol.${String(n).padStart(2, '0')}` : '其他' }),
+            el('span', { class: 'cmp-mgroup__name', text: title }),
+            el('span', { class: 'cmp-mgroup__n', text: `${cnt} 维` }),
+          ]));
+        }
+      }
+
       const row = el('div', {
         class: 'cmp-mrow',
         'data-openable': '',

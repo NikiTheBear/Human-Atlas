@@ -471,6 +471,54 @@ function expressToCode(st) {
 }
 
 /* ============================================================
+   9 · 双人对比页逐维拆解与显微镜（A2）
+   ============================================================ */
+hr('9 · 双人对比页 · 逐维拆解与全维度显微镜');
+
+const cmp = read('src/components/CompareView.js');
+
+/* 9.1 六大生态位逐维拆解 */
+check('生态位卡片有拆解按钮', /eco-break__toggle/.test(cmp));
+check('拆解按钮带 aria-expanded', /'aria-expanded':\s*'false'/.test(cmp));
+check('拆解按钮文案含项数', /查看 \$\{r\.parts\.length\} 项拆解/.test(cmp));
+check('遍历 parts 渲染全部小项', /r\.parts\.forEach/.test(cmp));
+check('命中雷区有单独区块', /eco-break__hits/.test(cmp));
+check('五种匹配法则都有中文徽章',
+  ['syncHigh', 'tension', 'syncLow', 'sync', 'bothHigh'].every((k) => new RegExp(`${k}:\\s*'`).test(cmp)),
+  Object.keys({ syncHigh: 1, tension: 1, syncLow: 1, sync: 1, bothHigh: 1 }).join(','));
+
+/* 9.2 全维度显微镜 */
+check('存在 #cmp-micro 锚点', /id:\s*'cmp-micro'/.test(cmp));
+check('四种视图都在', ['按 16 卷分组', '高度同频', '最大反差', '黄金互补']
+  .every((t) => cmp.includes(t)));
+check('有卷宗筛选 select', /cmp-micro__select/.test(cmp));
+check('有关键词搜索 input', /type:\s*'search'/.test(cmp));
+check('有图例条', /cmp-micro__legend/.test(cmp));
+check('图例标明中线 50', /中线 50 为人群中性/.test(cmp));
+
+/* 差值分档四态 */
+check('差值四档齐全', ['双高共振', '双低共鸣', '张力互补', '显著分叉', '温和差异']
+  .every((t) => cmp.includes(t)));
+
+/* 9.3 分组模式必须真的插组头 */
+check('按卷分组模式有组头', /mode === 'group'/.test(cmp) && /cmp-mgroup/.test(cmp));
+check('组头标出卷号与维度数',
+  /cmp-mgroup__no/.test(cmp) && /cmp-mgroup__n/.test(cmp));
+
+/* 9.4 单行可展开释义 */
+check('行可点击 + 键盘可达',
+  /role:\s*'button'/.test(cmp) && /tabindex:\s*'0'/.test(cmp));
+check('Enter/Space 都能触发展开', /e\.key === 'Enter'/.test(cmp) && /e\.key === ' '/.test(cmp));
+check('释义读 mirrors 明暗两面', /DATA\.mirrors\?\.\[dim\]/.test(cmp));
+check('自动生成对比提示', /function contrastHint\(/.test(cmp));
+
+/* 9.5 样式齐全 */
+check('哑铃轨样式存在', css.includes('.dtrack__dot--a') && css.includes('.dtrack__dot--b'));
+check('哑铃轨有 50 中位线', css.includes('.dtrack__mid'));
+check('375px 下哑铃轨换行整行', /@media \(max-width: 760px\)[\s\S]{0,4000}\.cmp-mrow \.dtrack \{ grid-column: 1 \/ -1/.test(css));
+check('组头样式存在', css.includes('.cmp-mgroup'));
+
+/* ============================================================
    汇总
    ============================================================ */
 hr('汇总');
@@ -478,7 +526,7 @@ if (fail) {
   console.log(`  失败 ${fail} 项：`);
   failures.forEach((f, i) => console.log(`   ${i + 1}. ${f}`));
 } else {
-  console.log(`  全部 8 项检查通过 · ${pass} 条断言 · 0 失败`);
+  console.log(`  全部 9 项检查通过 · ${pass} 条断言 · 0 失败`);
 }
 console.log(line());
 process.exit(fail ? 1 : 0);

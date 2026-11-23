@@ -893,7 +893,6 @@ function microSection({ rows, A, B, DATA, nameA, nameB }) {
 
   section.appendChild(el('div', { class: 'section-head' }, [
     el('div', { class: 'cmp-micro__title' }, [
-      el('span', { class: 'cmp-micro__no', text: '04' }),
       el('h2', { text: '全维度双人逐项显微镜' }),
     ]),
     el('div', {
@@ -1016,8 +1015,29 @@ function microSection({ rows, A, B, DATA, nameA, nameB }) {
       return;
     }
 
+    /* 「按 16 卷分组」这一档如果只排序不加组头，视觉上就是一条长列表，
+       用户根本看不出「这是 Vol.7 的了」。「分组」必须有组头才算数。
+       其余三档（同频/反差/黄金互补）是按差值排的，加了组头反而打断排序语义，
+       所以只在 group 模式插组头。 */
+    let lastVol = null;
     picked.forEach((r) => {
       const band = diffBand(r.a, r.b);
+
+      if (mode === 'group') {
+        const v = DATA.dimMap?.[r.dim]?.volume || 'other';
+        if (v !== lastVol) {
+          lastVol = v;
+          const n = Number(String(v).replace(/[^0-9]/g, ''));
+          const title = DATA.volumes?.[v]?.title || '';
+          const cnt = picked.filter((x) => (DATA.dimMap?.[x.dim]?.volume || 'other') === v).length;
+          list.appendChild(el('div', { class: 'cmp-mgroup', 'data-vol': v }, [
+            el('span', { class: 'cmp-mgroup__no', text: n ? `Vol.${String(n).padStart(2, '0')}` : '其他' }),
+            el('span', { class: 'cmp-mgroup__name', text: title }),
+            el('span', { class: 'cmp-mgroup__n', text: `${cnt} 维` }),
+          ]));
+        }
+      }
+
       const row = el('div', {
         class: 'cmp-mrow',
         'data-openable': '',
