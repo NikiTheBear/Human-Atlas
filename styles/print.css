@@ -126,9 +126,11 @@
     break-inside: auto;
     margin-bottom: 20pt !important;
     scroll-margin-top: 0 !important;
-    /* main.css 里为了滚动性能设了 content-visibility: auto，
-       打印时必须强制展开，否则 A4 分页会漏掉未渲染的区块。 */
-    content-visibility: visible !important;
+    /* 曾经这里有一条 content-visibility 的 visible 覆盖，
+       用来对冲 main.css 里给滚动性能加的 content-visibility auto。
+       那条 auto 已被证明会在真实浏览器里把视口外 8 个板块永久掐死
+       （报告页整页空白），已经彻底移除，所以这条对冲也不需要了。
+       保留 visible 其实无害，但会让人以为上游还开着 —— 一并删掉，避免误导。 */
   }
 
   .rsec__head {

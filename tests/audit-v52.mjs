@@ -544,6 +544,11 @@ check('仍保留 scroll-margin-top（吸顶偏移）',
 check('注释里写明了为什么不能加回来',
   /已移除，不要再加回来/.test(css));
 
+const printCss = read('styles/print.css');
+check('print.css 也没有 content-visibility 声明',
+  !/content-visibility\s*:/.test(printCss),
+  (printCss.match(/content-visibility\s*:[^;]*/g) || []).join(' | ') || '无声明');
+
 /* 报告页的 9 个板块 id 都要在 ReportView/LabView 里存在 */
 const lab = read('src/components/LabView.js');
 ['r-dash', 'r-mirror', 'r-cross', 'r-dual', 'r-sandbox', 'r-parliament',
