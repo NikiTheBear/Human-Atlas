@@ -2232,16 +2232,23 @@ html[data-theme='dark'] .report-cover {
   margin-bottom: 58px;
   /* 顶栏 56 + 二级导航 47 + 呼吸 16 + 余量 9 = 128 */
   scroll-margin-top: calc(var(--masthead-h) + var(--report-nav-h) + 25px);
-  /* 长报告有十几个大区块，视口外的部分跳过布局与绘制。
-     用 contain-intrinsic-size 占位，避免滚动条跳动。 */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 720px;
 }
 
-/* 打印时不能跳过，否则导出 PDF 会缺页 */
-@media print {
-  .rsec { content-visibility: visible; }
-}
+/* ------------------------------------------------------------
+   关于 content-visibility：已移除，不要再加回来
+   ------------------------------------------------------------
+   曾经在这里写 `content-visibility: auto; contain-intrinsic-size: auto 720px`
+   想省掉视口外区块的布局开销。实测这是【阻断级 Bug】：
+
+     · 报告页 DOM 里 9 个 .rsec 都在、图表 6 张都在（querySelector 能查到）
+     · 但每块高度恒等于占位的 720px，innerText 只有 1153 字符
+     · 用户滚动也不会触发渲染 —— 滚动 662px 后 innerText 仍是 1153
+     · 手动把 contentVisibility 改成 visible 的瞬间，innerText 从 1311 跳到 8216
+
+   结果是「封面画出来了，下面全是空白」——用户看到的就是「全息报告不显示任何东西」。
+   9 个区块的布局开销远小于一次白屏事故，这里宁可不要这点优化。
+   打印样式表 print.css 里那条 `content-visibility: visible !important` 因此也不再需要，
+   但留着无害，先不动。 */
 
 .rsec__head {
   display: flex;

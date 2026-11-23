@@ -519,6 +519,41 @@ check('375px 下哑铃轨换行整行', /@media \(max-width: 760px\)[\s\S]{0,400
 check('组头样式存在', css.includes('.cmp-mgroup'));
 
 /* ============================================================
+   10 · 报告页必须一次性完整渲染（content-visibility 回归）
+   ============================================================ */
+hr('10 · 报告页完整渲染（禁止 content-visibility 掐死区块）');
+
+/* 曾经在 .rsec 上写 content-visibility: auto，导致 9 个板块高度恒为 720px、
+   innerText 只有 1153 字符，用户滚动也不触发 —— 表现为「报告页一片空白」。
+   这条断言只检查声明块，不检查注释里提到的字样。 */
+const rsecBlock = (() => {
+  const i = css.indexOf('.rsec {');
+  if (i < 0) return '';
+  const j = css.indexOf('}', i);
+  return css.slice(i, j + 1);
+})();
+
+check('.rsec 存在', rsecBlock.length > 0);
+check('.rsec 不再声明 content-visibility',
+  !/content-visibility\s*:/.test(rsecBlock),
+  rsecBlock.replace(/\s+/g, ' ').slice(0, 80));
+check('.rsec 不再声明 contain-intrinsic-size',
+  !/contain-intrinsic-size\s*:/.test(rsecBlock));
+check('仍保留 scroll-margin-top（吸顶偏移）',
+  /scroll-margin-top\s*:/.test(rsecBlock));
+check('注释里写明了为什么不能加回来',
+  /已移除，不要再加回来/.test(css));
+
+/* 报告页的 9 个板块 id 都要在 ReportView/LabView 里存在 */
+const lab = read('src/components/LabView.js');
+['r-dash', 'r-mirror', 'r-cross', 'r-dual', 'r-sandbox', 'r-parliament',
+  'r-timeline', 'r-archives', 'r-manual', 'r-export'].forEach((id) => {
+  const inReport = new RegExp(`id: '${id}'`).test(report);
+  const inLab = new RegExp(`id: '${id}'`).test(lab);
+  check(`板块 ${id} 有锚点`, inReport || inLab);
+});
+
+/* ============================================================
    汇总
    ============================================================ */
 hr('汇总');
@@ -526,7 +561,7 @@ if (fail) {
   console.log(`  失败 ${fail} 项：`);
   failures.forEach((f, i) => console.log(`   ${i + 1}. ${f}`));
 } else {
-  console.log(`  全部 9 项检查通过 · ${pass} 条断言 · 0 失败`);
+  console.log(`  全部 10 项检查通过 · ${pass} 条断言 · 0 失败`);
 }
 console.log(line());
 process.exit(fail ? 1 : 0);
