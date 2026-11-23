@@ -1,15 +1,16 @@
 /* ============================================================
-   ecologySvg.js — 六大关系生态位雷达（六边形对比）
+   ecologySvg.js — 关系生态位雷达（N 边形对比，N = 生态位数）
    ============================================================ */
 
 import { svg, svgText, clamp } from '../core/utils.js';
 
 /**
- * @param {Array<{id,name,value}>} list  六个生态位得分（按 ECOLOGIES 顺序）
+ * @param {Array<{id,name,value}>} list  全部生态位得分（按 ECOLOGIES 顺序）
  * @param {Object} opt { width, color, colorText, colorMuted, colorBorder, bg, bestId }
  */
 export function ecologySvg(list, opt = {}) {
-  const items = (list || []).slice(0, 6);
+  /* 上限放到 8：再多雷达图就糊了，但第 7 个不该被悄悄切掉 */
+  const items = (list || []).slice(0, 8);
   const n = items.length;
   if (n < 3) return svg('svg', { viewBox: '0 0 10 10' });
 
@@ -29,7 +30,7 @@ export function ecologySvg(list, opt = {}) {
     viewBox: `0 0 ${W} ${H}`,
     width: '100%',
     role: 'img',
-    'aria-label': '六大关系生态位雷达图',
+    'aria-label': '关系生态位雷达图',
   });
 
   const angle = (i) => (Math.PI * 2 * i) / n - Math.PI / 2;

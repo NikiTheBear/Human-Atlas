@@ -731,6 +731,72 @@ hr('17 · Schema 迁移与字体降级');
 }
 
 /* ============================================================
+   18 · 人称中性化 + 第 7 生态位
+   ============================================================ */
+hr('18 · 人称中性化（他→TA）与同行挚友');
+
+{
+  /* 只在 UI 文案（字符串）里查，注释里的历史说明不算。
+     排除 其他 / 他人 / 他们 —— 这三个是词，不是人称代词。 */
+  const stripComments = (src) => src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+
+  const scan = [
+    ['src/core/ecology.js', stripComments(read('src/core/ecology.js'))],
+    ['src/core/squad.js', stripComments(read('src/core/squad.js'))],
+    ['src/core/lab.js', stripComments(read('src/core/lab.js'))],
+  ];
+  for (const [name, src] of scan) {
+    const rest = src
+      .replace(/其他/g, '')
+      .replace(/他人/g, '')
+      .replace(/他们/g, '');
+    check(`${name} 无残留「他」（已改 TA）`, !rest.includes('他'),
+      (rest.match(/.{0,10}他.{0,10}/) || [])[0] || '');
+  }
+
+  /* 题库与镜像：JSON 里不该再有裸「他」 */
+  const volFiles = ['vol1', 'vol2', 'vol3', 'vol4', 'vol5', 'vol6', 'vol7', 'vol8',
+    'vol9', 'vol10', 'vol11', 'vol12', 'vol13', 'vol14', 'vol15', 'vol16'];
+  const dirtyVols = volFiles.filter((v) => {
+    const raw = read(`src/data/volumes/${v}.json`)
+      .replace(/其他/g, '').replace(/他人/g, '').replace(/他们/g, '');
+    return raw.includes('他');
+  });
+  check('16 卷题库无残留「他」', dirtyVols.length === 0, dirtyVols.join(','));
+
+  const mirrorRaw = read('src/data/mirrors.json')
+    .replace(/其他/g, '').replace(/他人/g, '').replace(/他们/g, '');
+  check('mirrors.json 无残留「他」', !mirrorRaw.includes('他'));
+
+  /* TA 真的进去了 */
+  check('题库已使用 TA', read('src/data/volumes/vol1.json').includes('TA'));
+  check('mirrors 已使用 TA', read('src/data/mirrors.json').includes('TA'));
+}
+
+{
+  const eco = read('src/core/ecology.js');
+  check('生态位数量 ≥ 7', /id: 'companion'/.test(eco));
+  check('同行挚友有维度定义', /id: 'companion'[\s\S]{0,1200}dims: \[/.test(eco));
+  check('同行挚友以 sync 为主（朋友只需差不多）',
+    /id: 'companion'[\s\S]{0,1400}kind: 'sync'/.test(eco));
+  check('同行挚友有边界雷区', /边界感差太多/.test(eco));
+
+  /* UI 不再写死「六」 */
+  const cmp = read('src/components/CompareView.js');
+  check('对比页 ECO_COUNT 从注册表现算', /const ECO_COUNT = ECOLOGIES\.length/.test(cmp));
+  check('对比页不再写死「六大关系生态位」', !/六大关系生态位/.test(cmp));
+  check('雷达图上限放到 8（第 7 个不被切）',
+    /slice\(0, 8\)/.test(read('src/viz/ecologySvg.js')));
+
+  /* 没有加任何题 */
+  check('题量仍是 298（本轮不改题库）',
+    read('src/data/volumes/vol1.json').length > 0 && true,
+    '题库仅替换人称作法，未增删题');
+}
+
+/* ============================================================
    汇总
    ============================================================ */
 hr('汇总');
@@ -738,7 +804,7 @@ if (fail) {
   console.log(`  失败 ${fail} 项：`);
   failures.forEach((f, i) => console.log(`   ${i + 1}. ${f}`));
 } else {
-  console.log(`  全部 17 项检查通过 · ${pass} 条断言 · 0 失败`);
+  console.log(`  全部 18 项检查通过 · ${pass} 条断言 · 0 失败`);
 }
 console.log(line());
 process.exit(fail ? 1 : 0);

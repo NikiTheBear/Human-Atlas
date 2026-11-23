@@ -265,7 +265,7 @@ function foldableSection(section, { summary, defaultOpen = false } = {}) {
  *
  * 为什么不用 `?? 50` 补点：补出来的点不是「中性」，是「假的」。
  * 15 维里有 3 维没测，蝶形图会歪成另一只蝴蝶；
- * 用户看到的形状是编的，但他不知道哪几行是编的。
+ * 用户看到的形状是编的，但TA不知道哪几行是编的。
  * 占位条明确说清缺几个维度、要完成哪一卷，比假图诚实。
  */
 function chartLockCard({ title, note, need, missing, total }) {

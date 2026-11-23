@@ -498,14 +498,14 @@ function pickPartner(scores) {
   const av = scores.att_avoidance;
   const an = scores.att_anxiety;
   if (av >= 62) {
-    out.push('一个不太需要高频确认、能给足空间的人。他不必时刻在场，但每次出现都是真的在场。');
+    out.push('一个不太需要高频确认、能给足空间的人。TA不必时刻在场，但每次出现都是真的在场。');
   } else if (an >= 62) {
     out.push('一个表达稳定、承诺清楚的人。你需要的不是浪漫，而是可预期的回应。');
   } else {
     out.push('一个情绪稳定、边界清晰的人。你不太需要戏剧性，你需要的是长期的可靠。');
   }
   if (scores.mot_mastery >= 62) {
-    out.push('一个同样有自己目标的人。你无法长期尊重一个没有方向感的人，哪怕他很温柔。');
+    out.push('一个同样有自己目标的人。你无法长期尊重一个没有方向感的人，哪怕TA很温柔。');
   }
   if (scores.cog_global >= 62) {
     out.push('一个能和你聊到结构层面的人。你会在「聊不到一起」的关系里慢慢失去兴趣。');
@@ -524,10 +524,10 @@ function pickToxic(scores) {
     out.push('习惯用情绪施压的人：你一读空气就自动让步，这段关系会迅速变成单向消耗。');
   }
   if (scores.att_avoidance >= 60) {
-    out.push('需要全天候黏连的人：他的靠近会被你体验成入侵，最后你会用冷淡把关系弄坏。');
+    out.push('需要全天候黏连的人：TA的靠近会被你体验成入侵，最后你会用冷淡把关系弄坏。');
   }
   if (scores.att_anxiety >= 60) {
-    out.push('长期含糊其辞的人：他会不断触发你的猜测循环，把你拖进反复确认的漩涡。');
+    out.push('长期含糊其辞的人：TA会不断触发你的猜测循环，把你拖进反复确认的漩涡。');
   }
   if (scores.val_moral >= 60) {
     out.push('把原则当筹码的人：你会在每一次「这次特殊」里被磨掉信任，最后连自己都怀疑。');

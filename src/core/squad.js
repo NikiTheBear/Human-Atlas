@@ -20,42 +20,42 @@ export const SQUAD_ROLES = [
     id: 'anchor',
     name: '定海神针',
     latin: 'The Anchor',
-    desc: '情绪最稳、最不容易被带动的那一个。事情一乱，所有人会先看他的表情。',
+    desc: '情绪最稳、最不容易被带动的那一个。事情一乱，所有人会先看TA的表情。',
     weights: { big5_order: 1.4, mot_security: 1.4, def_detach: 1.0, att_anxiety: -1.2 },
   },
   {
     id: 'igniter',
     name: '破冰点火器',
     latin: 'The Igniter',
-    desc: '沉默一旦超过三秒，他一定开口。他不在乎话题是否完美，只在乎没人尴尬。',
+    desc: '沉默一旦超过三秒，TA一定开口。TA不在乎话题是否完美，只在乎没人尴尬。',
     weights: { big5_social: 1.5, big5_assert: 1.2, hss_novelty: 1.0, big5_compliance: -0.8 },
   },
   {
     id: 'operator',
     name: '隐形操盘手',
     latin: 'The Operator',
-    desc: '他很少在群里说话，但真正推动事情的那几条线都在他手上。',
+    desc: 'TA很少在群里说话，但真正推动事情的那几条线都在TA手上。',
     weights: { covert_control: 1.6, dark_mach: 1.3, cog_global: 1.0, big5_assert: -0.6 },
   },
   {
     id: 'warmer',
     name: '气氛调温师',
     latin: 'The Warmer',
-    desc: '谁被冷落了他第一个发现，谁不高兴了他第一个递台阶。整屋的温度由他调。',
+    desc: '谁被冷落了TA第一个发现，谁不高兴了TA第一个递台阶。整屋的温度由TA调。',
     weights: { big5_compassion: 1.5, jung_fe: 1.3, def_fawn: 0.9, big5_assert: -0.4 },
   },
   {
     id: 'risk',
     name: '冷静风控官',
     latin: 'The Risk Officer',
-    desc: '所有人都在兴奋时，他是那个说「等一下，这里有问题」的人。',
+    desc: '所有人都在兴奋时，TA是那个说「等一下，这里有问题」的人。',
     weights: { big5_alert: 1.5, cog_logic: 1.3, light_kant: 1.0, big5_open: -0.5 },
   },
   {
     id: 'longhaul',
     name: '长期主义者',
     latin: 'The Long Hauler',
-    desc: '他不参与当下的争论，他在算三年后的事。小组里最不显眼也最不可缺的那个。',
+    desc: 'TA不参与当下的争论，TA在算三年后的事。小组里最不显眼也最不可缺的那个。',
     weights: { time_future: 1.4, big5_industry: 1.3, mot_purpose: 1.0, time_present_hed: -0.8 },
   },
 ];
@@ -258,7 +258,7 @@ export function squadCharter(members, roles, gaps) {
   const r = (id) => roles.find((x) => x.role === id);
 
   if (r('operator')) {
-    lines.push(`${r('operator').name} 大概率是真正推动事情的人，但他的动作不一定让所有人看见。定期问一句「现在是谁在推」，能省掉很多误会。`);
+    lines.push(`${r('operator').name} 大概率是真正推动事情的人，但TA的动作不一定让所有人看见。定期问一句「现在是谁在推」，能省掉很多误会。`);
   }
   if (r('igniter') && r('risk')) {
     lines.push(`${r('igniter').name} 会先冲，${r('risk').name} 会先拦。这不是矛盾，是这支队伍最值钱的一组刹车与油门——只要两个人互相知道对方在做什么。`);
@@ -267,7 +267,7 @@ export function squadCharter(members, roles, gaps) {
     lines.push(`${r('warmer').name} 承担的调温工作通常不会被记功。把「谁在照顾气氛」明确说出来，能防止这种劳动长期隐形。`);
   }
   if (r('anchor')) {
-    lines.push(`${r('anchor').name} 一沉默，全队会本能地紧张。他的稳定是公共资源，也需要被回充——别只在出事时才找他。`);
+    lines.push(`${r('anchor').name} 一沉默，全队会本能地紧张。TA的稳定是公共资源，也需要被回充——别只在出事时才找TA。`);
   }
   if (r('longhaul')) {
     lines.push(`${r('longhaul').name} 说的是三年后的事，容易被当下的紧迫感压过去。每次决策留五分钟专门听这一段。`);

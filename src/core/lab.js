@@ -208,9 +208,9 @@ export const PARLIAMENT_PAIRS = [
     a: 'sin_pride', b: 'att_anxiety', threshold: 58,
     title: '高自尊 × 依恋焦虑',
     voiceA: '我不需要向谁证明什么。我的价值由我自己判定。',
-    voiceB: '可他一冷淡，我就开始怀疑是不是自己哪里不够好。',
+    voiceB: '可TA一冷淡，我就开始怀疑是不是自己哪里不够好。',
     verdict: '外层是硬的，内层是软的。这种结构让你在远处显得很有骨气，在近处却反复确认。',
-    tip: '把「他是不是不喜欢我了」翻译成「我需要一次具体的回应」。要证据，不要情绪。',
+    tip: '把「TA是不是不喜欢我了」翻译成「我需要一次具体的回应」。要证据，不要情绪。',
   },
   {
     a: 'light_kant', b: 'dark_mach', threshold: 58,
@@ -288,9 +288,9 @@ export const PARLIAMENT_PAIRS = [
     a: 'covert_control', b: 'big5_compassion', threshold: 56,
     title: '隐性掌控 × 高共情',
     voiceA: '我知道怎么让事情按我的方向走。这不叫操控，叫懂人。',
-    voiceB: '但我又真的在意对方的感受。让他不舒服，我自己也难受。',
+    voiceB: '但我又真的在意对方的感受。让TA不舒服，我自己也难受。',
     verdict: '你能同时读懂一个人的需求和弱点。这让你的影响力很强，也让你常在「用不用」之间犹豫。',
-    tip: '每次想推动别人之前，先问自己一句：如果他知道我在推动，他会怎么想？答案就是边界。',
+    tip: '每次想推动别人之前，先问自己一句：如果TA知道我在推动，TA会怎么想？答案就是边界。',
   },
   {
     a: 'money_vigilance', b: 'time_present_hed', threshold: 56,

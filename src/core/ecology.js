@@ -1,5 +1,5 @@
 /* ============================================================
-   ecology.js — 六大关系生态位引擎
+   ecology.js — 关系生态位引擎（当前 7 个，数量由 ECOLOGIES 决定）
 
    核心修正（v5.0.1）：
      最初版本只用「同频 = 100 − |a − b|」。两个完全一样的人会拿到
@@ -102,7 +102,7 @@ export const ECOLOGIES = [
     id: 'confidant',
     name: '灵魂知己',
     latin: 'The Confidant',
-    summary: '精神底色同频：你怎么看世界，他就怎么看世界。',
+    summary: '精神底色同频：你怎么看世界，TA就怎么看世界。',
     dims: [
       /* 哲学底色：双方都得真在这条线上，不是都不在乎 */
       { id: 'phil_stoic', kind: 'syncHigh', w: 1.6 },
@@ -131,7 +131,7 @@ export const ECOLOGIES = [
     id: 'cofounder',
     name: '事业搭档',
     latin: 'The Cofounder',
-    summary: '认知执行互补：你补他的盲区，他补你的盲区。',
+    summary: '认知执行互补：你补TA的盲区，TA补你的盲区。',
     dims: [
       /* 认知风格要有差异 */
       { id: 'cog_global', kind: 'tension', w: 1.8 },
@@ -196,6 +196,52 @@ export const ECOLOGIES = [
     ],
     penalties: [],
     unlock: null,
+  },
+  /* ------------------------------------------------------------
+     第 7 位 · 同行挚友（v5.2.4 新增）
+     ------------------------------------------------------------
+     为什么加它：现有六个生态位里没有「普通朋友」这个最普遍的关系类型。
+       · 灵魂知己测的是精神同频（哲学立场 / 道德基础 / 开放性），太重
+       · 事业搭档 / 日常合住 是同事与室友
+       · 心动拉扯 / 长期伴侣 是恋爱与伴侣
+       · 镜面宿敌 是竞争
+     普通朋友在这上面一律低分，但关系本身没问题 —— 因为朋友不需要
+     「世界观都一样」，只需要「节奏合得来、边界干净」。
+
+     设计要点：
+       · 以 sync（相似）为主，不用 syncHigh —— 朋友不必两人都高，
+         只需要差不多。这是它与「灵魂知己」最本质的区别。
+       · 唯一用 syncHigh 的是 val_boundary：边界感两人都得清楚，
+         朋友关系最容易毁在「一方觉得无所谓，另一方觉得被冒犯」。
+       · sin_gluttony 用 sync：一起放纵的默契，同高同低都行。
+     ------------------------------------------------------------ */
+  {
+    id: 'companion',
+    name: '同行挚友',
+    latin: 'The Companion',
+    summary: '一起消磨时间的适配度：节奏合不合、边界干不干净。',
+    dims: [
+      /* ---- 节奏接近即可（sync：越像越好，不要求都高）---- */
+      { id: 'big5_social', kind: 'sync', w: 1.4 },
+      { id: 'mot_hedonism', kind: 'sync', w: 1.2 },
+      { id: 'hss_novelty', kind: 'sync', w: 1.0 },
+      /* 一起放纵的默契：同高同低都成立 */
+      { id: 'sin_gluttony', kind: 'sync', w: 1.0 },
+      /* ---- 这三条必须两人都在线（syncHigh：都高才算好）----
+         朋友关系最容易毁在「一方觉得无所谓，另一方觉得被冒犯」，
+         所以边界、配合意愿、基本忠诚都不能只是「差不多」，
+         而是双方都得站得住。这也是它与「灵魂知己」的分野：
+         知己要求世界观同频，朋友只要求相处底线同频。 */
+      { id: 'val_boundary', kind: 'syncHigh', w: 1.6 },
+      { id: 'tki_collaborating', kind: 'syncHigh', w: 1.0 },
+      { id: 'mft_loyalty', kind: 'syncHigh', w: 1.2 },
+    ],
+    penalties: [
+      {
+        id: 'val_boundary', gap: 45, w: 12, label: '边界感差太多（一方越界而不自知）',
+      },
+    ],
+    unlock: 'vol4',
   },
 ];
 
@@ -510,7 +556,7 @@ export function relationshipScript(A, B, masks = {}) {
     if (Number.isFinite(aMask) && Number.isFinite(bMask) && Math.abs(aMask - bMask) >= 15) {
       const thick = aMask > bMask ? 'A' : 'B';
       body += `${N(thick)} 刚开始会显得更完整、更得体，话都说得恰到好处；另一方则更早露出真实的一面。`
-        + '这段关系最初的错位就藏在这里：一个人以为对方天生从容，其实那只是他习惯的外壳。';
+        + '这段关系最初的错位就藏在这里：一个人以为对方天生从容，其实那只是TA习惯的外壳。';
       tags.push('体面差');
     } else {
       body += '你们的初始体面度接近，所以第一印象大概率为「同类」。';
@@ -543,7 +589,7 @@ export function relationshipScript(A, B, masks = {}) {
     const sceneMap = {
       big5_open: '一起去看一个谁都没听过的小展，出来后能聊两小时',
       big5_aesthetic: '同一张照片、同一段配乐，你们会同时停下来',
-      phil_humanist: '聊起某个人的处境，你们都先替他说话',
+      phil_humanist: '聊起某个人的处境，你们都先替TA说话',
       light_humanism: '对一件公共事件，你们第一反应都是「那几个人怎么办」',
       hss_novelty: '临时改道去一个没计划的地方，越乱越兴奋',
       hss_intensity: '凌晨三点还在说话，谁都不想先结束',
@@ -659,7 +705,7 @@ const SUBTEXT_RULES = [
     at: 58,
     line: '「我们是不是进展得太快了。」',
     real: '靠近让我紧张。我怕一旦依赖上，就再也承受不了失去。',
-    better: '把节奏交给他决定，但把话说清楚：「我不急，你可以按你的速度来，但我不会消失。」',
+    better: '把节奏交给TA决定，但把话说清楚：「我不急，你可以按你的速度来，但我不会消失。」',
     tag: '回避依恋',
   },
   {
@@ -675,7 +721,7 @@ const SUBTEXT_RULES = [
     at: 58,
     line: '「都行，你决定就好。」',
     real: '我有偏好，但说出来怕你不高兴，所以我把选择权先交出去。',
-    better: '主动给两个选项让他挑，而不是开放式提问。有边界的选择题，他才答得出来。',
+    better: '主动给两个选项让TA挑，而不是开放式提问。有边界的选择题，TA才答得出来。',
     tag: '讨好安抚',
   },
   {
@@ -683,7 +729,7 @@ const SUBTEXT_RULES = [
     at: 58,
     line: '「我们先理性分析一下这件事。」',
     real: '这件事让我有情绪，但我不允许自己有，所以我把它变成一道题。',
-    better: '配合分析，但在最后加一句：「分析完了，你现在心里什么感觉？」给他一个允许脆弱的入口。',
+    better: '配合分析，但在最后加一句：「分析完了，你现在心里什么感觉？」给TA一个允许脆弱的入口。',
     tag: '理智化',
   },
   {
@@ -699,7 +745,7 @@ const SUBTEXT_RULES = [
     at: 58,
     line: '「这件事就是你不对。」',
     real: '我需要的不是道歉，是确认我在这个问题上是对的。',
-    better: '先承认他讲得对的那部分（哪怕只有一句），再补你的部分。他要的常常只是被承认，不是赢。',
+    better: '先承认TA讲得对的那部分（哪怕只有一句），再补你的部分。TA要的常常只是被承认，不是赢。',
     tag: '竞争型冲突',
   },
   {
@@ -707,7 +753,7 @@ const SUBTEXT_RULES = [
     at: 58,
     line: '「算了，不说了。」',
     real: '我说下去会吵起来，而吵架让我害怕。我宁愿自己咽下去。',
-    better: '别追着要他现在讲完。改成：「那先放着，等你想说的时候我听。」把门留着，不要推。',
+    better: '别追着要TA现在讲完。改成：「那先放着，等你想说的时候我听。」把门留着，不要推。',
     tag: '回避型冲突',
   },
   {
@@ -729,7 +775,7 @@ const SUBTEXT_RULES = [
 ];
 
 /**
- * @param {Object} target  对方 state（我们解码「他」的潜台词）
+ * @param {Object} target  对方 state（我们解码「TA」的潜台词）
  * @param {string} name    对方称呼
  */
 export function subtextDecoder(target, name = '对方') {
@@ -775,11 +821,11 @@ export function chemistryBoard(A, B) {
 
   /* ---- 从欲望引擎看：对方最在意什么，就给它什么 ---- */
   const motives = [
-    ['mot_autonomy', '不替他做决定', '给他一段完全不被打扰的时间，不要问他在干什么'],
-    ['mot_mastery', '认真看他的成果', '让他讲一次他做成的具体的事，听完追问一个细节'],
+    ['mot_autonomy', '不替TA做决定', '给TA一段完全不被打扰的时间，不要问TA在干什么'],
+    ['mot_mastery', '认真看TA的成果', '让TA讲一次TA做成的具体的事，听完追问一个细节'],
     ['mot_belonging', '具体的分量', '一句「这件事我只跟你讲」，比任何夸奖都有效'],
     ['mot_security', '提前说清楚', '把你们下一步的安排讲明白，模糊本身就是消耗'],
-    ['mot_purpose', '意义要落地', '跟他聊一件「这事对谁有用」，而不是「这事值多少钱」'],
+    ['mot_purpose', '意义要落地', '跟TA聊一件「这事对谁有用」，而不是「这事值多少钱」'],
     ['mot_hedonism', '一起浪费时间', '安排一个没有任何产出的下午，允许纯粹开心'],
   ];
 
@@ -793,15 +839,15 @@ export function chemistryBoard(A, B) {
 
   /* ---- 从图式看：别踩的雷 ---- */
   const mines = [
-    ['schema_abandonment', '不要说「随便你」', '这句话对他是「我要走了」的简化版，宁可说「我不同意，但我不会走」'],
+    ['schema_abandonment', '不要说「随便你」', '这句话对TA是「我要走了」的简化版，宁可说「我不同意，但我不会走」'],
     ['schema_deprivation', '不要拿关心当条件', '如果想给，就别让对方觉得欠你'],
-    ['schema_defect', '不要在别人面前纠正他', '私下说都行，当众说是另一种伤害'],
-    ['schema_mistrust', '别追问得太急', '查岗式的追问只会让他更确信你不可信'],
-    ['schema_std', '不要替他降标准', '「这样就行了」在他是「你不用管了」'],
-    ['schema_sacrifice', '不要让他一直让步', '每一次他退让，都在心里记了一笔'],
-    ['schema_approval', '不要只讲道理', '他要的第一句是「你做得挺好」，然后才是建议'],
-    ['schema_entitlement', '别当众驳他', '他的自尊比事实更急'],
-    ['schema_negativity', '不要突然变计划', '临时改期对你是小事，对他是灾难预演'],
+    ['schema_defect', '不要在别人面前纠正TA', '私下说都行，当众说是另一种伤害'],
+    ['schema_mistrust', '别追问得太急', '查岗式的追问只会让TA更确信你不可信'],
+    ['schema_std', '不要替TA降标准', '「这样就行了」在TA是「你不用管了」'],
+    ['schema_sacrifice', '不要让TA一直让步', '每一次TA退让，都在心里记了一笔'],
+    ['schema_approval', '不要只讲道理', 'TA要的第一句是「你做得挺好」，然后才是建议'],
+    ['schema_entitlement', '别当众驳TA', 'TA的自尊比事实更急'],
+    ['schema_negativity', '不要突然变计划', '临时改期对你是小事，对TA是灾难预演'],
   ];
 
   /* 阈值门：只有该图式确实显著（≥56）才输出红线。
@@ -834,29 +880,29 @@ export function chemistryBoard(A, B) {
   if (aMft && Number.isFinite(aMft.v) && aMft.v >= 58) {
     green.push({
       for: who('A'),
-      title: `他的底线是「${mftLabel[aMft.id]}」`,
-      text: '在这件事上不要讲效率和划算，那是他判断一个人值不值得深交的地方',
+      title: `TA的底线是「${mftLabel[aMft.id]}」`,
+      text: '在这件事上不要讲效率和划算，那是TA判断一个人值不值得深交的地方',
     });
   }
   if (bMft && Number.isFinite(bMft.v) && bMft.v >= 58) {
     green.push({
       for: who('B'),
-      title: `他的底线是「${mftLabel[bMft.id]}」`,
-      text: '在这件事上不要讲效率和划算，那是他判断一个人值不值得深交的地方',
+      title: `TA的底线是「${mftLabel[bMft.id]}」`,
+      text: '在这件事上不要讲效率和划算，那是TA判断一个人值不值得深交的地方',
     });
   }
   if (aMftLow && Number.isFinite(aMftLow.v) && aMftLow.v <= 42) {
     red.push({
       for: who('A'),
-      title: `别拿「${mftLabel[aMftLow.id]}」要求他`,
-      text: '这一项在他身上本来就弱，用道德去要求，只会换来敷衍而不是认同',
+      title: `别拿「${mftLabel[aMftLow.id]}」要求TA`,
+      text: '这一项在TA身上本来就弱，用道德去要求，只会换来敷衍而不是认同',
     });
   }
   if (bMftLow && Number.isFinite(bMftLow.v) && bMftLow.v <= 42) {
     red.push({
       for: who('B'),
-      title: `别拿「${mftLabel[bMftLow.id]}」要求他`,
-      text: '这一项在他身上本来就弱，用道德去要求，只会换来敷衍而不是认同',
+      title: `别拿「${mftLabel[bMftLow.id]}」要求TA`,
+      text: '这一项在TA身上本来就弱，用道德去要求，只会换来敷衍而不是认同',
     });
   }
 

@@ -11,9 +11,12 @@ import { compareStates, displayName } from '../core/comparator.js';
 import { radarSvg } from '../viz/radarSvg.js';
 import { ecologySvg } from '../viz/ecologySvg.js';
 import {
-  scoreAllEcologies, relationshipScript, subtextDecoder, chemistryBoard,
+  ECOLOGIES, scoreAllEcologies, relationshipScript, subtextDecoder, chemistryBoard,
   CONFIDENCE_LABEL,
 } from '../core/ecology.js';
+
+/* 生态位数量从注册表现算 —— 加第 7、第 8 个时不用再改文案 */
+const ECO_COUNT = ECOLOGIES.length;
 
 /* A/B 两点专属色：优先读 styles/main.css 里的 --cmp-a / --cmp-b（日夜双轨），
    这里的常量只作为 getComputedStyle 不可用（如 SSR / 测试环境）时的兜底：
@@ -404,12 +407,12 @@ function renderResult(box, A, B, { DATA, col }) {
   ]));
   box.appendChild(verdict);
 
-  /* ---------- 六大关系生态位 ---------- */
+  /* ---------- 关系生态位（数量从 ECOLOGIES 现算，不写死） ---------- */
   {
     const eco = scoreAllEcologies(A, B, res.dims, { a: A.maskIndex, b: B.maskIndex });
 
     const head = el('div', { class: 'section-head' }, [
-      el('h2', { text: '六大关系生态位' }),
+      el('h2', { text: `${ECO_COUNT} 种关系生态位` }),
       el('div', {
         class: 'section-head__hint',
         text: eco.best
@@ -422,13 +425,13 @@ function renderResult(box, A, B, { DATA, col }) {
     if (!eco.list.length) {
       box.appendChild(el('div', { class: 'res-card' }, [
         el('h4', { text: '交集维度还不足以推演生态位' }),
-        el('p', { text: '六套权重矩阵需要一定的共同维度才能给出可信结果。先各自再完成 1–2 卷。' }),
+        el('p', { text: '每套权重矩阵都需要一定的共同维度才能给出可信结果。先各自再完成 1–2 卷。' }),
       ]));
     } else {
       /* 雷达 */
       const radarCard = el('div', { class: 'chart-card', style: { marginBottom: '18px' } });
       radarCard.appendChild(el('div', { class: 'chart-card__head' }, [
-        el('h3', { text: '六维轮廓' }),
+        el('h3', { text: `${ECO_COUNT} 维轮廓` }),
         el('span', { class: 'chart-card__note', text: '顶点为各自生态位得分' }),
       ]));
       const radarBody = el('div', { class: 'chart-card__body' });
@@ -447,7 +450,7 @@ function renderResult(box, A, B, { DATA, col }) {
       radarCard.appendChild(radarBody);
       box.appendChild(radarCard);
 
-      /* 六张卡 —— 每张底部可展开逐维拆解 */
+      /* 每张卡底部可展开逐维拆解 */
       const ecoGrid = el('div', { class: 'eco-grid' });
       ordered.forEach((r) => {
         const isBest = r.id === eco.best?.id;
@@ -711,7 +714,7 @@ function renderResult(box, A, B, { DATA, col }) {
   }
 
   {
-    /* 全维度双人逐项显微镜 −− 放在六大生态位之后、三幕剧之前 */
+    /* 全维度双人逐项显微镜 −− 放在生态位之后、三幕剧之前 */
     const micro = microSection({
       rows: res.rows || [], A, B, DATA, nameA, nameB,
     });

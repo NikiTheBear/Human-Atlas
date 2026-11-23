@@ -322,7 +322,7 @@ function panel04() {
 function panel05() {
   const box = el('div', { class: 'guide-panel' });
 
-  box.appendChild(el('h4', { class: 'guide-panel__h', text: '六大关系生态位' }));
+  box.appendChild(el('h4', { class: 'guide-panel__h', text: '关系生态位' }));
   const eco = [
     ['长期伴侣', '底线一致 + 依恋稳态；扣分雷区是焦虑 × 回避的追逃。'],
     ['心动拉扯', '异质张力 + 推进度；双方都躲就没人破冰。'],
@@ -512,8 +512,8 @@ export function renderGuide(root, ctx) {
       no: '05',
       icon: ICONS.social,
       title: '多维社交与关系实验室',
-      hook: '测出你们最适合当什么关系——六大生态位、印象盲猜与小圈子群像。',
-      kws: ['六大生态位', '乔哈里窗', '群像星图'],
+      hook: '测出你们最适合当什么关系——关系生态位、印象盲猜与小圈子群像。',
+      kws: ['关系生态位', '乔哈里窗', '群像星图'],
       render: () => panel05(),
     },
     {
@@ -603,7 +603,7 @@ export function renderGuide(root, ctx) {
     {
       tag: '想重点测清关系与情绪模式',
       title: '三卷关系内核',
-      desc: '三观 · 亲密防线 · 冲突剧场。三卷闭环即可解锁六大关系生态位合盘。',
+      desc: '三观 · 亲密防线 · 冲突剧场。三卷闭环即可解锁关系生态位合盘。',
       action: { text: '先去 Vol.4 三观 →', run: () => { markSeen(); go('#/vol/vol4'); } },
       extra: [
         { text: 'Vol.7', href: '#/vol/vol7' },
