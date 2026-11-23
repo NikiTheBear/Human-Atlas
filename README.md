@@ -2,6 +2,11 @@
 
 > 分卷潜行式多维深度测评系统 · 纯前端 · 零后端 · 零第三方图表库
 
+**[▶ 在线直接用](https://nikithebear.github.io/Human-Atlas/)**  ·
+**[⬇ 下载单文件版 / 站点包](https://github.com/NikiTheBear/Human-Atlas/releases/latest)**
+
+不想跑构建、只想拿来用：去 [Releases](https://github.com/NikiTheBear/Human-Atlas/releases/latest) 下 `human-atlas-vX-single-file.html`，双击即开，断网可用。
+
 **双季十六卷**：第一辑 · 本源八卷（152 题 / 60 维）+ 第二辑 · 破圈深水八卷（146 题 / 67 维），共 **298 个情境题、127 个可追踪维度**。
 
 任意一卷即可独立作答并生成报告；完成 ≥3 卷触发跨卷交叉读心（65 条黄金规则）；完成 ≥5 卷激活面具显影；完成核心八卷解锁 36 种复合原型与《个人人性全息白皮书》。
@@ -24,7 +29,7 @@
 
 ### 发给朋友
 
-只发 **`human-atlas.html`** 这一个文件（522 KB）。微信 / 邮件 / AirDrop 都行。
+只发 **`human-atlas.html`** 这一个文件（约 1.2 MB）。微信 / 邮件 / AirDrop 都行。
 对方双击就能用，进度存在他自己浏览器里，与你无关。
 
 如果对方也想看到他朋友们的对比，他可以把报告页生成的 `HA4-` 存档码发回来。
@@ -37,7 +42,7 @@
 npm start        # 本地预览 index.html（http://localhost:4173）
 npm run single   # 重新生成 human-atlas.html（单文件版）
 npm run build    # 完整构建：data → single → dist/
-npm test         # 250 项自动化验收（49 计分排雷 + 201 全链路）
+npm test         # 301 项自动化验收（49 计分排雷 + 252 全链路）
 ```
 
 改完题库后：
