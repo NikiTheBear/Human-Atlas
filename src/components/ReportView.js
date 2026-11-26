@@ -13,6 +13,7 @@ import { buildVolumeTypology } from '../core/typology.js';
 import {
   sandboxSection, parliamentSection, timelineSection,
 } from './LabView.js';
+import { pressureSandbox } from '../core/lab.js';
 import { tierOf, maskTierOf, layeredScores } from '../core/scoring.js';
 import { butterflySvg, BUTTERFLY_PAIRS } from '../viz/butterflySvg.js';
 import { radarSvg, maskRadar } from '../viz/radarSvg.js';
@@ -23,7 +24,7 @@ import { jungStackSvg, jungTypeHint } from '../viz/jungStackSvg.js';
 import { matrixSvg, neuroOf, NEURO_QUADRANTS } from '../viz/matrixSvg.js';
 import { alignmentSvg, alignmentFrom, ALIGNMENTS } from '../viz/alignmentSvg.js';
 import {
-  downloadPoster, downloadMarkdown, copyMarkdown, copyAIPrompt, buildAIPrompt,
+  downloadPoster, downloadDualStatePoster, downloadMarkdown, copyMarkdown, copyAIPrompt, buildAIPrompt,
 } from './Exporter.js';
 import {
   exportJSON, encodeSoulCode, initialSnapshotOf, retakeVolume, hasInitialSnapshot, importJSON,
@@ -1043,6 +1044,34 @@ export function renderReport(root, ctx) {
       ]),
     ]));
   }
+  const dualSandbox = pressureSandbox(report.scores || {}, 15);
+  dualSec.appendChild(el('div', { class: 'dual-export-row' }, [
+    el('span', { class: 'dual-export-row__hint', text: '把顺境与耗竭两面导成一张高对比战报卡' }),
+    el('button', {
+      type: 'button',
+      class: 'btn btn--sm btn--ghost',
+      text: '导出双态战报图 PNG',
+      onclick: async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        btn.textContent = '绘制中…';
+        try {
+          const name = await downloadDualStatePoster(report, {
+            theme: App.theme,
+            nickname,
+            sandbox: dualSandbox,
+            dimMap: DATA.dimMap,
+          });
+          toast(`已保存 ${name}`);
+        } catch (err) {
+          console.error(err);
+          toast('双态战报图生成失败');
+        }
+        btn.textContent = '导出双态战报图 PNG';
+        btn.disabled = false;
+      },
+    }),
+  ]));
   wrap.appendChild(dualSec);
 
   /* ============ 实验室 · 压力沙盒 / 内在议会 / 时间胶囊 ============ */
@@ -1258,6 +1287,55 @@ export function renderReport(root, ctx) {
             toast('海报生成失败');
           }
           btn.textContent = '暗夜黑金版';
+          btn.disabled = false;
+        },
+      }),
+    ],
+  ));
+
+  expGrid.appendChild(expCard(
+    '双态对比战报 · PNG',
+    '1080 × 1620 顺境舒展态 vs 高压退行态（含低电量失衡位移轨迹）。',
+    [
+      el('button', {
+        class: 'btn btn--sm btn--solid',
+        type: 'button',
+        text: '象牙双态卡',
+        onclick: async (e) => {
+          const btn = e.currentTarget;
+          btn.disabled = true;
+          btn.textContent = '绘制中…';
+          try {
+            const name = await downloadDualStatePoster(reportForExport, {
+              theme: 'light', nickname, sandbox: dualSandbox, dimMap: DATA.dimMap,
+            });
+            toast(`已保存 ${name}`);
+          } catch (err) {
+            console.error(err);
+            toast('双态战报图生成失败');
+          }
+          btn.textContent = '象牙双态卡';
+          btn.disabled = false;
+        },
+      }),
+      el('button', {
+        class: 'btn btn--sm',
+        type: 'button',
+        text: '黑金双态卡',
+        onclick: async (e) => {
+          const btn = e.currentTarget;
+          btn.disabled = true;
+          btn.textContent = '绘制中…';
+          try {
+            const name = await downloadDualStatePoster(reportForExport, {
+              theme: 'dark', nickname, sandbox: dualSandbox, dimMap: DATA.dimMap,
+            });
+            toast(`已保存 ${name}`);
+          } catch (err) {
+            console.error(err);
+            toast('双态战报图生成失败');
+          }
+          btn.textContent = '黑金双态卡';
           btn.disabled = false;
         },
       }),

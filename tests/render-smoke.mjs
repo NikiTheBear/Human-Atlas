@@ -461,7 +461,7 @@ async function runChecks(browser, base) {
   /** 在页面里取值 */
   async function evalJson(expr) {
     const { result, exceptionDetails } = await s.send('Runtime.evaluate', {
-      expression: `(() => { try { return JSON.stringify(${expr}); } catch (e) { return JSON.stringify({__err: String(e)}); } })()`,
+      expression: `(async () => { try { return JSON.stringify(await (${expr})); } catch (e) { return JSON.stringify({__err: String(e)}); } })()`,
       returnByValue: true,
       awaitPromise: true,
     });
@@ -688,10 +688,56 @@ async function runChecks(browser, base) {
     return { qCount: qs.length, hasApply: !!applyBtn && !applyBtn.disabled };
   })()`);
   await sleep(400);
-  const projInsight = await evalJson(`!!document.querySelector('.cmp-proj__insight')`);
-  check('双人对比「我以为的 TA」投射抽屉可算出投射偏差透视',
-    projFlow.qCount === 10 && projFlow.hasApply && projInsight,
-    JSON.stringify({ ...projFlow, projInsight }));
+  const projInsight = await evalJson(`({
+    hasInsight: !!document.querySelector('.cmp-proj__insight'),
+    shareBtns: document.querySelectorAll('.cmp-share-bar button').length,
+    projBtn: !!document.querySelector('.cmp-proj__insight button')
+  })`);
+  check('双人对比「我以为的 TA」投射抽屉可算出投射偏差透视且含战报按钮',
+    projFlow.qCount === 10 && projFlow.hasApply && projInsight.hasInsight && projInsight.shareBtns >= 2 && projInsight.projBtn,
+    JSON.stringify({ ...projFlow, ...projInsight }));
+
+  // 战报图 Canvas PNG 真浏览器生成能力验证
+  await open('#/report');
+  const posterSmoke = await evalJson(`(async () => {
+    const dualBtn = !!document.querySelector('.dual-export-row button');
+    const mod = await import('/src/components/Exporter.js');
+    const dualBlob = await mod.exportDualStatePoster({
+      archetype: { best: { name: '古典守门人', psych_tag: '原则守卫' } },
+      dual: { flourish: '舒展表现', underPressure: '高压反应', style: { name: '理智冻结', trigger: '失控', brake: '先撤退' } },
+      scores: { sin_pride: 60, virtue_kindness: 55 },
+    }, {
+      theme: 'light',
+      nickname: 'Smoke',
+      sandbox: { scores: { sin_pride: 76, virtue_kindness: 39 }, rising: [['sin_pride', 16]], falling: [['virtue_kindness', -16]] },
+      dimMap: { sin_pride: { name: '傲慢' }, virtue_kindness: { name: '仁慈' } },
+    });
+    const cmpBlob = await mod.exportComparePoster({
+      res: {
+        overall: 82, grade: { id: 'A', name: '深度同盟', desc: '稳固默契' },
+        common: ['vol1'], dims: ['sin_pride'], sync: { value: 78 }, collisions: [],
+        resonances: [{ title: '原则共振' }], topGaps: [],
+      },
+      eco: { list: [{ id: 'partner', name: '长期伴侣', value: 76 }] },
+      nameA: 'A',
+      nameB: 'B',
+      isProjection: true,
+      projectionDiffs: [{ dim: 'sin_pride', a: 72, b: 48, signed: 24 }],
+      dimMap: { sin_pride: { name: '傲慢' } },
+    }, { theme: 'dark' });
+    return {
+      dualBtn,
+      dualType: dualBlob?.type,
+      dualSize: dualBlob?.size || 0,
+      cmpType: cmpBlob?.type,
+      cmpSize: cmpBlob?.size || 0,
+    };
+  })()`);
+  check('双态对比卡与合盘/投射战报卡真 Canvas 可导出非空 PNG',
+    posterSmoke.dualBtn
+      && posterSmoke.dualType === 'image/png' && posterSmoke.dualSize > 10000
+      && posterSmoke.cmpType === 'image/png' && posterSmoke.cmpSize > 10000,
+    JSON.stringify(posterSmoke));
 
   /* ============ 4.5 页面无未捕获异常 ============ */
   const errs = (browser.cdp.events || [])

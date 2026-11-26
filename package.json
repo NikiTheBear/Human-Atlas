@@ -1,7 +1,7 @@
 {
   "name": "human-atlas",
   "private": true,
-  "version": "5.2.2",
+  "version": "5.3.0",
   "description": "人性全息图谱 The Human Atlas — 分卷潜行式多维深度测评系统（纯前端 / 零依赖）",
   "type": "module",
   "scripts": {

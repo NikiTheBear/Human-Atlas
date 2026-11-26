@@ -616,7 +616,7 @@ hr('13 · 版本号对齐与资源指纹');
 {
   const pkg = JSON.parse(read('package.json'));
   check('package.json 版本形如 x.y.z', /^\d+\.\d+\.\d+$/.test(pkg.version), pkg.version);
-  check('版本号与最新 tag 一致（v 前缀去掉）', `v${pkg.version}` === 'v5.2.2', `v${pkg.version}`);
+  check('版本号与最新 tag 一致（v 前缀去掉）', `v${pkg.version}` === 'v5.3.0', `v${pkg.version}`);
 }
 
 const buildSrc = read('scripts/build.js');

@@ -9,6 +9,7 @@ import { el, round, toast, clamp } from '../core/utils.js';
 import { decodeSoulCode, encodeSoulCode } from '../core/storage.js';
 import { computeAll } from '../core/scoring.js';
 import { compareStates, displayName } from '../core/comparator.js';
+import { downloadComparePoster } from './Exporter.js';
 import { radarSvg } from '../viz/radarSvg.js';
 import { ecologySvg } from '../viz/ecologySvg.js';
 import {
@@ -434,14 +435,77 @@ function renderResult(box, A, B, { DATA, col }) {
   ]));
   box.appendChild(verdict);
 
+  const eco = scoreAllEcologies(A, B, res.dims, { a: A.maskIndex, b: B.maskIndex });
+  const projectionDiffs = A._isProjection
+    ? (res.dims || [])
+      .filter((r) => Number.isFinite(r.a) && Number.isFinite(r.b))
+      .map((r) => ({ ...r, signed: r.a - r.b, abs: Math.abs(r.a - r.b) }))
+      .sort((x, y) => y.abs - x.abs)
+    : null;
+
+  const exportPoster = async (theme, btn, idleLabel) => {
+    btn.disabled = true;
+    btn.textContent = '绘制中…';
+    try {
+      const name = await downloadComparePoster({
+        res,
+        eco,
+        A,
+        B,
+        nameA,
+        nameB,
+        projectionDiffs,
+        dimMap: DATA.dimMap,
+        isProjection: Boolean(A._isProjection),
+      }, { theme });
+      toast(`已保存 ${name}`);
+    } catch (err) {
+      console.error(err);
+      toast('战报图生成失败');
+    }
+    btn.textContent = idleLabel;
+    btn.disabled = false;
+  };
+
+  const shareBar = el('div', { class: 'cmp-share-bar' }, [
+    el('span', {
+      class: 'cmp-share-bar__label',
+      text: A._isProjection ? '导出「我以为的 TA」投射偏差战报卡：' : '导出双人合盘战报图（1080×1720 PNG）：',
+    }),
+    el('button', {
+      type: 'button',
+      class: 'btn btn--sm btn--solid',
+      text: A._isProjection ? '投射战报 · 象牙版' : '合盘战报 · 象牙版',
+      onclick: (e) => exportPoster('light', e.currentTarget, e.currentTarget.textContent),
+    }),
+    el('button', {
+      type: 'button',
+      class: 'btn btn--sm btn--ghost',
+      text: A._isProjection ? '投射战报 · 黑金版' : '合盘战报 · 黑金版',
+      onclick: (e) => exportPoster('dark', e.currentTarget, e.currentTarget.textContent),
+    }),
+  ]);
+  box.appendChild(shareBar);
+
   if (A._isProjection) {
-    box.appendChild(renderProjectionDeviation(res, A, B, DATA));
+    box.appendChild(renderProjectionDeviation(res, A, B, DATA, projectionDiffs, () => {
+      const curTheme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      return downloadComparePoster({
+        res,
+        eco,
+        A,
+        B,
+        nameA,
+        nameB,
+        projectionDiffs,
+        dimMap: DATA.dimMap,
+        isProjection: true,
+      }, { theme: curTheme });
+    }));
   }
 
   /* ---------- 关系生态位（数量从 ECOLOGIES 现算，不写死） ---------- */
   {
-    const eco = scoreAllEcologies(A, B, res.dims, { a: A.maskIndex, b: B.maskIndex });
-
     const head = el('div', { class: 'section-head' }, [
       el('h2', { text: `${ECO_COUNT} 种关系生态位` }),
       el('div', {
@@ -1293,21 +1357,49 @@ function buildProjectionDrawer(DATA, onApply, onReset) {
   return details;
 }
 
-function renderProjectionDeviation(res, A, B, DATA) {
+function renderProjectionDeviation(res, A, B, DATA, precomputedDiffs = null, onExportCard = null) {
   const box = el('div', { class: 'cmp-proj__insight' });
-  box.appendChild(el('h3', {
-    style: { margin: '0 0 6px', fontSize: '15px', fontFamily: 'var(--font-serif)' },
-    text: `投射偏差透视 · ${displayName(A, '我对TA的投射')} vs ${displayName(B, 'TA 的真实存档')}`,
-  }));
+  const headRow = el('div', {
+    style: {
+      display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '6px',
+    },
+  }, [
+    el('h3', {
+      style: { margin: '0', fontSize: '15px', fontFamily: 'var(--font-serif)' },
+      text: `投射偏差透视 · ${displayName(A, '我对TA的投射')} vs ${displayName(B, 'TA 的真实存档')}`,
+    }),
+    onExportCard
+      ? el('button', {
+        type: 'button',
+        class: 'btn btn--xs btn--ghost',
+        text: '保存投射偏差战报 PNG',
+        onclick: async (e) => {
+          const btn = e.currentTarget;
+          btn.disabled = true;
+          btn.textContent = '绘制中…';
+          try {
+            const name = await onExportCard();
+            toast(`已保存 ${name}`);
+          } catch (err) {
+            console.error(err);
+            toast('战报图生成失败');
+          }
+          btn.textContent = '保存投射偏差战报 PNG';
+          btn.disabled = false;
+        },
+      })
+      : null,
+  ]);
+  box.appendChild(headRow);
   box.appendChild(el('p', {
     style: { margin: '0 0 8px', fontSize: '12px', color: 'var(--text-secondary)' },
     text: '按你猜错幅度最大排序（正值 = 你高估了 TA，负值 = 你低估了 TA）：',
   }));
 
-  const diffs = (res.dims || [])
+  const diffs = (precomputedDiffs || (res.dims || [])
     .filter((r) => Number.isFinite(r.a) && Number.isFinite(r.b))
     .map((r) => ({ ...r, signed: r.a - r.b, abs: Math.abs(r.a - r.b) }))
-    .sort((x, y) => y.abs - x.abs)
+    .sort((x, y) => y.abs - x.abs))
     .slice(0, 6);
 
   if (!diffs.length) {

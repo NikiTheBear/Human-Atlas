@@ -252,22 +252,20 @@ function drawRadar(ctx, cx, cy, R, axes, opts = {}) {
 }
 
 /* ------------------------------------------------------------
-   海报绘制
+   共享画布装帧（安全 DPR + 顶部晨光 + Ex-Libris 藏书票双框）
    ------------------------------------------------------------ */
 
-export async function drawPoster(report, {
+function createPosterFrame({
   width = 1080,
   height = 1920,
   theme = 'light',
-  long = false,
-  nickname = '',
+  padX = 84,
+  headerY = 104,
 } = {}) {
   const P = PALETTE[theme] || PALETTE.light;
 
   // iOS Safari 对单张 canvas 有硬上限（约 4096×4096 或 1677 万像素，
-  // 超出后 toDataURL 直接返回空字符串 → 白图）。
-  // 1080×2800 @2x = 2160×5600 = 1210 万像素，高度 5600 已经越过 4096。
-  // 这里按「最长边 ≤ 4096 且总面积 ≤ 1600 万」动态降 DPR。
+  // 超出后 toDataURL 直接返回空字符串 → 白图）。按「最长边 ≤ 4096 且总面积 ≤ 1600 万」动态降 DPR。
   const SAFE_SIDE = 4096;
   const SAFE_AREA = 16_000_000;
   let dpr = 2;
@@ -283,23 +281,20 @@ export async function drawPoster(report, {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  // 背景
+  // 背景 + 顶部柔和渐层
   ctx.fillStyle = P.page;
   ctx.fillRect(0, 0, width, height);
 
-  // 顶部柔和渐层
   const grad = ctx.createRadialGradient(width * 0.88, 40, 0, width * 0.88, 40, width * 0.9);
   grad.addColorStop(0, theme === 'dark' ? 'rgba(201,169,110,0.10)' : 'rgba(168,137,79,0.09)');
   grad.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height * 0.55);
 
-  const padX = long ? 92 : 84;
   const cw = width - padX * 2;
+  let y = headerY;
 
-  let y = long ? 96 : 104;
-
-  /* ---------- 页眉 ---------- */
+  // 页眉
   ctx.textAlign = 'left';
   ctx.fillStyle = P.faint;
   ctx.font = `400 22px ${FONT_SANS}`;
@@ -315,6 +310,78 @@ export async function drawPoster(report, {
   y += 26;
   hairline(ctx, padX, y, width - padX, P.border);
   y += 70;
+
+  return { canvas, ctx, P, cw, padX, startY: y };
+}
+
+function finishPosterFrame(canvas, ctx, { width, height, padX = 84, P }) {
+  const footY = height - 76;
+  hairline(ctx, padX, footY - 40, width - padX, P.border);
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = P.faint;
+  ctx.font = `400 17px ${FONT_SANS}`;
+  ctx.letterSpacing = '3px';
+  ctx.fillText('HUMAN-ATLAS · 人性全息图谱', padX, footY);
+
+  ctx.textAlign = 'right';
+  ctx.fillText('纯前端本地运算 · 无数据上传', width - padX, footY);
+  ctx.letterSpacing = '0px';
+
+  // 双线藏书票边框（Ex-Libris）
+  const exOuter = 26;
+  const exInner = 33;
+  ctx.save();
+  ctx.strokeStyle = P.border;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(exOuter + 0.5, exOuter + 0.5, width - exOuter * 2 - 1, height - exOuter * 2 - 1);
+  ctx.globalAlpha = 0.55;
+  ctx.strokeStyle = P.gold;
+  ctx.lineWidth = 0.8;
+  ctx.strokeRect(exInner + 0.5, exInner + 0.5, width - exInner * 2 - 1, height - exInner * 2 - 1);
+  ctx.globalAlpha = 1;
+
+  const corner = 22;
+  ctx.strokeStyle = P.gold;
+  ctx.lineWidth = 1.6;
+  const cx0 = exOuter;
+  const cy0 = exOuter;
+  const cx1 = width - exOuter;
+  const cy1 = height - exOuter;
+  [[cx0, cy0, 1, 1], [cx1, cy0, -1, 1], [cx0, cy1, 1, -1], [cx1, cy1, -1, -1]].forEach(([x, y0, sx, sy]) => {
+    ctx.beginPath();
+    ctx.moveTo(x + sx * corner, y0);
+    ctx.lineTo(x, y0);
+    ctx.lineTo(x, y0 + sy * corner);
+    ctx.stroke();
+  });
+  ctx.restore();
+
+  return canvas;
+}
+
+function canvasToPngBlob(canvas) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), 'image/png', 1);
+  });
+}
+
+/* ------------------------------------------------------------
+   海报绘制
+   ------------------------------------------------------------ */
+
+export async function drawPoster(report, {
+  width = 1080,
+  height = 1920,
+  theme = 'light',
+  long = false,
+  nickname = '',
+} = {}) {
+  const padX = long ? 92 : 84;
+  const { canvas, ctx, P, cw, startY } = createPosterFrame({
+    width, height, theme, padX, headerY: long ? 96 : 104,
+  });
+  let y = startY;
 
   /* ---------- 署名 ---------- */
   if (nickname) {
@@ -645,51 +712,7 @@ export async function drawPoster(report, {
   }
 
   /* ---------- 页脚 ---------- */
-  const footY = height - 76;
-  hairline(ctx, padX, footY - 40, width - padX, P.border);
-
-  ctx.textAlign = 'left';
-  ctx.fillStyle = P.faint;
-  ctx.font = `400 17px ${FONT_SANS}`;
-  ctx.letterSpacing = '3px';
-  ctx.fillText('HUMAN-ATLAS · 人性全息图谱', padX, footY);
-
-  ctx.textAlign = 'right';
-  ctx.fillText('纯前端本地运算 · 无数据上传', width - padX, footY);
-  ctx.letterSpacing = '0px';
-
-  /* ---------- 双线藏书票边框（Ex-Libris） ---------- */
-  // 外框细线 + 内框更细的金线，四角留出小缺口，做出印刷品的装帧感
-  const exOuter = 26;
-  const exInner = 33;
-  ctx.save();
-  ctx.strokeStyle = P.border;
-  ctx.lineWidth = 1;
-  ctx.strokeRect(exOuter + 0.5, exOuter + 0.5, width - exOuter * 2 - 1, height - exOuter * 2 - 1);
-  ctx.globalAlpha = 0.55;
-  ctx.strokeStyle = P.gold;
-  ctx.lineWidth = 0.8;
-  ctx.strokeRect(exInner + 0.5, exInner + 0.5, width - exInner * 2 - 1, height - exInner * 2 - 1);
-  ctx.globalAlpha = 1;
-
-  // 四角的短角标
-  const corner = 22;
-  ctx.strokeStyle = P.gold;
-  ctx.lineWidth = 1.6;
-  const cx0 = exOuter;
-  const cy0 = exOuter;
-  const cx1 = width - exOuter;
-  const cy1 = height - exOuter;
-  [[cx0, cy0, 1, 1], [cx1, cy0, -1, 1], [cx0, cy1, 1, -1], [cx1, cy1, -1, -1]].forEach(([x, y, sx, sy]) => {
-    ctx.beginPath();
-    ctx.moveTo(x + sx * corner, y);
-    ctx.lineTo(x, y);
-    ctx.lineTo(x, y + sy * corner);
-    ctx.stroke();
-  });
-  ctx.restore();
-
-  return canvas;
+  return finishPosterFrame(canvas, ctx, { width, height, padX, P });
 }
 
 function computeLightDarkRatio(report) {
@@ -710,9 +733,508 @@ export async function exportPoster(report, { long = false, theme = 'light', nick
   const w = 1080;
   const h = long ? 2800 : 1920;
   const canvas = await drawPoster(report, { width: w, height: h, theme, long, nickname });
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), 'image/png', 1);
+  return canvasToPngBlob(canvas);
+}
+
+/* ------------------------------------------------------------
+   战报卡 1：顺境 × 高压双态对比卡（1080 × 1620）
+   ------------------------------------------------------------ */
+
+export async function drawDualStatePoster(report, {
+  width = 1080,
+  height = 1620,
+  theme = 'light',
+  nickname = '',
+  sandbox = null,
+  dimMap = {},
+} = {}) {
+  const { canvas, ctx, P, cw, padX, startY } = createPosterFrame({
+    width, height, theme, padX: 84, headerY: 98,
   });
+  let y = startY - 12;
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = P.gold;
+  ctx.font = `400 20px ${FONT_SANS}`;
+  ctx.letterSpacing = '4px';
+  ctx.fillText('DUAL-STATE MATRIX · 顺境舒展 × 高压退行', padX, y);
+  ctx.letterSpacing = '0px';
+  y += 54;
+
+  const arch = report?.archetype?.best;
+  const headline = arch?.name || (nickname ? `${nickname} 的双态图谱` : '顺境与高压双态');
+  ctx.fillStyle = P.text;
+  ctx.font = `500 56px ${FONT_SERIF}`;
+  ctx.fillText(headline, padX, y);
+  y += 40;
+
+  ctx.fillStyle = P.sub;
+  ctx.font = `400 22px ${FONT_SANS}`;
+  ctx.fillText(
+    `${nickname ? `${nickname} · ` : ''}${arch?.psych_tag || '同一个性格在高能量与低电量下的两张面孔'}`,
+    padX, y,
+  );
+  y += 42;
+
+  /* ---------- 左右双态对撞主卡 ---------- */
+  const colGap = 24;
+  const colW = (cw - colGap) / 2;
+  const dualH = 330;
+  const dual = report?.dual || {};
+  const dualCards = [
+    {
+      x: padX,
+      kicker: 'FLOURISH · 顺境舒展态',
+      color: P.virtue,
+      body: dual.flourish || '完成更多卷宗后将勾勒你的高能量舒展形态。',
+    },
+    {
+      x: padX + colW + colGap,
+      kicker: 'DEPLETED · 高压退行态',
+      color: P.sin,
+      body: dual.underPressure || '完成更多卷宗后将显影你的低电量防御形态。',
+    },
+  ];
+
+  dualCards.forEach((c) => {
+    roundRect(ctx, c.x, y, colW, dualH, 8);
+    ctx.fillStyle = P.card;
+    ctx.fill();
+    ctx.strokeStyle = P.border;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 顶部色彩标识线
+    roundRect(ctx, c.x, y, colW, 5, 3);
+    ctx.fillStyle = c.color;
+    ctx.fill();
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = c.color;
+    ctx.font = `500 18px ${FONT_SANS}`;
+    ctx.letterSpacing = '2.5px';
+    ctx.fillText(c.kicker, c.x + 26, y + 46);
+    ctx.letterSpacing = '0px';
+
+    drawText(ctx, c.body, c.x + 26, y + 88, {
+      maxWidth: colW - 52,
+      lineHeight: 36,
+      font: `400 22px ${FONT_SANS}`,
+      color: P.text,
+      maxLines: 6,
+    });
+  });
+
+  y += dualH + 28;
+
+  /* ---------- 退行触发点 & 刹车处方 ---------- */
+  const style = dual.style;
+  const styleBoxH = style ? 250 : 120;
+  roundRect(ctx, padX, y, cw, styleBoxH, 8);
+  ctx.fillStyle = P.card;
+  ctx.fill();
+  ctx.strokeStyle = P.border;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  if (style) {
+    ctx.textAlign = 'left';
+    ctx.fillStyle = P.gold;
+    ctx.font = `500 23px ${FONT_SERIF}`;
+    ctx.fillText(`高压退行路径 · ${style.name}`, padX + 28, y + 46);
+
+    const wTag = drawBadge(ctx, 'Vol.8 高压剧场', padX + cw - 190, y + 18, {
+      color: P.gold, border: P.goldSoft, font: `400 17px ${FONT_SANS}`, padX: 14, height: 32,
+    });
+    void wTag;
+
+    let sy = y + 92;
+    sy = drawText(ctx, `触发点：${style.trigger}`, padX + 28, sy, {
+      maxWidth: cw - 56, lineHeight: 32, font: `400 20px ${FONT_SANS}`, color: P.sub, maxLines: 2,
+    });
+    sy += 8;
+    drawText(ctx, `刹车处方：${style.brake}`, padX + 28, sy, {
+      maxWidth: cw - 56, lineHeight: 32, font: `400 20px ${FONT_SANS}`, color: P.text, maxLines: 2,
+    });
+  } else {
+    drawText(ctx, '完成 Vol.8「高压剧场」后，这里将显影你专属的高压触发词与现场刹车方案。', padX + 28, y + 52, {
+      maxWidth: cw - 56, lineHeight: 34, font: `400 21px ${FONT_SANS}`, color: P.sub, maxLines: 2,
+    });
+  }
+
+  y += styleBoxH + 34;
+
+  /* ---------- 压力耗竭位移条（常态 → 极度耗竭） ---------- */
+  ctx.textAlign = 'left';
+  ctx.fillStyle = P.faint;
+  ctx.font = `400 18px ${FONT_SANS}`;
+  ctx.letterSpacing = '3px';
+  ctx.fillText('STRESS SHIFT AT DEPLETED 15% · 低电量最易失衡维度', padX, y);
+  ctx.letterSpacing = '0px';
+  y += 32;
+
+  const rising = (sandbox?.rising || []).map(([dim, delta]) => ({ dim, delta }));
+  const falling = (sandbox?.falling || []).map(([dim, delta]) => ({ dim, delta }));
+  const shifts = [...rising.slice(0, 3), ...falling.slice(0, 3)];
+
+  if (shifts.length) {
+    shifts.forEach((item) => {
+      const label = dimMap?.[item.dim]?.name || item.dim;
+      const base = Number(report?.scores?.[item.dim]);
+      const dep = Number(sandbox?.scores?.[item.dim]);
+      const valid = Number.isFinite(base) && Number.isFinite(dep);
+      const isUp = item.delta > 0;
+      const tone = isUp ? P.sin : P.virtue;
+
+      roundRect(ctx, padX, y, cw, 62, 6);
+      ctx.fillStyle = P.card;
+      ctx.fill();
+      ctx.strokeStyle = P.border;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = P.text;
+      ctx.font = `500 21px ${FONT_SANS}`;
+      ctx.fillText(label, padX + 22, y + 38);
+
+      // 中间水平位移轨（260px）
+      const trackX = padX + 340;
+      const trackW = 280;
+      const trackY = y + 31;
+      ctx.fillStyle = P.border;
+      ctx.fillRect(trackX, trackY - 2, trackW, 4);
+
+      if (valid) {
+        const bx = trackX + (Math.max(0, Math.min(100, base)) / 100) * trackW;
+        const dx = trackX + (Math.max(0, Math.min(100, dep)) / 100) * trackW;
+        const lo = Math.min(bx, dx);
+        const span = Math.max(4, Math.abs(dx - bx));
+        ctx.fillStyle = tone;
+        ctx.globalAlpha = 0.45;
+        ctx.fillRect(lo, trackY - 3, span, 6);
+        ctx.globalAlpha = 1;
+
+        ctx.beginPath();
+        ctx.arc(bx, trackY, 5, 0, Math.PI * 2);
+        ctx.fillStyle = P.faint;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(dx, trackY, 7, 0, Math.PI * 2);
+        ctx.fillStyle = tone;
+        ctx.fill();
+      }
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = tone;
+      ctx.font = `500 21px ${FONT_SERIF}`;
+      const numText = valid ? `${Math.round(base)} → ${Math.round(dep)} (${isUp ? '+' : ''}${round(item.delta, 0)})` : `${isUp ? '+' : ''}${round(item.delta, 0)}`;
+      ctx.fillText(numText, padX + cw - 22, y + 38);
+
+      y += 74;
+    });
+  } else {
+    roundRect(ctx, padX, y, cw, 110, 8);
+    ctx.fillStyle = P.card;
+    ctx.fill();
+    drawText(ctx, '答完更多核心维度后，这里将画出常态与极度耗竭状态之间位移最剧烈的 6 条性格轨迹。', padX + 24, y + 48, {
+      maxWidth: cw - 48, lineHeight: 32, font: `400 20px ${FONT_SANS}`, color: P.sub, maxLines: 2,
+    });
+  }
+
+  return finishPosterFrame(canvas, ctx, { width, height, padX, P });
+}
+
+export async function exportDualStatePoster(report, opts = {}) {
+  const canvas = await drawDualStatePoster(report, opts);
+  return canvasToPngBlob(canvas);
+}
+
+export async function downloadDualStatePoster(report, opts = {}) {
+  const blob = await exportDualStatePoster(report, opts);
+  const name = `human-atlas-dual-${Date.now()}.png`;
+  downloadBlob(name, blob);
+  return name;
+}
+
+/* ------------------------------------------------------------
+   战报卡 2：双人合盘 & 「我以为的 TA」投射对照卡（1080 × 1720）
+   ------------------------------------------------------------ */
+
+export async function drawComparePoster(payload, {
+  width = 1080,
+  height = 1720,
+  theme = 'light',
+} = {}) {
+  const {
+    res = {},
+    eco = { list: [] },
+    nameA = '我',
+    nameB = '对方',
+    projectionDiffs = null,
+    dimMap = {},
+    isProjection = false,
+  } = payload || {};
+
+  const { canvas, ctx, P, cw, padX, startY } = createPosterFrame({
+    width, height, theme, padX: 84, headerY: 96,
+  });
+  let y = startY - 14;
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = P.gold;
+  ctx.font = `400 20px ${FONT_SANS}`;
+  ctx.letterSpacing = '4px';
+  ctx.fillText(
+    isProjection
+      ? 'PROJECTION VS REALITY · 「我以为的 TA」投射偏差战报'
+      : 'SOUL ALIGNMENT · 双人全息合盘战报',
+    padX, y,
+  );
+  ctx.letterSpacing = '0px';
+  y += 46;
+
+  /* ---------- 对阵卡 + 总契合定级 ---------- */
+  const heroH = 266;
+  roundRect(ctx, padX, y, cw, heroH, 10);
+  ctx.fillStyle = P.card;
+  ctx.fill();
+  ctx.strokeStyle = P.border;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // 左：双方名字 & 判词
+  ctx.textAlign = 'left';
+  ctx.fillStyle = P.text;
+  ctx.font = `500 36px ${FONT_SERIF}`;
+  ctx.fillText(`${nameA}  ×  ${nameB}`, padX + 30, y + 58);
+
+  const grade = res.grade || { id: '—', name: '合盘速写', desc: '' };
+  ctx.fillStyle = P.gold;
+  ctx.font = `500 24px ${FONT_SERIF}`;
+  ctx.fillText(`${grade.name} · ${grade.id} 级`, padX + 30, y + 100);
+
+  drawText(ctx, grade.desc || '只基于双方真正共有的核心维度对比推演。', padX + 30, y + 142, {
+    maxWidth: cw - 270,
+    lineHeight: 32,
+    font: `400 20px ${FONT_SANS}`,
+    color: P.sub,
+    maxLines: 3,
+  });
+
+  // 右：大号总契合度圆盾
+  const scoreX = padX + cw - 122;
+  const scoreY = y + 114;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(scoreX, scoreY, 72, 0, Math.PI * 2);
+  ctx.strokeStyle = P.goldSoft;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.fillStyle = P.text;
+  ctx.font = `500 52px ${FONT_SERIF}`;
+  ctx.fillText(Number.isFinite(res.overall) ? `${Math.round(res.overall)}` : '—', scoreX, scoreY + 12);
+  ctx.fillStyle = P.faint;
+  ctx.font = `400 17px ${FONT_SANS}`;
+  ctx.fillText('契合度 %', scoreX, scoreY + 42);
+  ctx.restore();
+
+  y += heroH + 22;
+
+  /* ---------- 四项关键指标 ---------- */
+  const metrics = [
+    { k: '交汇范围', v: res.isExpressPair ? '极速速写' : `${(res.common || []).length} 卷` },
+    { k: '可比维度', v: `${(res.dims || []).length} 维` },
+    { k: '价值观共振', v: res.sync ? `${Math.round(res.sync.value)}` : '—' },
+    { k: '阴影碰撞', v: `${(res.collisions || []).length} 处` },
+  ];
+  const mw = cw / 4;
+  metrics.forEach((m, i) => {
+    const mx = padX + i * mw;
+    roundRect(ctx, mx + (i ? 6 : 0), y, mw - (i ? 6 : 6), 90, 6);
+    ctx.fillStyle = P.card;
+    ctx.fill();
+    ctx.strokeStyle = P.border;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = P.faint;
+    ctx.font = `400 17px ${FONT_SANS}`;
+    ctx.fillText(m.k, mx + 22, y + 32);
+
+    ctx.fillStyle = P.text;
+    ctx.font = `500 28px ${FONT_SERIF}`;
+    ctx.fillText(m.v, mx + 22, y + 70);
+  });
+  y += 116;
+
+  /* ---------- 主视觉模块：投射模式优先画「投射偏差透视」，常规合盘画「七大生态位排行」 ---------- */
+  if (isProjection && projectionDiffs?.length) {
+    ctx.textAlign = 'left';
+    ctx.fillStyle = P.faint;
+    ctx.font = `400 18px ${FONT_SANS}`;
+    ctx.letterSpacing = '3px';
+    ctx.fillText('PROJECTION GAPS · 你误解 TA 最深的维度 Top 5', padX, y);
+    ctx.letterSpacing = '0px';
+    y += 26;
+
+    projectionDiffs.slice(0, 5).forEach((d) => {
+      const name = dimMap?.[d.dim]?.name || d.dim;
+      const absD = Math.round(Math.abs(d.signed));
+      const tag = absD < 8 ? '直觉命中' : d.signed > 0 ? `高估 +${absD}` : `低估 -${absD}`;
+      const barTone = absD < 8 ? P.virtue : d.signed > 0 ? P.gold : P.sin;
+
+      roundRect(ctx, padX, y, cw, 64, 6);
+      ctx.fillStyle = P.card;
+      ctx.fill();
+      ctx.strokeStyle = P.border;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = P.text;
+      ctx.font = `500 21px ${FONT_SANS}`;
+      ctx.fillText(name, padX + 20, y + 39);
+
+      // 双点对照轨（你猜金点 vs 真实红褐点）
+      const tx = padX + 310;
+      const tw = 290;
+      const ty = y + 32;
+      ctx.fillStyle = P.border;
+      ctx.fillRect(tx, ty - 2, tw, 4);
+      const ax = tx + (Math.max(0, Math.min(100, d.a)) / 100) * tw;
+      const bx = tx + (Math.max(0, Math.min(100, d.b)) / 100) * tw;
+      ctx.fillStyle = barTone;
+      ctx.globalAlpha = 0.4;
+      ctx.fillRect(Math.min(ax, bx), ty - 3, Math.max(4, Math.abs(bx - ax)), 6);
+      ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(ax, ty, 6, 0, Math.PI * 2); ctx.fillStyle = P.gold; ctx.fill();
+      ctx.beginPath(); ctx.arc(bx, ty, 6, 0, Math.PI * 2); ctx.fillStyle = P.sin; ctx.fill();
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = barTone;
+      ctx.font = `500 20px ${FONT_SERIF}`;
+      ctx.fillText(`猜${Math.round(d.a)} / 真${Math.round(d.b)} · ${tag}`, padX + cw - 20, y + 39);
+
+      y += 74;
+    });
+    y += 14;
+  }
+
+  const ecoList = (eco?.list || []).slice(0, isProjection ? 3 : 7);
+  if (ecoList.length) {
+    ctx.textAlign = 'left';
+    ctx.fillStyle = P.faint;
+    ctx.font = `400 18px ${FONT_SANS}`;
+    ctx.letterSpacing = '3px';
+    ctx.fillText(
+      isProjection ? 'ECOLOGY FIT · 投射关系生态位前 3' : `RELATIONSHIP ECOLOGIES · ${eco.list.length} 大关系生态位排行`,
+      padX, y,
+    );
+    ctx.letterSpacing = '0px';
+    y += 28;
+
+    ecoList.forEach((r, idx) => {
+      const best = idx === 0;
+      const rowH = isProjection ? 56 : 62;
+      roundRect(ctx, padX, y, cw, rowH, 6);
+      ctx.fillStyle = P.card;
+      ctx.fill();
+      ctx.strokeStyle = best ? P.goldSoft : P.border;
+      ctx.lineWidth = best ? 1.5 : 1;
+      ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = best ? P.gold : P.text;
+      ctx.font = `500 21px ${FONT_SERIF}`;
+      ctx.fillText(`${best ? '★ ' : ''}${r.name}`, padX + 20, y + (rowH / 2 + 7));
+
+      const barX = padX + 230;
+      const barW = 540;
+      const barY = y + rowH / 2;
+      ctx.fillStyle = P.border;
+      ctx.fillRect(barX, barY - 3, barW, 6);
+      const frac = Math.max(0, Math.min(100, Number(r.value) || 0)) / 100;
+      ctx.fillStyle = best ? P.gold : P.sub;
+      ctx.fillRect(barX, barY - 3, barW * frac, 6);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = best ? P.gold : P.text;
+      ctx.font = `500 24px ${FONT_SERIF}`;
+      ctx.fillText(String(Math.round(r.value)), padX + cw - 20, y + (rowH / 2 + 8));
+
+      y += rowH + 10;
+    });
+    y += 14;
+  }
+
+  /* ---------- 底部双栏结论：共振亮点 vs 阴影/最大分叉 ---------- */
+  const bottomRemain = height - 132 - y;
+  if (bottomRemain >= 190) {
+    const bw = (cw - 24) / 2;
+    const bh = Math.min(280, bottomRemain);
+
+    const resItems = (res.resonances || []).slice(0, 3).map((r) => `· ${r.title}`);
+    if (!resItems.length && res.complement?.golden?.length) {
+      res.complement.golden.slice(0, 3).forEach((g) => {
+        resItems.push(`· ${dimMap?.[g.dim]?.name || g.dim}（差 ${Math.round(g.diff)}）`);
+      });
+    }
+    if (!resItems.length) resItems.push('· 跨卷共振维度尚未完全解锁');
+
+    const colItems = (res.collisions || []).slice(0, 3).map((c) => `· ${c.title}`);
+    if (!colItems.length && res.topGaps?.length) {
+      res.topGaps.slice(0, 3).forEach((g) => {
+        colItems.push(`· ${dimMap?.[g.dim]?.name || g.dim}（相差 ${Math.round(g.diff)} 分）`);
+      });
+    }
+    if (!colItems.length) colItems.push('· 暂未触发高危冲突闭环');
+
+    [
+      { x: padX, title: '同频与互补亮点', color: P.virtue, lines: resItems },
+      { x: padX + bw + 24, title: '碰撞预警与最大分叉', color: P.sin, lines: colItems },
+    ].forEach((b) => {
+      roundRect(ctx, b.x, y, bw, bh, 8);
+      ctx.fillStyle = P.card;
+      ctx.fill();
+      ctx.strokeStyle = P.border;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = b.color;
+      ctx.font = `500 18px ${FONT_SANS}`;
+      ctx.letterSpacing = '2px';
+      ctx.fillText(b.title, b.x + 22, y + 40);
+      ctx.letterSpacing = '0px';
+
+      drawText(ctx, b.lines.join('\n'), b.x + 22, y + 82, {
+        maxWidth: bw - 44,
+        lineHeight: 36,
+        font: `400 20px ${FONT_SANS}`,
+        color: P.text,
+        maxLines: 5,
+      });
+    });
+  }
+
+  return finishPosterFrame(canvas, ctx, { width, height, padX, P });
+}
+
+export async function exportComparePoster(payload, opts = {}) {
+  const canvas = await drawComparePoster(payload, opts);
+  return canvasToPngBlob(canvas);
+}
+
+export async function downloadComparePoster(payload, opts = {}) {
+  const blob = await exportComparePoster(payload, opts);
+  const tag = payload?.isProjection ? 'projection' : 'compare';
+  const name = `human-atlas-${tag}-${Date.now()}.png`;
+  downloadBlob(name, blob);
+  return name;
 }
 
 /* ------------------------------------------------------------
