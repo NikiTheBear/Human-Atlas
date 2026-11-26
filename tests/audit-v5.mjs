@@ -5,7 +5,7 @@
    八项硬指标：
      1  主线零回归（16 卷 / 298 题 / 127 维 / HA4- 与 HA3- 往返）
      2  28 题极速包完整性与维度覆盖
-     3  六大生态位蒙特卡洛（5,000 随机 + 500 跨模式）
+     3  七大生态位蒙特卡洛（5,000 随机 + 500 跨模式）
      4  乔哈里窗 12 题盲盒
      5  群像星图 3–6 人与时间胶囊边界
      6  压力沙盒状态隔离
@@ -243,7 +243,7 @@ check('虚拟卷只含快答题型',
 const expressDims = new Set(expressVol.dimensions);
 check('覆盖维度数 ≥ 90', expressDims.size >= 90, `${expressDims.size}/127`);
 
-/* 六大生态位在极速包下的可用维度数 */
+/* 七大生态位在极速包下的可用维度数 */
 {
   const rows = [];
   for (const def of ECOLOGIES) {
@@ -253,7 +253,7 @@ check('覆盖维度数 ≥ 90', expressDims.size >= 90, `${expressDims.size}/127
     rows.push({ id: def.id, avail, total: def.dims.length });
   }
   const dead = rows.filter((r) => r.avail === 0);
-  check('六大生态位在极速包下均有可用维度', dead.length === 0,
+  check('七大生态位在极速包下均有可用维度', dead.length === 0,
     rows.map((r) => `${r.id}:${r.avail}/${r.total}`).join(' '));
 
   /* 用极速包的画像跑一遍，确认不出 NaN */
@@ -262,7 +262,7 @@ check('覆盖维度数 ≥ 90', expressDims.size >= 90, `${expressDims.size}/127
   for (const d of expressDims) if (Number.isFinite(ex.computedScores[d])) exScores[d] = ex.computedScores[d];
   ex.computedScores = exScores;
   const r = scoreAllEcologies(ex, ex, [...expressDims], { a: 50, b: 50 });
-  check('极速包画像下六生态位无 NaN',
+  check('极速包画像下七生态位无 NaN',
     r.list.every((x) => Number.isFinite(x.value)),
     r.list.map((x) => `${x.id}:${x.value}`).join(' '));
 }
@@ -293,9 +293,9 @@ check('覆盖维度数 ≥ 90', expressDims.size >= 90, `${expressDims.size}/127
 }
 
 /* ============================================================
-   3 · 六大生态位蒙特卡洛
+   3 · 七大生态位蒙特卡洛
    ============================================================ */
-hr(`3 · 六大生态位蒙特卡洛 · ${ROUNDS} 对随机双人`);
+hr(`3 · 七大生态位蒙特卡洛 · ${ROUNDS} 对随机双人`);
 
 const stats = {};
 for (const def of ECOLOGIES) stats[def.id] = { vals: [], wins: 0, name: def.name };

@@ -176,7 +176,7 @@
         "dark_narc": 0.8,
         "big5_rumination": 0.7
       },
-      "psych_tag": "高焦虑 × 高先发反击型"
+      "psych_tag": "高骄傲 × 高依恋焦虑拉扯型"
     },
     {
       "id": "AR10",
@@ -338,7 +338,7 @@
         "big5_compassion": 1.0,
         "def_project": -1.0
       },
-      "psych_tag": "高善意 × 高妥协顺从型"
+      "psych_tag": "高善意假设 × 共情不设防型"
     },
     {
       "id": "AR19",
@@ -354,6 +354,7 @@
         "def_fawn": 1.5,
         "big5_compliance": 1.2,
         "att_anxiety": 0.9,
+        "big5_compassion": 0.8,
         "big5_assert": -0.8
       },
       "psych_tag": "高服从 × 高共情的接应型"

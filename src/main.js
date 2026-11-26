@@ -12,7 +12,7 @@ import {
 } from './core/storage.js';
 
 import { resolveEffectiveComputed } from './core/synthesizer.js';
-import { el, qs, go, parseHash } from './core/utils.js';
+import { el, qs, go, parseHash, toast } from './core/utils.js';
 
 import { renderHub } from './components/VolumeHub.js';
 import { renderQuiz } from './components/QuizRunner.js';
@@ -282,9 +282,37 @@ function render(route) {
     return;
   }
 
-  // 极速模式：入口 / 答题 / 简报
+  // 极速模式：入口 / 答题 / 简报（含主题 10 题切面微诊断）
   if (head === 'express') {
     document.body.classList.remove('is-immersive');
+    if (parts[1] === 'pack' && parts[2]) {
+      const packId = parts[2];
+      const action = parts[3] || '';
+      if (action === 'quiz') {
+        root.className = 'page page--narrow page--immersive';
+        document.body.classList.add('is-immersive');
+        const vol = buildExpressVolume(DATA, DATA.express, packId);
+        const dataWithExpress = { ...DATA, volumes: { ...DATA.volumes, [vol.volume_id]: vol } };
+        seedFromVolumes(App.state, vol);
+        renderQuiz(root, {
+          App,
+          DATA: dataWithExpress,
+          volId: vol.volume_id,
+          mode: 'run',
+          recompute,
+          go,
+        });
+        return;
+      }
+      if (action === 'result') {
+        root.className = 'page';
+        renderExpressResult(root, { App, DATA, recompute, soulCode, go, packId });
+        return;
+      }
+      root.className = 'page';
+      renderExpressIntro(root, { App, DATA, go, packId });
+      return;
+    }
     if (parts[1] === 'quiz') {
       root.className = 'page page--narrow page--immersive';
       document.body.classList.add('is-immersive');
@@ -330,9 +358,12 @@ function render(route) {
     return;
   }
 
-  if (head === 'compare') {
+  if (head === 'compare' || head === 'join') {
     setActiveNav('compare');
     root.className = 'page';
+    if (head === 'join') {
+      toast('本地离线模式下请直接在双人对比室粘贴 HA4- 存档码');
+    }
     renderCompare(root, { App, DATA, VOL_IDS, soulCode, importSoulCode, go });
     return;
   }

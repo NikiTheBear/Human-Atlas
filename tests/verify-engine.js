@@ -7,7 +7,10 @@
 import fs from 'node:fs';
 import { DIMENSIONS, VOLUMES, MIRRORS, ARCHETYPES, CROSS_RULES, PAIR_RULES, DIM_ORDER } from '../src/data/bundle.js';
 import { computeAll, maskIndex, maskTierOf, tierOf } from '../src/core/scoring.js';
-import { encodeSoulCode, decodeSoulCode, SCHEMA_VERSION } from '../src/core/storage.js';
+import { encodeSoulCode, decodeSoulCode, mergeImportedState, SCHEMA_VERSION } from '../src/core/storage.js';
+import {
+  EXPRESS_BUCKET, buildExpressVolume, seedFromVolumes, commitExpress, resetExpress, expressProgress,
+} from '../src/core/express.js';
 import {
   buildHolographicReport, matchArchetype, matchCrossRules, mirrorFor,
   topGifts, topShadows, buildVolumeReport,
@@ -1024,6 +1027,49 @@ function tc7() {
 
   check('tierOf 四档正确',
     tierOf(90).id === 1 && tierOf(70).id === 2 && tierOf(50).id === 3 && tierOf(20).id === 4);
+
+  // 无共同 coreDims 时 compareStates 不应把非核心轴伪装成价值观共振
+  const noCoreA = emptyState('无核A');
+  const noCoreB = emptyState('无核B');
+  const nonCore = DIM_ORDER.filter((d) => !(PAIR_RULES.coreDims || []).includes(d)).slice(0, 14);
+  nonCore.forEach((d, idx) => {
+    noCoreA.computedScores[d] = 75;
+    noCoreB.computedScores[d] = idx < 7 ? 75 : 30;
+  });
+  const noCoreRes = compareStates(noCoreA, noCoreB, DATA);
+  check('无共同 coreDims 时 sync 为 null（不降级伪造价值观共振）',
+    noCoreRes.ok && noCoreRes.sync === null && (noCoreRes.basis ? noCoreRes.basis.hasSync === false : true),
+    `sync=${noCoreRes.sync}`);
+
+  // Express 重做清零闭环
+  const ex = emptyState('重做测试');
+  const exVol = buildExpressVolume(DATA, {
+    questions: Object.values(VOLUMES).flatMap((v) => v.questions || []).filter((q) => q.type === 'forced_choice').slice(0, 28).map((q) => q.id),
+  });
+  ex.answersByVolume[EXPRESS_BUCKET] = {};
+  for (const q of exVol.questions) {
+    ex.answersByVolume[EXPRESS_BUCKET][q.id] = { value: q.options[0].key, ms: 4000, changes: 0 };
+  }
+  commitExpress(ex, exVol);
+  resetExpress(ex, exVol, DATA);
+  seedFromVolumes(ex, exVol);
+  check('resetExpress 后重新进入极速版不会回填旧答案',
+    expressProgress(ex, exVol).answered === 0,
+    `answered=${expressProgress(ex, exVol).answered}`);
+
+  // mergeImportedState 保留遥测、初印象与题级合并
+  const mLocal = emptyState('本地');
+  mLocal.answersByVolume.vol1 = { v1_q01: { value: 6, ms: 3000 } };
+  mLocal.telemetry = { v1_q01: { ms: 3000, changes: 0 } };
+  const mImport = emptyState('备份');
+  mImport.answersByVolume.vol1 = { v1_q01: { value: 2, ms: 9000 }, v1_q02: { value: 'A', ms: 5000 } };
+  mImport.telemetry = { v1_q02: { ms: 5000, changes: 1 } };
+  mImport.initialSnapshot = { vol1: { sealedAt: Date.now(), scores: { sin_pride: 60 } } };
+  const merged = mergeImportedState(mLocal, mImport);
+  check('mergeImportedState 按题级保留双方作答并优先本机',
+    merged.answersByVolume.vol1.v1_q01.value === 6 && merged.answersByVolume.vol1.v1_q02.value === 'A');
+  check('mergeImportedState 保留 telemetry 与 initialSnapshot',
+    Boolean(merged.telemetry.v1_q02) && Boolean(merged.initialSnapshot.vol1));
 }
 
 /* ------------------------------------------------------------

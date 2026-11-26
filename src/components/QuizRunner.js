@@ -222,19 +222,73 @@ function renderStealthScale(q, value, onPick) {
 }
 
 function renderImpulse(q, value, onPick) {
-  const holder = el('div', { class: 'impulse-halo is-live' });
+  let locked = value !== undefined && value !== null;
+  const holder = el('div', { class: `impulse-halo${locked ? ' is-locked' : ' is-live'}` });
 
   const meter = el('div', { class: 'impulse-meter' }, [el('i')]);
   holder.appendChild(meter);
 
+  const hintText = el('span', {
+    text: locked
+      ? '已捕捉第一直觉（直觉题为防反复润色已锁定）'
+      : '这是发生在头三秒的事，不是深思熟虑后的结论',
+  });
   const hint = el('div', { class: 'q-hint' }, [
     el('span', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' }),
-    el('span', { text: '这是发生在头三秒的事，不是深思熟虑后的结论' }),
+    hintText,
   ]);
   holder.appendChild(hint);
-  holder.appendChild(renderForcedChoice(q, value, onPick));
 
-  setTimeout(() => holder.classList.remove('is-live'), 5400);
+  let fc = null;
+  let unlockBtn = null;
+
+  const syncLock = (pickedVal) => {
+    holder.classList.toggle('is-locked', locked);
+    if (locked) holder.classList.remove('is-live');
+    hintText.textContent = locked
+      ? '已捕捉第一直觉（直觉题为防反复润色已锁定）'
+      : '已临时解锁：请重选你的真实第一反应（本次修改将记入摇摆校准）';
+    if (fc) {
+      fc.querySelectorAll('.opt').forEach((btn) => {
+        btn.disabled = locked;
+        if (pickedVal !== undefined) {
+          btn.classList.toggle('is-sel', btn.dataset.k === String(pickedVal));
+        }
+      });
+    }
+    if (unlockBtn) {
+      unlockBtn.style.display = locked ? 'inline-flex' : 'none';
+    }
+  };
+
+  fc = renderForcedChoice(q, value, (pickedVal) => {
+    if (locked) return;
+    locked = true;
+    syncLock(pickedVal);
+    onPick(pickedVal);
+  });
+  holder.appendChild(fc);
+
+  unlockBtn = el('button', {
+    type: 'button',
+    class: 'btn btn--xs btn--ghost impulse-unlock',
+    text: '手滑改选（记入摇摆校准）',
+    onclick: () => {
+      locked = false;
+      syncLock();
+    },
+  });
+  holder.appendChild(el('div', { class: 'impulse-foot' }, [unlockBtn]));
+
+  syncLock(value);
+
+  const timer = setTimeout(() => holder.classList.remove('is-live'), 5400);
+  holder.isLocked = () => locked;
+  holder.lockWith = (pickedVal) => {
+    locked = true;
+    syncLock(pickedVal);
+  };
+  holder.dispose = () => clearTimeout(timer);
   return holder;
 }
 
@@ -257,7 +311,7 @@ function renderBudget(q, value, onChange) {
 
   const rows = [];
 
-  const update = () => {
+  const update = (notify = true) => {
     const total = Object.values(map).reduce((a, b) => a + Number(b || 0), 0);
     totalVal.textContent = `${total}`;
     totalBox.className = `budget__total ${total === 100 ? 'is-ok' : 'is-off'}`;
@@ -267,29 +321,36 @@ function renderBudget(q, value, onChange) {
         ? `超出 ${total - 100} 点`
         : `还剩 ${100 - total} 点`;
     rows.forEach((r) => { r.val.textContent = `${map[r.key]}`; });
-    onChange({ ...map });
+    if (notify) onChange({ ...map });
   };
 
-  // 把某一项设为 value，超出 100 的部分从其它项按比例回吸
+  // 把某一项设为 next：超出 100 时按其它非零项当前占比等比回吸；不足 100 时保留余量由用户分配
   const applyValue = (key, next) => {
     map[key] = Math.max(0, Math.min(100, Math.round(next)));
 
     const total = Object.values(map).reduce((a, b) => a + Number(b || 0), 0);
     if (total > 100) {
       let over = total - 100;
-      const others = (q.items || []).filter((x) => x.key !== key).map((x) => x.key);
-      for (const k of others) {
-        if (over <= 0) break;
-        const take = Math.min(map[k], over);
-        map[k] -= take;
-        over -= take;
+      const others = (q.items || []).map((x) => x.key).filter((k) => k !== key && map[k] > 0);
+      const othersSum = others.reduce((acc, k) => acc + map[k], 0);
+      if (othersSum > 0) {
+        let taken = 0;
+        for (const k of others) {
+          const share = Math.min(map[k], Math.floor((map[k] / othersSum) * over));
+          map[k] -= share;
+          taken += share;
+        }
+        let rem = over - taken;
+        for (const k of others) {
+          if (rem <= 0) break;
+          const extra = Math.min(map[k], rem);
+          map[k] -= extra;
+          rem -= extra;
+        }
       }
-    } else if (total < 100) {
-      // 不足 100 时补给该行，让用户「拖一下就到底」这件事变得可预期
-      map[key] = Math.max(0, Math.min(100, map[key]));
     }
     rows.forEach((r) => { if (r.input.value !== String(map[r.key])) r.input.value = String(map[r.key]); });
-    update();
+    update(true);
   };
 
   (q.items || []).forEach((it) => {
@@ -336,7 +397,7 @@ function renderBudget(q, value, onChange) {
     wrap.appendChild(row);
   });
 
-  update();
+  update(false);
 
   const tools = el('div', {
     style: { display: 'flex', gap: '10px', marginTop: '6px', flexWrap: 'wrap' },
@@ -353,7 +414,7 @@ function renderBudget(q, value, onChange) {
           map[it.key] = base + (i < rest ? 1 : 0);
         });
         rows.forEach((r) => { r.input.value = String(map[r.key]); });
-        update();
+        update(true);
       },
     }),
     el('button', {
@@ -363,7 +424,7 @@ function renderBudget(q, value, onChange) {
       onclick: () => {
         (q.items || []).forEach((it) => { map[it.key] = 0; });
         rows.forEach((r) => { r.input.value = '0'; });
-        update();
+        update(true);
       },
     }),
   ]);
@@ -468,7 +529,10 @@ export function renderQuiz(root, ctx) {
   if (prog && Number.isFinite(prog.currentIdx)) {
     idx = clamp(prog.currentIdx, 0, qs.length - 1);
   } else {
-    const firstUnanswered = qs.findIndex((q) => stored[q.id]?.value === undefined);
+    const firstUnanswered = qs.findIndex((q) => {
+      const rec = stored[q.id];
+      return !rec || rec.draft || rec.value === undefined;
+    });
     idx = firstUnanswered < 0 ? 0 : firstUnanswered;
   }
 
@@ -476,6 +540,8 @@ export function renderQuiz(root, ctx) {
   let focus = createFocusTimer();   // 自动扣除切屏 / 失焦时长
   let changesInQuestion = 0;
   let lastInterlude = -1;
+  let activeImpulse = null;
+  let disposed = false;
   /* 当前题的作答入口。鼠标点击 / 键盘数字键 / 回退修改共用同一条路径，
      保证「选中态」与「下方语义提示」永远同步。
      不能直接在 onKey 里引用 renderQuestion 内的 onPick —— 那会越出作用域。 */
@@ -485,20 +551,24 @@ export function renderQuiz(root, ctx) {
   const AUTO_KEY = 'human-atlas::autoAdvance';
   let autoAdvance = localStorage.getItem(AUTO_KEY) !== '0';
   let advanceTimer = 0;
+  let leaveTimer = 0;
 
   const cancelAdvance = () => {
     if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = 0; }
+    if (leaveTimer) { clearTimeout(leaveTimer); leaveTimer = 0; }
   };
 
   const scheduleAdvance = () => {
     cancelAdvance();
     advanceTimer = setTimeout(() => {
       advanceTimer = 0;
-      if (!autoAdvance) return;
+      if (disposed || !autoAdvance) return;
       const card = cardHolder.querySelector('.q-card');
       if (!card) return;
       card.classList.add('is-leaving');
-      setTimeout(() => {
+      leaveTimer = setTimeout(() => {
+        leaveTimer = 0;
+        if (disposed) return;
         if (current < qs.length - 1) move(1);
         else commit({ advance: true });
       }, 220);
@@ -686,7 +756,17 @@ export function renderQuiz(root, ctx) {
   }
 
   function finish() {
-    const answeredNow = Object.keys(answers()).length;
+    const a = answers();
+    const answeredNow = qs.filter((q) => {
+      const rec = a[q.id];
+      if (!rec || rec.draft || rec.value === undefined || rec.value === null) return false;
+      if (q.type === 'pyramid_top3') return Array.isArray(rec.value) && rec.value.length >= 3;
+      if (q.type === 'budget_100') {
+        return typeof rec.value === 'object'
+          && Object.values(rec.value).reduce((x, y) => x + Number(y || 0), 0) === 100;
+      }
+      return true;
+    }).length;
     if (answeredNow < qs.length) {
       toast(`还有 ${qs.length - answeredNow} 题未作答，先把它们完成`);
       return;
@@ -697,7 +777,7 @@ export function renderQuiz(root, ctx) {
     if (vol.isExpress) {
       delete state.inProgress[volId];
       persist();
-      nav('#/express/result');
+      nav(vol.resultRoute || '#/express/result');
       return;
     }
 
@@ -723,6 +803,7 @@ export function renderQuiz(root, ctx) {
     const savedValue = a[q.id]?.value;
 
     // 每题一个全新的计时器，切屏时长不计入
+    if (activeImpulse?.dispose) { activeImpulse.dispose(); activeImpulse = null; }
     focus.dispose();
     focus = createFocusTimer();
     changesInQuestion = a[q.id]?.changes || 0;
@@ -790,6 +871,7 @@ export function renderQuiz(root, ctx) {
 
     const onPick = (value) => {
       setValue(q, value);
+      if (activeImpulse?.lockWith) activeImpulse.lockWith(value);
       // 立即反映选中态
       cardHolder.querySelectorAll('.opt').forEach((o) => {
         o.classList.toggle('is-sel', o.dataset.k === String(value));
@@ -813,13 +895,7 @@ export function renderQuiz(root, ctx) {
       card.appendChild(renderForcedChoice(q, savedValue, onPick));
     } else if (q.type === 'impulse_3s') {
       const wrap = renderImpulse(q, savedValue, onPick);
-      // 绑定选择后的高亮
-      wrap.querySelectorAll('.opt').forEach((o) => {
-        o.addEventListener('click', () => {
-          wrap.querySelectorAll('.opt').forEach((x) => x.classList.remove('is-sel'));
-          o.classList.add('is-sel');
-        });
-      });
+      activeImpulse = wrap;
       card.appendChild(wrap);
     } else if (q.type === 'stealth_scale') {
       const wrap = renderStealthScale(q, savedValue, (v) => {
@@ -832,10 +908,10 @@ export function renderQuiz(root, ctx) {
         const total = Object.values(map).reduce((x, y) => x + Number(y || 0), 0);
         if (total === 100) setValue(q, { ...map });
         else {
-          // 未满 100 也记录草稿，但不覆盖已完成的合法值
+          // 未满 100 仅存草稿（不覆盖已完成的合法值，且计分/统计统一忽略 draft）
           state.inProgress[volId] = { currentIdx: current, updatedAt: Date.now() };
           const a2 = answers();
-          if (!a2[q.id] || !a2[q.id].value) {
+          if (!a2[q.id] || a2[q.id].draft || a2[q.id].value === undefined) {
             a2[q.id] = { value: { ...map }, draft: true, ms: focus.net() };
           }
           persist();
@@ -879,7 +955,7 @@ export function renderQuiz(root, ctx) {
 
     if (q.type === 'forced_choice' || q.type === 'impulse_3s') {
       const opt = q.options?.[n - 1];
-      if (!opt) return;
+      if (!opt || activeImpulse?.isLocked?.()) return;
       e.preventDefault();
       if (pickHandler) pickHandler(opt.key);
     } else if (q.type === 'stealth_scale') {
@@ -906,8 +982,12 @@ export function renderQuiz(root, ctx) {
   };
   window.addEventListener('keydown', onKey);
 
-  // 离开页面时记录
+  // 离开页面时释放所有计时器与全局监听
   const cleanup = () => {
+    disposed = true;
+    cancelAdvance();
+    if (activeImpulse?.dispose) { activeImpulse.dispose(); activeImpulse = null; }
+    focus.dispose();
     window.removeEventListener('keydown', onKey);
   };
   window.addEventListener('hashchange', cleanup, { once: true });

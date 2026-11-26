@@ -57,7 +57,7 @@ export function spectrumSvg(o, opt = {}) {
     x: 0, y: trackY, width: W, height: 2, rx: 1, fill: `url(#${gid})`,
   }));
 
-  // 中心与两端刻度
+  // 轨道端线与中线刻度（圆形指示点用 HTML 层绘制，避免 preserveAspectRatio:none 压扁圆点）
   [0, 0.5, 1].forEach((f) => {
     s.appendChild(svg('line', {
       x1: W * f, y1: trackY - 5, x2: W * f, y2: trackY + 7,
@@ -65,12 +65,16 @@ export function spectrumSvg(o, opt = {}) {
     }));
   });
 
-  // 指示点
-  const x = (W * v) / 100;
-  s.appendChild(svg('circle', { cx: x, cy: trackY, r: 9, fill: color, opacity: 0.12 }));
-  s.appendChild(svg('circle', { cx: x, cy: trackY, r: 4, fill: color, stroke: bg, 'stroke-width': 1.6 }));
-
   trackBox.appendChild(s);
+
+  // 正圆指示点 + 外圈光晕（不受 SVG 横向拉伸变形影响，在 0 / 100 端也不裁切）
+  const halo = document.createElement('span');
+  halo.style.cssText = `position:absolute;left:${v}%;top:${trackY}px;width:18px;height:18px;border-radius:50%;transform:translate(-50%,-50%);background:${color};opacity:0.12;pointer-events:none;`;
+  const dot = document.createElement('span');
+  dot.style.cssText = `position:absolute;left:${v}%;top:${trackY}px;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);background:${color};border:1.6px solid ${bg};box-sizing:border-box;pointer-events:none;`;
+  trackBox.appendChild(halo);
+  trackBox.appendChild(dot);
+
   wrap.appendChild(trackBox);
 
   /* ---------- 数值 ---------- */

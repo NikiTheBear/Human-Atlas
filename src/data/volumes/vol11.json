@@ -179,7 +179,7 @@
       "id": "v11_q04",
       "type": "impulse_3s",
       "stealth_mode": "impulse",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "mft_loyalty",
       "is_sensitive": true,
       "weight": 1.25,
@@ -358,6 +358,10 @@
         "light_kant": [
           1.2,
           -1.4
+        ],
+        "mft_sanctity": [
+          0.8,
+          -0.8
         ]
       }
     },
@@ -764,7 +768,7 @@
       "id": "v11_q16",
       "type": "impulse_3s",
       "stealth_mode": "impulse",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "mft_fairness",
       "is_sensitive": false,
       "weight": 1.25,
@@ -821,7 +825,7 @@
       "id": "v11_q17",
       "type": "forced_choice",
       "stealth_mode": "projection",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "phil_stoic",
       "is_sensitive": false,
       "weight": 1.4,

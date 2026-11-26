@@ -644,7 +644,8 @@
           "effects": {
             "inst_sp": 1.2,
             "mot_autonomy": 1.4,
-            "enn_8": 0.4
+            "enn_8": 0.4,
+            "enn_5": 0.9
           }
         },
         {

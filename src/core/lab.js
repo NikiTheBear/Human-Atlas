@@ -43,7 +43,6 @@ const DARKWARD = new Set([
   'money_avoid', 'money_worship', 'money_status',
   'tki_avoiding', 'tki_competing', 'pac_child',
   'enn_4', 'enn_6', 'enn_9',
-  'phil_cynic', 'phil_nihilism',
 ]);
 
 /* 正向调控维度：越耗竭越低、越充沛越高。 */

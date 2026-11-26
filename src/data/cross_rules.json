@@ -116,14 +116,13 @@
   {
     "id": "CR_06",
     "required_volumes": [
-      "vol4",
       "vol6"
     ],
     "conditions": [
       {
         "dim": "mot_autonomy",
         "op": ">=",
-        "val": 68
+        "val": 64
       },
       {
         "dim": "mot_security",
@@ -612,7 +611,7 @@
       }
     ],
     "title": "把意义放在别人身上的人",
-    "tag": "利TA的双刃",
+    "tag": "利他的双刃",
     "insight": "你的意义感来自「我所做的事对别人有用」。这让你非常有温度，也让你在没人需要你的时候，突然不知道自己是谁。",
     "advice": "建立一件只对你自己有意义的事。它不该被任何人需要，也不该被任何人评价。"
   },
@@ -797,8 +796,7 @@
   {
     "id": "CR_36",
     "required_volumes": [
-      "vol9",
-      "vol2"
+      "vol9"
     ],
     "conditions": [
       {
@@ -1119,8 +1117,7 @@
   {
     "id": "CR_50",
     "required_volumes": [
-      "vol16",
-      "vol6"
+      "vol16"
     ],
     "conditions": [
       {
@@ -1465,8 +1462,7 @@
     "id": "CR_65",
     "required_volumes": [
       "vol12",
-      "vol13",
-      "vol7"
+      "vol13"
     ],
     "conditions": [
       {

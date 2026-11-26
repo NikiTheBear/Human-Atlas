@@ -6,7 +6,8 @@
    ============================================================ */
 
 import { el, round, toast, clamp } from '../core/utils.js';
-import { decodeSoulCode } from '../core/storage.js';
+import { decodeSoulCode, encodeSoulCode } from '../core/storage.js';
+import { computeAll } from '../core/scoring.js';
 import { compareStates, displayName } from '../core/comparator.js';
 import { radarSvg } from '../viz/radarSvg.js';
 import { ecologySvg } from '../viz/ecologySvg.js';
@@ -220,16 +221,18 @@ export function renderCompare(root, ctx) {
   const wrap = el('div');
   root.appendChild(wrap);
 
+  const totalQ = Object.values(DATA.volumes || {}).reduce((s, v) => s + (v.questions?.length || 0), 0);
   wrap.appendChild(el('div', { class: 'cmp-intro' }, [
     el('div', { class: 'eyebrow', style: { marginBottom: '14px' }, text: 'Soul Alignment · 双人对比' }),
     el('h1', { text: '两个人的暗线' }),
     el('p', {
-      text: '把两份存档码放进同一个房间。系统只比较你们真正都测过的那批维度——不必强迫任何一方做满 152 题。它会算出你们的价值共振、性格互补，以及那些最容易在深夜引爆的阴影碰撞。',
+      text: `把两份存档码放进同一个房间。系统只比较你们真正都测过的那批维度——不必强迫任何一方做满 ${totalQ} 题。它会算出你们的价值共振、性格互补，以及那些最容易在深夜引爆的阴影碰撞。`,
     }),
   ]));
 
   let stateA = null;
   let stateB = null;
+  let projMeta = null;
 
   const resultBox = el('div', { id: 'cmp-result' });
 
@@ -241,14 +244,38 @@ export function renderCompare(root, ctx) {
 
   const form = el('div', { class: 'cmp-form' });
 
-  const slotA = slotInput('a', 'A · 你', selfCode, (s) => {
-    stateA = s ? hydrate({ ...s, nickname: s.nickname || App.state.nickname || '' }) : null;
+  let slotA = null;
+  slotA = slotInput('a', 'A · 你（或你对 TA 的投射）', selfCode, (s) => {
+    const rawCode = (slotA ? slotA.ta.value : selfCode).trim();
+    const isProjMatch = projMeta && rawCode === projMeta.code;
+    if (!isProjMatch) projMeta = null;
+    stateA = s
+      ? hydrate({
+        ...s,
+        nickname: isProjMatch ? projMeta.name : (s.nickname || App.state.nickname || ''),
+        _isProjection: Boolean(isProjMatch),
+      })
+      : null;
     maybeRender();
   }, DATA.dimOrder);
   const slotB = slotInput('b', 'B · 对方', '', (s) => {
     stateB = s;
     maybeRender();
   }, DATA.dimOrder);
+
+  /* 「我以为的 TA」投射对照抽屉（纯内存临时算分，绝不写入本地档案） */
+  const projDrawer = buildProjectionDrawer(DATA, ({ code, name }) => {
+    projMeta = { code, name };
+    slotA.ta.value = code;
+    slotA.ta.dispatchEvent(new Event('input'));
+    toast(stateB ? '已载入投射档案并生成投射偏差对比' : '已载入「我对 TA 的投射」，请在右侧粘贴 TA 的真实存档码');
+  }, () => {
+    projMeta = null;
+    slotA.ta.value = selfCode;
+    slotA.ta.dispatchEvent(new Event('input'));
+    toast('已切回你自己的存档码');
+  });
+  wrap.appendChild(projDrawer);
 
   form.appendChild(slotA.node);
   form.appendChild(slotB.node);
@@ -407,6 +434,10 @@ function renderResult(box, A, B, { DATA, col }) {
   ]));
   box.appendChild(verdict);
 
+  if (A._isProjection) {
+    box.appendChild(renderProjectionDeviation(res, A, B, DATA));
+  }
+
   /* ---------- 关系生态位（数量从 ECOLOGIES 现算，不写死） ---------- */
   {
     const eco = scoreAllEcologies(A, B, res.dims, { a: A.maskIndex, b: B.maskIndex });
@@ -435,8 +466,8 @@ function renderResult(box, A, B, { DATA, col }) {
         el('span', { class: 'chart-card__note', text: '顶点为各自生态位得分' }),
       ]));
       const radarBody = el('div', { class: 'chart-card__body' });
-      const ordered = ['partner', 'spark', 'confidant', 'cofounder', 'roommate', 'rival']
-        .map((id) => eco.list.find((r) => r.id === id))
+      const ordered = ECOLOGIES
+        .map((def) => eco.list.find((r) => r.id === def.id))
         .filter(Boolean);
       radarBody.appendChild(ecologySvg(ordered, {
         width: 520,
@@ -1107,4 +1138,206 @@ function microSection({ rows, A, B, DATA, nameA, nameB }) {
 
   paint();
   return section;
+}
+
+/* ------------------------------------------------------------
+   投射对照抽屉：「我以为的 TA」vs TA 的真实档案
+   ------------------------------------------------------------ */
+
+const PROJECTION_IDS = [
+  'v1_q01', 'v2_q05', 'v3_q01', 'v4_q01', 'v7_q01',
+  'v7_q02', 'v10_q01', 'v13_q01', 'v15_q01', 'v15_q05',
+];
+
+function collectProjectionQuestions(DATA) {
+  const map = new Map();
+  for (const vol of Object.values(DATA.volumes || {})) {
+    for (const q of vol.questions || []) {
+      if (PROJECTION_IDS.includes(q.id)) {
+        map.set(q.id, { ...q, _volId: vol.volume_id, _volTitle: vol.title });
+      }
+    }
+  }
+  return PROJECTION_IDS.map((id) => map.get(id)).filter(Boolean);
+}
+
+function buildProjectionDrawer(DATA, onApply, onReset) {
+  const qs = collectProjectionQuestions(DATA);
+  const picks = new Map();
+
+  const details = el('details', { class: 'cmp-proj', id: 'cmp-projection' });
+  details.appendChild(el('summary', { class: 'cmp-proj__summary' }, [
+    el('span', { text: '投射对照模式 · 先凭直觉替 TA 猜 10 题，对比 TA 的真实存档码' }),
+    el('span', { class: 'cmp-proj__badge', text: '我以为的 TA vs 真实 TA' }),
+  ]));
+
+  const body = el('div', { class: 'cmp-proj__body' });
+  body.appendChild(el('p', {
+    class: 'cmp-proj__intro',
+    text: '不填你自己，完全站在「你以为 TA 在以下 10 个情境里会怎么反应」作答。生成纯内存投射档放到左侧后，对比右侧 TA 的真实 HA4 码，直接找出你误解 TA 最深的维度（绝不会写入或覆盖你自己的档案）。',
+  }));
+
+  const targetInput = el('input', {
+    class: 'cmp-proj__input',
+    type: 'text',
+    placeholder: '对方称呼（默认：TA）',
+  });
+  body.appendChild(el('label', { class: 'cmp-proj__name' }, [
+    el('span', { text: '投射对象：' }),
+    targetInput,
+  ]));
+
+  const list = el('div', { class: 'cmp-proj__list' });
+  const countLabel = el('span', { style: { fontSize: '12px', color: 'var(--text-secondary)' }, text: `已猜 0 / ${qs.length} 题（至少猜 5 题）` });
+  const applyBtn = el('button', {
+    class: 'btn btn--sm btn--solid',
+    type: 'button',
+    disabled: true,
+    text: '填入左侧作为投射档案',
+  });
+
+  const syncFoot = () => {
+    const n = picks.size;
+    countLabel.textContent = `已猜 ${n} / ${qs.length} 题${n < 5 ? '（至少猜 5 题可生成）' : '（可直接填入或继续细猜）'}`;
+    applyBtn.disabled = n < 5;
+  };
+
+  qs.forEach((q, idx) => {
+    const card = el('div', { class: 'cmp-proj__q', dataset: { qid: q.id } });
+    card.appendChild(el('div', { class: 'cmp-proj__qhead' }, [
+      el('span', { text: `第 ${idx + 1} / ${qs.length} 题` }),
+      el('span', { text: q._volTitle }),
+    ]));
+    card.appendChild(el('div', {
+      class: 'cmp-proj__prompt',
+      text: [q.context, q.prompt].filter(Boolean).join(' '),
+    }));
+
+    if (q.type === 'stealth_scale') {
+      const bar = el('div', { class: 'cmp-proj__scale' });
+      if (q.scale?.left) bar.appendChild(el('span', { text: q.scale.left }));
+      const dots = [];
+      for (let v = 1; v <= 7; v += 1) {
+        const dot = el('button', {
+          type: 'button',
+          class: 'cmp-proj__dot',
+          text: String(v),
+          onclick: () => {
+            picks.set(q.id, { volId: q._volId, value: v });
+            dots.forEach((d, i) => d.classList.toggle('is-on', i + 1 === v));
+            syncFoot();
+          },
+        });
+        dots.push(dot);
+        bar.appendChild(dot);
+      }
+      if (q.scale?.right) bar.appendChild(el('span', { text: q.scale.right }));
+      card.appendChild(bar);
+    } else {
+      const opts = el('div', { class: 'cmp-proj__opts' });
+      const btns = [];
+      (q.options || []).forEach((o) => {
+        const btn = el('button', {
+          type: 'button',
+          class: 'cmp-proj__opt',
+          text: `${o.key}. ${o.text}`,
+          onclick: () => {
+            picks.set(q.id, { volId: q._volId, value: o.key });
+            btns.forEach((b, i) => b.classList.toggle('is-on', q.options[i]?.key === o.key));
+            syncFoot();
+          },
+        });
+        btns.push(btn);
+        opts.appendChild(btn);
+      });
+      card.appendChild(opts);
+    }
+    list.appendChild(card);
+  });
+
+  body.appendChild(list);
+
+  applyBtn.addEventListener('click', () => {
+    const answersByVolume = {};
+    for (const [qid, { volId, value }] of picks.entries()) {
+      (answersByVolume[volId] ||= {})[qid] = { value, ms: 1500, changes: 0 };
+    }
+    const label = targetInput.value.trim() || 'TA';
+    const projName = `我对${label}的投射`;
+    const computed = computeAll({ answersByVolume, telemetry: {}, completedVolumes: [] }, DATA);
+    const code = encodeSoulCode({
+      nickname: projName,
+      completedVolumes: [],
+      computedScores: computed.scores,
+      maskIndex: null,
+    }, DATA.dimOrder);
+    onApply({ code, name: projName });
+  });
+
+  const resetBtn = el('button', {
+    class: 'btn btn--sm btn--ghost',
+    type: 'button',
+    text: '重置猜题并恢复我的档案',
+    onclick: () => {
+      picks.clear();
+      list.querySelectorAll('.is-on').forEach((n) => n.classList.remove('is-on'));
+      syncFoot();
+      onReset();
+    },
+  });
+
+  body.appendChild(el('div', { class: 'cmp-proj__foot' }, [
+    countLabel, applyBtn, resetBtn,
+  ]));
+  details.appendChild(body);
+  return details;
+}
+
+function renderProjectionDeviation(res, A, B, DATA) {
+  const box = el('div', { class: 'cmp-proj__insight' });
+  box.appendChild(el('h3', {
+    style: { margin: '0 0 6px', fontSize: '15px', fontFamily: 'var(--font-serif)' },
+    text: `投射偏差透视 · ${displayName(A, '我对TA的投射')} vs ${displayName(B, 'TA 的真实存档')}`,
+  }));
+  box.appendChild(el('p', {
+    style: { margin: '0 0 8px', fontSize: '12px', color: 'var(--text-secondary)' },
+    text: '按你猜错幅度最大排序（正值 = 你高估了 TA，负值 = 你低估了 TA）：',
+  }));
+
+  const diffs = (res.dims || [])
+    .filter((r) => Number.isFinite(r.a) && Number.isFinite(r.b))
+    .map((r) => ({ ...r, signed: r.a - r.b, abs: Math.abs(r.a - r.b) }))
+    .sort((x, y) => y.abs - x.abs)
+    .slice(0, 6);
+
+  if (!diffs.length) {
+    box.appendChild(el('p', {
+      style: { fontSize: '12px', color: 'var(--text-tertiary)' },
+      text: '共同覆盖维度不足，尝试多猜几题后重新填入左侧对比。',
+    }));
+    return box;
+  }
+
+  const rows = el('div', { class: 'cmp-proj__rows' });
+  diffs.forEach((r) => {
+    const dimName = DATA.dimMap?.[r.dim]?.name || r.dim;
+    const mirror = DATA.mirrors?.[r.dim];
+    const dir = Math.abs(r.signed) < 8
+      ? '直觉几乎命中'
+      : r.signed > 0
+        ? `你高估了 +${Math.round(r.signed)} 分`
+        : `你低估了 ${Math.round(Math.abs(r.signed))} 分`;
+    const sideHint = mirror
+      ? `（TA 真实偏${r.b >= 50 ? mirror.high?.label || '高分侧' : mirror.low?.label || '低分侧'}）`
+      : '';
+    rows.appendChild(el('div', { class: 'cmp-proj__row' }, [
+      el('span', { text: `${dimName}${sideHint}` }),
+      el('span', {
+        style: { fontVariantNumeric: 'tabular-nums', color: 'var(--text-secondary)' },
+        text: `你猜 ${Math.round(r.a)} · 真实 ${Math.round(r.b)} · ${dir}`,
+      }),
+    ]));
+  });
+  box.appendChild(rows);
+  return box;
 }

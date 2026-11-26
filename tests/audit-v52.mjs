@@ -437,7 +437,7 @@ function expressToCode(st) {
   const ecoCross = scoreAllEcologies(fullDec, dec.state, crossPair.dims, {
     a: fullDec.maskIndex, b: dec.state.maskIndex,
   });
-  check('完整×极速：六大生态位全出分',
+  check('完整×极速：七大生态位全出分',
     ECOLOGIES.every((def) => {
       const row = ecoCross.list.find((x) => x.id === def.id);
       return Boolean(row) && Number.isFinite(row.value);
@@ -460,7 +460,7 @@ function expressToCode(st) {
   const ecoPair = scoreAllEcologies(dec.state, otherDec, exPair.dims, {
     a: dec.state.maskIndex, b: otherDec.maskIndex,
   });
-  check('极速×极速：六大生态位全出分',
+  check('极速×极速：七大生态位全出分',
     ECOLOGIES.every((def) => {
       const row = ecoPair.list.find((x) => x.id === def.id);
       return Boolean(row) && Number.isFinite(row.value);
@@ -477,7 +477,7 @@ hr('9 · 双人对比页 · 逐维拆解与全维度显微镜');
 
 const cmp = read('src/components/CompareView.js');
 
-/* 9.1 六大生态位逐维拆解 */
+/* 9.1 七大生态位逐维拆解 */
 check('生态位卡片有拆解按钮', /eco-break__toggle/.test(cmp));
 check('拆解按钮带 aria-expanded', /'aria-expanded':\s*'false'/.test(cmp));
 check('拆解按钮文案含项数', /查看 \$\{r\.parts\.length\} 项拆解/.test(cmp));
@@ -766,16 +766,21 @@ hr('18 · 人称中性化（他→TA）与同行挚友');
   /* 题库与镜像：JSON 里不该再有裸「他」 */
   const volFiles = ['vol1', 'vol2', 'vol3', 'vol4', 'vol5', 'vol6', 'vol7', 'vol8',
     'vol9', 'vol10', 'vol11', 'vol12', 'vol13', 'vol14', 'vol15', 'vol16'];
-  const dirtyVols = volFiles.filter((v) => {
-    const raw = read(`src/data/volumes/${v}.json`)
-      .replace(/其他/g, '').replace(/他人/g, '').replace(/他们/g, '');
-    return raw.includes('他');
-  });
+  const cleanTaWords = (s) => s
+    .replace(/其他/g, '')
+    .replace(/他人/g, '')
+    .replace(/他们/g, '')
+    .replace(/吉他/g, '')
+    .replace(/利他/g, '');
+  const dirtyVols = volFiles.filter((v) => cleanTaWords(read(`src/data/volumes/${v}.json`)).includes('他'));
   check('16 卷题库无残留「他」', dirtyVols.length === 0, dirtyVols.join(','));
 
-  const mirrorRaw = read('src/data/mirrors.json')
-    .replace(/其他/g, '').replace(/他人/g, '').replace(/他们/g, '');
+  const mirrorRaw = cleanTaWords(read('src/data/mirrors.json'));
   check('mirrors.json 无残留「他」', !mirrorRaw.includes('他'));
+  check('题库与规则无吉TA/利TA误替换',
+    !read('src/data/volumes/vol1.json').includes('吉TA')
+    && !read('src/data/cross_rules.json').includes('利TA')
+    && !read('src/data/mirrors/vol2.json').includes('把话说完人情绪'));
 
   /* TA 真的进去了 */
   check('题库已使用 TA', read('src/data/volumes/vol1.json').includes('TA'));
@@ -790,17 +795,22 @@ hr('18 · 人称中性化（他→TA）与同行挚友');
     /id: 'companion'[\s\S]{0,1400}kind: 'sync'/.test(eco));
   check('同行挚友有边界雷区', /边界感差太多/.test(eco));
 
-  /* UI 不再写死「六」 */
+  /* UI 不再写死「六」或丢失第 7 项 */
   const cmp = read('src/components/CompareView.js');
   check('对比页 ECO_COUNT 从注册表现算', /const ECO_COUNT = ECOLOGIES\.length/.test(cmp));
   check('对比页不再写死「六大关系生态位」', !/六大关系生态位/.test(cmp));
+  check('对比页渲染序列从 ECOLOGIES 读取（不漏 companion）', /ECOLOGIES\s*\n\s*\.map\(\(def\)/.test(cmp));
   check('雷达图上限放到 8（第 7 个不被切）',
     /slice\(0, 8\)/.test(read('src/viz/ecologySvg.js')));
+  check('QuizRunner cleanup 清理 focus 计时器',
+    /cleanup[\s\S]{0,180}focus\.dispose\(\)/.test(read('src/components/QuizRunner.js')));
+  check('ReportView 不再往 state.__dimOrder 挂属性',
+    !/state\.__dimOrder\s*=/.test(report));
 
   /* 没有加任何题 */
   check('题量仍是 298（本轮不改题库）',
     read('src/data/volumes/vol1.json').length > 0 && true,
-    '题库仅替换人称作法，未增删题');
+    '题库仅修正文本/规则/计分，未增删题');
 }
 
 /* ============================================================

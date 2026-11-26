@@ -39,10 +39,10 @@ for (const dir of ['src']) {
   copyDir(path.join(ROOT, dir), path.join(DIST, dir));
 }
 
-// 4. 剔除源码级的可编辑 JSON，只保留编译后的 bundle（减小体积）
+// 4. 剔除源码级的可编辑 JSON / MD / 分卷碎片，只保留编译后的 bundle.js（减小体积）
 const dataDir = path.join(DIST, 'src', 'data');
 for (const name of fs.readdirSync(dataDir)) {
-  if (name.endsWith('.json') || name.endsWith('.md')) {
+  if (name !== 'bundle.js') {
     fs.rmSync(path.join(dataDir, name), { recursive: true, force: true });
   }
 }
@@ -69,6 +69,36 @@ if (fs.existsSync(single)) {
   const cryptoMod = await import('node:crypto');
   const hash8 = (buf) => cryptoMod.createHash('sha256').update(buf).digest('hex').slice(0, 8);
 
+  // 先对 dist/src 下的 ESM 相对 import 做拓扑指纹重写，确保主模块更新时下游模块同样不吃旧缓存
+  const esmHashes = new Map();
+  const esmVisiting = new Set();
+  const stampEsm = (filePath) => {
+    const abs = path.resolve(filePath);
+    if (esmHashes.has(abs)) return esmHashes.get(abs);
+    if (esmVisiting.has(abs) || !fs.existsSync(abs)) return '';
+    esmVisiting.add(abs);
+    let code = fs.readFileSync(abs, 'utf8');
+    const importRe = /(\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)(['"])(\.[^'"?]+?\.(?:js|mjs))(['"])/g;
+    code = code.replace(importRe, (m, prefix, q1, spec, q2) => {
+      const target = path.resolve(path.dirname(abs), spec);
+      if (!fs.existsSync(target)) return m;
+      const v = stampEsm(target);
+      return v ? `${prefix}${q1}${spec}?v=${v}${q2}` : m;
+    });
+    fs.writeFileSync(abs, code);
+    const v = hash8(Buffer.from(code, 'utf8'));
+    esmHashes.set(abs, v);
+    esmVisiting.delete(abs);
+    return v;
+  };
+  (function walkEsm(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walkEsm(p);
+      else if (/\.(?:js|mjs)$/.test(e.name)) stampEsm(p);
+    }
+  })(path.join(DIST, 'src'));
+
   const stampHtml = (htmlPath) => {
     let html = fs.readFileSync(htmlPath, 'utf8');
     const re = /(?:href|src)="((?!https?:|data:|#)[^"?]+?\.(?:css|js|mjs))"/g;
@@ -89,7 +119,7 @@ if (fs.existsSync(single)) {
 
   const n1 = stampHtml(path.join(DIST, 'index.html'));
   fs.copyFileSync(path.join(DIST, 'index.html'), path.join(DIST, '404.html'));
-  console.log(`[build] 资源指纹：${n1} 个 css/js 已加 ?v=`);
+  console.log(`[build] 资源指纹：${n1} 个 css/js + ${esmHashes.size} 个 ESM 模块已加 ?v=`);
 }
 
 // 8. 体积统计

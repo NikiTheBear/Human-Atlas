@@ -27,7 +27,12 @@ import {
 } from './Exporter.js';
 import {
   exportJSON, encodeSoulCode, initialSnapshotOf, retakeVolume, hasInitialSnapshot, importJSON,
+  mergeImportedState,
 } from '../core/storage.js';
+import {
+  extractBehavioralEvidence, buildStructuredPrompt, BYOK_PRESETS,
+  loadByokConfig, saveByokConfig, clearByokKey, streamOpenAICompatible,
+} from '../core/dossierCore.js';
 import { confirmDialog, openSoulDialog, openImportDialog } from './Dialogs.js';
 
 const meanOf = (ids, map) => {
@@ -374,20 +379,7 @@ function renderEmptyDossier(root, ctx) {
       importJSONText: (text) => {
         const r = importJSON(text);
         if (r.ok) {
-          const merged = { ...App.state };
-          merged.completedVolumes = Array.from(new Set([
-            ...(App.state.completedVolumes || []),
-            ...(r.state.completedVolumes || []),
-          ]));
-          merged.answersByVolume = { ...(r.state.answersByVolume || {}), ...(App.state.answersByVolume || {}) };
-          merged.inProgress = { ...(r.state.inProgress || {}), ...(App.state.inProgress || {}) };
-          /* 本地分优先于导入分（与 importSoulCode 的合并口径一致） */
-          merged.computedScores = { ...(r.state.computedScores || {}), ...(App.state.computedScores || {}) };
-          merged.zScores = { ...(r.state.zScores || {}), ...(App.state.zScores || {}) };
-          merged.nickname = App.state.nickname || r.state.nickname || '';
-          merged.maskIndex = Number.isFinite(App.state.maskIndex) ? App.state.maskIndex : r.state.maskIndex;
-          if (!App.state.topValues?.length && r.state.topValues?.length) merged.topValues = r.state.topValues;
-          App.state = merged;
+          App.state = mergeImportedState(App.state, r.state);
           window.HumanAtlas?.recompute?.();
         }
         return r;
@@ -585,6 +577,59 @@ export function renderReport(root, ctx) {
       },
       text: `${maskTier.name} · ${maskTier.desc}`,
     }));
+  }
+
+  /* 行为遥测聚光灯：暴露“犹豫 / 反复改选 / 极速盲选”反自陈证据 */
+  const behavioral = extractBehavioralEvidence(effState, DATA.volumes, { limit: 3 });
+  if (behavioral.hasTelemetry) {
+    const spot = el('div', { class: 'telemetry-spotlight' });
+    const metrics = [
+      `阅读基线 ~${behavioral.baselineMsPerChar || '—'} ms/字`,
+      `采集 ${behavioral.measuredCount}/${behavioral.totalAnswered} 题`,
+    ];
+    if (behavioral.changedCount > 0) metrics.push(`当场改选 ${behavioral.changedCount} 题`);
+    if (behavioral.blindCount > 0) metrics.push(`极速直觉/盲选 ${behavioral.blindCount} 题`);
+
+    spot.appendChild(el('div', { class: 'telemetry-spotlight__head' }, [
+      el('span', { class: 'telemetry-spotlight__kicker', text: '作答行为遥测 · 反自陈取证' }),
+      el('div', { class: 'telemetry-spotlight__stats' }, metrics.map((m) => el('span', { class: 'telemetry-pill', text: m }))),
+    ]));
+
+    if (behavioral.spotlight.length) {
+      const list = el('div', { class: 'telemetry-spotlight__list' });
+      behavioral.spotlight.forEach((item) => {
+        const badges = [];
+        if (item.ratio >= 1.5) badges.push(`停留 ${item.ratio}×`);
+        if (item.changes > 0) badges.push(`改选 ${item.changes} 次`);
+        if (!badges.length) badges.push(`${(item.ms / 1000).toFixed(1)}s`);
+
+        list.appendChild(el('div', { class: 'telemetry-spotlight__item' }, [
+          el('div', { class: 'telemetry-spotlight__meta' }, [
+            el('span', { class: 'telemetry-badge', text: badges.join(' · ') }),
+            el('span', { class: 'telemetry-vol', text: item.volTitle }),
+          ]),
+          el('div', { class: 'telemetry-spotlight__q', text: `「${item.prompt}」` }),
+          el('div', {
+            class: 'telemetry-spotlight__a',
+            text: `最终选择：${item.choice}（停留 ${(item.ms / 1000).toFixed(1)}s${item.changes ? ` / 摇摆 ${item.changes} 次` : ''}）`,
+          }),
+        ]));
+      });
+      spot.appendChild(list);
+    } else {
+      spot.appendChild(el('p', {
+        class: 'telemetry-spotlight__empty',
+        text: '你的作答节奏非常均匀，未检出显著超基线纠结或反复改选题。',
+      }));
+    }
+    cover.appendChild(spot);
+  } else if (effState.imported && completed.length) {
+    cover.appendChild(el('div', { class: 'telemetry-spotlight telemetry-spotlight--muted' }, [
+      el('span', {
+        class: 'telemetry-spotlight__empty',
+        text: '当前档来自 HA4 分享码：仅含维度得分，不含单题作答耗时与改选遥测；本机答题会自动记录行为犹豫曲线。',
+      }),
+    ]));
   }
 
   wrap.appendChild(cover);
@@ -1019,13 +1064,12 @@ export function renderReport(root, ctx) {
   const parliament = parliamentSection({ scores: report.scores });
   if (parliament) wrap.appendChild(parliament);
 
-  // 时间胶囊需要 dimOrder 才能解码粘贴进来的存档码
-  state.__dimOrder = DATA.dimOrder;
   const timeline = timelineSection({
     state,
     scores: report.scores,
     colors: labColors,
     dimMap: DATA.dimMap,
+    dimOrder: DATA.dimOrder,
   });
   if (timeline) wrap.appendChild(timeline);
 
@@ -1089,10 +1133,10 @@ export function renderReport(root, ctx) {
     archSec.appendChild(box);
   });
 
-  if (completed.length < 8) {
+  if (completed.length < VOL_IDS.length) {
     archSec.appendChild(el('div', { class: 'empty' }, [
-      el('h3', { text: `还有 ${8 - completed.length} 卷未启封` }),
-      el('p', { text: '每一卷都会补上一块此前缺失的拼图。全部完成时，60 维图谱才会真正闭合。' }),
+      el('h3', { text: `还有 ${VOL_IDS.length - completed.length} 卷未启封` }),
+      el('p', { text: `每一卷都会补上一块此前缺失的拼图。全部完成时，${DATA.dimOrder.length} 维图谱才会真正闭合。` }),
       el('a', { class: 'btn', href: '#/', text: '前往卷宗大厅' }),
     ]));
   }
@@ -1307,7 +1351,7 @@ export function renderReport(root, ctx) {
           answersByVolume: state.answersByVolume || {},
           telemetry: state.telemetry || {},
           volumes: DATA.volumes,
-          mask: state.maskDetail || null,
+          mask: effState.maskDetail || null,
           topValues: report.values || [],
         }),
       }),
@@ -1321,7 +1365,7 @@ export function renderReport(root, ctx) {
             answersByVolume: state.answersByVolume || {},
             telemetry: state.telemetry || {},
             volumes: DATA.volumes,
-            mask: state.maskDetail || null,
+            mask: effState.maskDetail || null,
             topValues: report.values || [],
           });
           downloadText(`human-atlas-ai-prompt-${Date.now()}.md`, text, 'text/markdown;charset=utf-8');
@@ -1348,6 +1392,17 @@ export function renderReport(root, ctx) {
 
   expSec.appendChild(expGrid);
 
+  /* 可选：浏览器直连 AI 深谈面板（BYOK / 本地 Ollama，默认零联网） */
+  expSec.appendChild(buildByokPanel({
+    report: reportForExport,
+    nickname,
+    answersByVolume: state.answersByVolume || {},
+    telemetry: state.telemetry || {},
+    volumes: DATA.volumes,
+    mask: effState.maskDetail || null,
+    topValues: report.values || [],
+  }));
+
   // 打印页脚
   expSec.appendChild(el('div', {
     class: 'print-colophon',
@@ -1370,6 +1425,229 @@ export function renderReport(root, ctx) {
   ]));
 
   wrap.appendChild(disclaimer());
+}
+
+/* ------------------------------------------------------------
+   浏览器直连 AI 深谈（BYOK / Ollama）
+   ------------------------------------------------------------ */
+
+function buildByokPanel({
+  report, nickname, answersByVolume, telemetry, volumes, mask, topValues,
+}) {
+  const cfg = loadByokConfig();
+  let controller = null;
+  let generated = '';
+
+  const panel = el('div', { class: 'byok-panel', id: 'byok-panel' });
+  panel.appendChild(el('div', { class: 'byok-panel__head' }, [
+    el('div', {}, [
+      el('div', { class: 'byok-panel__title', text: '可选 · 浏览器直连 AI 深谈（自带 Key / 本地 Ollama）' }),
+      el('p', {
+        class: 'byok-panel__note',
+        text: '默认完全零联网；仅在你点击「开始深谈」时，直接向你填写的 OpenAI 兼容接口发送上方的确定性密文。API Key 默认只存在当前标签页内存（sessionStorage），关闭即清。',
+      }),
+    ]),
+  ]));
+
+  const urlInput = el('input', {
+    class: 'byok-input',
+    type: 'url',
+    value: cfg.baseUrl,
+    placeholder: 'https://api.deepseek.com/v1 或 http://localhost:11434/v1',
+  });
+  const modelInput = el('input', {
+    class: 'byok-input',
+    type: 'text',
+    value: cfg.model,
+    placeholder: 'deepseek-chat / gpt-4o-mini / qwen2.5:14b',
+  });
+  const keyInput = el('input', {
+    class: 'byok-input',
+    type: 'password',
+    value: cfg.apiKey,
+    autocomplete: 'off',
+    placeholder: '填入你的 API Key（本地 Ollama 可留空）',
+  });
+  const rememberCheck = el('input', {
+    type: 'checkbox',
+    checked: cfg.rememberKey,
+  });
+  const focusInput = el('textarea', {
+    class: 'byok-textarea',
+    rows: 2,
+    placeholder: '（可选）写一个你当下最纠结的现实问题：例如「为什么我总在关系深入前想逃？」',
+  });
+
+  const persist = () => saveByokConfig({
+    baseUrl: urlInput.value,
+    model: modelInput.value,
+    apiKey: keyInput.value,
+    rememberKey: rememberCheck.checked,
+  });
+  [urlInput, modelInput, keyInput, rememberCheck].forEach((inp) => {
+    inp.addEventListener('change', persist);
+  });
+
+  // 预设切换
+  const presets = el('div', { class: 'byok-presets' }, [
+    el('span', { class: 'byok-presets__label', text: '快速预设：' }),
+    ...BYOK_PRESETS.map((p) => el('button', {
+      type: 'button',
+      class: 'btn btn--sm btn--ghost byok-preset',
+      text: p.label,
+      onclick: () => {
+        urlInput.value = p.baseUrl;
+        modelInput.value = p.model;
+        persist();
+        toast(`已填入 ${p.label} 预设`);
+      },
+    })),
+    el('button', {
+      type: 'button',
+      class: 'btn btn--sm btn--ghost',
+      text: '清除已存 Key',
+      onclick: () => {
+        clearByokKey();
+        keyInput.value = '';
+        rememberCheck.checked = false;
+        toast('本地保存的 Key 已清除');
+      },
+    }),
+  ]);
+  panel.appendChild(presets);
+
+  const form = el('div', { class: 'byok-form' }, [
+    el('label', { class: 'byok-field' }, [
+      el('span', { text: 'API Base URL' }),
+      urlInput,
+    ]),
+    el('label', { class: 'byok-field' }, [
+      el('span', { text: '模型名称（Model）' }),
+      modelInput,
+    ]),
+    el('label', { class: 'byok-field byok-field--wide' }, [
+      el('span', { text: 'API Key（浏览器本地发送，不经过本站服务器）' }),
+      keyInput,
+    ]),
+    el('label', { class: 'byok-check' }, [
+      rememberCheck,
+      el('span', { text: '将 Key 保存在本机 localStorage（仅私人设备建议勾选）' }),
+    ]),
+    el('label', { class: 'byok-field byok-field--wide' }, [
+      el('span', { text: '附加现实追问（可选）' }),
+      focusInput,
+    ]),
+  ]);
+  panel.appendChild(form);
+
+  const statusLine = el('div', { class: 'byok-status', text: '' });
+  const outputBox = el('pre', { class: 'byok-output', style: { display: 'none' }, text: '' });
+  const copyReplyBtn = el('button', {
+    type: 'button',
+    class: 'btn btn--sm btn--ghost',
+    text: '复制深谈结果',
+    disabled: true,
+    onclick: async () => {
+      if (!generated) return;
+      try {
+        await navigator.clipboard.writeText(generated);
+        toast('已复制深谈全文');
+      } catch {
+        downloadText(`human-atlas-ai-reply-${Date.now()}.md`, generated, 'text/markdown;charset=utf-8');
+        toast('已下载深谈文本');
+      }
+    },
+  });
+  const stopBtn = el('button', {
+    type: 'button',
+    class: 'btn btn--sm btn--ghost',
+    text: '停止生成',
+    disabled: true,
+    onclick: () => {
+      if (controller) controller.abort();
+    },
+  });
+  const runBtn = el('button', {
+    type: 'button',
+    class: 'btn btn--sm btn--gold',
+    text: '开始流式深谈',
+    onclick: async () => {
+      persist();
+      const base = urlInput.value.trim();
+      const mod = modelInput.value.trim();
+      const key = keyInput.value.trim();
+      const isLocal = /localhost|127\.0\.0\.1/.test(base);
+      if (!base || !mod) {
+        statusLine.textContent = '请先填写 API Base URL 与模型名称。';
+        return;
+      }
+      if (!isLocal && !key) {
+        statusLine.textContent = '远程接口需要填写 API Key（若使用本地 Ollama 请点击上方「Ollama 本地」预设）。';
+        return;
+      }
+
+      const prompt = buildStructuredPrompt(report, {
+        nickname,
+        answersByVolume,
+        telemetry,
+        volumes,
+        mask,
+        topValues,
+        focusQuestion: focusInput.value,
+      });
+
+      controller = new AbortController();
+      generated = '';
+      outputBox.style.display = 'block';
+      outputBox.textContent = '';
+      runBtn.disabled = true;
+      stopBtn.disabled = false;
+      copyReplyBtn.disabled = true;
+      statusLine.textContent = `正在直连 ${mod}，流式解析中…`;
+
+      try {
+        generated = await streamOpenAICompatible({
+          baseUrl: base,
+          apiKey: key,
+          model: mod,
+          signal: controller.signal,
+          messages: [
+            {
+              role: 'system',
+              content: '你是一位克制、犀利、基于心理测量数据与作答犹豫证据进行分析的深度咨询师。不要阿谀奉承，不要输出星座鸡汤，严格围绕具体分数、矛结构与可验证微行动给出中文回应。',
+            },
+            { role: 'user', content: prompt },
+          ],
+          onToken: (_, full) => {
+            generated = full;
+            outputBox.textContent = full;
+          },
+        });
+        statusLine.textContent = `已完成（${generated.length} 字）· 所有内容仅保留在当前页面`;
+        copyReplyBtn.disabled = !generated;
+      } catch (err) {
+        if (err?.name === 'AbortError') {
+          statusLine.textContent = `已手动停止（已生成 ${generated.length} 字）`;
+          copyReplyBtn.disabled = !generated;
+        } else {
+          const msg = err?.message || String(err);
+          statusLine.textContent = `请求失败：${msg}（注意部分服务商限制浏览器直连跨域 CORS，可改用本地 Ollama 或一键复制上方密文粘贴到网页对话）`;
+        }
+      } finally {
+        controller = null;
+        runBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
+    },
+  });
+
+  panel.appendChild(el('div', { class: 'byok-actions' }, [
+    runBtn, stopBtn, copyReplyBtn,
+  ]));
+  panel.appendChild(statusLine);
+  panel.appendChild(outputBox);
+
+  return panel;
 }
 
 /* ------------------------------------------------------------
@@ -1431,8 +1709,15 @@ function renderVolumeReport(root, ctx, volId) {
     if (m) mirrors[d.id] = m;
   });
 
-  const giftList = topGifts(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
-  const shadowList = topShadows(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
+  const zMap = {};
+  for (const d of dims.map((x) => x.id)) {
+    const z = state.zScores?.[d];
+    if (Number.isFinite(z)) zMap[d] = z;
+  }
+  const hasZ = Object.keys(zMap).length > 0 ? zMap : null;
+
+  const giftList = topGifts(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3, hasZ);
+  const shadowList = topShadows(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3, hasZ);
 
   root.classList.add('view');
   const wrap = el('div', { class: 'report', style: { '--vc': vol.theme_color } });
@@ -1454,11 +1739,6 @@ function renderVolumeReport(root, ctx, volId) {
   const scoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
   // 分型引擎用的是同一份分数；这里给个别名，避免后面重复声明造成 TDZ
   const typoScoreMap = scoreMap;
-  const zMap = {};
-  for (const d of Object.keys(typoScoreMap)) {
-    const z = state.zScores?.[d];
-    if (Number.isFinite(z)) zMap[d] = z;
-  }
   const typo = buildVolumeTypology(volId, typoScoreMap, zMap, DATA.dimMap, {
     pressure: state.pressureStyle || null,
     mask: state.maskIndex,
@@ -1501,7 +1781,7 @@ function renderVolumeReport(root, ctx, volId) {
     }));
   }
 
-  const answeredCount = vol.questions.filter((q) => ans[q.id]?.value !== undefined).length;
+  const answeredCount = vol.questions.filter((q) => ans[q.id] && !ans[q.id].draft && ans[q.id].value !== undefined).length;
   cover.appendChild(el('div', { class: 'gauges' }, [
     gauge('本卷完成度', `${answeredCount}`, ` / ${vol.questions.length} 题`),
     gauge('维度数', `${dims.length}`, ''),

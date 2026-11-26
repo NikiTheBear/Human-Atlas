@@ -78,7 +78,7 @@
       "id": "v14_q02",
       "type": "stealth_scale",
       "stealth_mode": "normalization",
-      "layer": "stealth",
+      "layer": "explicit",
       "mirror_key": "money_avoid",
       "is_sensitive": true,
       "weight": 0.85,
@@ -291,7 +291,7 @@
       "id": "v14_q07",
       "type": "forced_choice",
       "stealth_mode": "normalization",
-      "layer": "stealth",
+      "layer": "explicit",
       "mirror_key": "money_avoid",
       "is_sensitive": true,
       "weight": 1.4,
@@ -521,7 +521,7 @@
       "id": "v14_q12",
       "type": "forced_choice",
       "stealth_mode": "projection",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "money_status",
       "is_sensitive": false,
       "weight": 1.4,
@@ -574,7 +574,7 @@
       "id": "v14_q13",
       "type": "stealth_scale",
       "stealth_mode": "normalization",
-      "layer": "stealth",
+      "layer": "explicit",
       "mirror_key": "time_future",
       "is_sensitive": true,
       "weight": 0.85,
@@ -779,7 +779,8 @@
           "effects": {
             "time_future": 1.6,
             "mot_mastery": 1.2,
-            "big5_industry": 0.8
+            "big5_industry": 0.8,
+            "time_present_fate": -1
           }
         },
         {
@@ -852,7 +853,10 @@
           "label": "看一眼定投，把下个月自动划走的日子排好",
           "dim": "time_future",
           "base": 0,
-          "gain": 1
+          "gain": 1,
+          "effects": {
+            "time_present_fate": -0.9
+          }
         },
         {
           "key": "face",
@@ -866,7 +870,10 @@
           "label": "把账单短信一删，等哪天心情好了再一起看",
           "dim": "money_avoid",
           "base": 0,
-          "gain": 1
+          "gain": 1,
+          "effects": {
+            "time_present_fate": 1
+          }
         },
         {
           "key": "treat",

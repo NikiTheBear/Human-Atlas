@@ -247,6 +247,9 @@ export function scoreBudgetItem(pts, itemCount, polarity = 1, expectedPts = null
 
 export function scorePool(state, questions, opts = {}) {
   const validDimSet = opts.validDimSet || null;
+  const dimHomeMap = opts.dimHomeMap || null;
+  // 跨卷副权重总量上限（相对于所属主卷证据分母）：防止无关卷大水漫灌稀释主测维度
+  const maxAuxRatio = opts.maxAuxRatio === undefined ? 0.35 : Number(opts.maxAuxRatio);
   /**
    * 证据收缩的先验权重。
    * 默认 1.2：只被 1–2 题测到的维度向 50 拉，避免「答对一次就满分」。
@@ -255,14 +258,31 @@ export function scorePool(state, questions, opts = {}) {
    * 两侧如果都被拉向 50，差值会被系统性压小，G_mirror 永远偏低。
    */
   const priorW = opts.priorW === undefined ? 1.2 : Number(opts.priorW);
-  const num = {};
-  const den = {};
+  const homeNum = {};
+  const homeDen = {};
+  const auxNum = {};
+  const auxDen = {};
   const counts = {};
 
+  const addEvidence = (d, qVol, w, val) => {
+    if (!(w > 0)) return;
+    const homeVol = dimHomeMap?.[d];
+    if (!homeVol || homeVol === qVol) {
+      homeNum[d] = (homeNum[d] || 0) + w * val;
+      homeDen[d] = (homeDen[d] || 0) + w;
+    } else {
+      auxNum[d] = (auxNum[d] || 0) + w * val;
+      auxDen[d] = (auxDen[d] || 0) + w;
+    }
+    counts[d] = (counts[d] || 0) + 1;
+  };
+
   for (const q of questions) {
-    const ans = state.answersByVolume?.[q.volume_id ?? q.volumeId];
-    const value = ans?.[q.id]?.value;
-    if (value === undefined || value === null) continue;
+    const qVol = q.volume_id ?? q.volumeId;
+    const ans = state.answersByVolume?.[qVol];
+    const rec = ans?.[q.id];
+    if (!rec || rec.draft || rec.value === undefined || rec.value === null) continue;
+    const value = rec.value;
 
     const tele = state.telemetry?.[q.id];
     const baseW = Number(q.weight) || TYPE_WEIGHT[q.type] || 1;
@@ -322,20 +342,13 @@ export function scorePool(state, questions, opts = {}) {
         const expected = (100 * g.keys.length) / N;
         const centered = scoreBudgetItem(pts, N, g.polarity, expected);
 
-        num[g.dim] = (num[g.dim] || 0) + effW * centered;
-        den[g.dim] = (den[g.dim] || 0) + effW;
-        counts[g.dim] = (counts[g.dim] || 0) + 1;
+        addEvidence(g.dim, qVol, effW, centered);
 
         // 附带维度联动：以「相对均值的偏离」为强度，避免被基准值污染
         for (const [d, f] of Object.entries(g.effects)) {
           const factor = Number(f) || 0;
           if (!factor) continue;
-          num[d] = (num[d] || 0) + effW * centered * factor;
-          // v4.4：分母按 |factor| 加权。
-          // 旧实现固定 +effW，导致 factor=0.4 的弱联动与 factor=1.5 的强联动
-          // 在同一个维度上获得相同话语权，弱联动被系统性高估。
-          den[d] = (den[d] || 0) + effW * Math.abs(factor);
-          counts[d] = (counts[d] || 0) + 1;
+          addEvidence(d, qVol, effW * Math.abs(factor), centered * (factor < 0 ? -1 : 1));
         }
       }
 
@@ -348,9 +361,7 @@ export function scorePool(state, questions, opts = {}) {
           if (validDimSet && !validDimSet.has(d)) continue;
           const factor = Number(f) || 0;
           if (!factor) continue;
-          num[d] = (num[d] || 0) + effW * centered * factor;
-          den[d] = (den[d] || 0) + effW * Math.abs(factor);
-          counts[d] = (counts[d] || 0) + 1;
+          addEvidence(d, qVol, effW * Math.abs(factor), centered * (factor < 0 ? -1 : 1));
         }
       }
       continue;
@@ -375,24 +386,39 @@ export function scorePool(state, questions, opts = {}) {
       // 振幅加权：主测题（振幅 4.0）自然压过附加题（振幅 0.8）
       const dimWeight = qWeight * clamp(hi - lo, 0.4, 4);
 
-      num[d] = (num[d] || 0) + dimWeight * centered;
-      den[d] = (den[d] || 0) + dimWeight;
-      counts[d] = (counts[d] || 0) + 1;
+      addEvidence(d, qVol, dimWeight, centered);
     }
   }
 
-  // ---- 证据收缩（shrinkage）----
+  // ---- 证据收缩（shrinkage）+ 主卷保护 ----
   // 只被 1–2 道题测到的维度，不该仅凭一次极端作答就宣称 100 分或 0 分。
-  // 给分母加一个「先验权重」，把低证据维度向 50 拉。
+  // 同时当主卷作答存在时，将跨卷副权重总量限制在主卷的 maxAuxRatio 倍以内。
   const PRIOR_W = Math.max(0, priorW);
   const scores = {};
   const evidence = {};
-  for (const d of Object.keys(den)) {
-    if (den[d] <= 0) continue;
-    const n = num[d] / (den[d] + PRIOR_W);
+  const allDims = new Set([...Object.keys(homeDen), ...Object.keys(auxDen)]);
+  for (const d of allDims) {
+    const hD = homeDen[d] || 0;
+    const hN = homeNum[d] || 0;
+    const aD = auxDen[d] || 0;
+    const aN = auxNum[d] || 0;
+
+    let effNum = hN;
+    let effDen = hD;
+    if (hD > 0 && aD > 0) {
+      const scale = Math.min(1, (hD * maxAuxRatio) / aD);
+      effNum += aN * scale;
+      effDen += aD * scale;
+    } else if (hD === 0 && aD > 0) {
+      effNum = aN;
+      effDen = aD;
+    }
+
+    if (effDen <= 0) continue;
+    const n = effNum / (effDen + PRIOR_W);
     scores[d] = clamp(round(50 + 50 * n, 1), 0, 100);
     // 证据强度：0–1，用于报告页标注可信度
-    evidence[d] = round(den[d] / (den[d] + PRIOR_W), 2);
+    evidence[d] = round(effDen / (effDen + PRIOR_W), 2);
   }
 
   // ---- 个人内部相对尖峰 Z_d ----
@@ -458,7 +484,13 @@ export function answeredQuestions(state, DATA, volId) {
   if (!v) return { questions: [], answered: [] };
   const list = questionsOfVolume(DATA, volId);
   const ans = state.answersByVolume?.[volId] || {};
-  return { questions: list, answered: list.filter((q) => ans[q.id]?.value !== undefined) };
+  return {
+    questions: list,
+    answered: list.filter((q) => {
+      const rec = ans[q.id];
+      return Boolean(rec && !rec.draft && rec.value !== undefined && rec.value !== null);
+    }),
+  };
 }
 
 /* ------------------------------------------------------------
@@ -469,8 +501,9 @@ export function answeredQuestions(state, DATA, volId) {
 export function socialDesirabilityIndex(state, questions) {
   const vals = [];
   for (const q of questions) {
-    const ans = state.answersByVolume?.[q.volume_id ?? q.volumeId]?.[q.id]?.value;
-    if (ans === undefined || ans === null) continue;
+    const rec = state.answersByVolume?.[q.volume_id ?? q.volumeId]?.[q.id];
+    if (!rec || rec.draft || rec.value === undefined || rec.value === null) continue;
+    const ans = rec.value;
 
     if (Array.isArray(q.options)) {
       const sds = q.options.map((o) => Number(o.social_desirability)).filter(Number.isFinite);
@@ -500,8 +533,9 @@ export function hesitationIndex(state, questions) {
   let acc = 0;
   let n = 0;
   for (const q of sens) {
-    const ans = state.answersByVolume?.[q.volume_id ?? q.volumeId]?.[q.id]?.value;
-    if (ans === undefined || ans === null) continue;
+    const ansRec = state.answersByVolume?.[q.volume_id ?? q.volumeId]?.[q.id];
+    if (!ansRec || ansRec.draft || ansRec.value === undefined || ansRec.value === null) continue;
+    const ans = ansRec.value;
     n += 1;
 
     const rec = getTelemetry(state, q.id);
@@ -512,6 +546,13 @@ export function hesitationIndex(state, questions) {
     const expected = Math.max(400, baseline * chars);
     const ratio = rec.ms / expected;
     const changes = rec.changes || 0;
+
+    if (q.type === 'budget_100' || q.type === 'pyramid_top3') {
+      if (ratio > 2.4 || changes >= 3) {
+        acc += Math.min(1.0, Math.max(0, ratio - 1.4) * 0.6 + 0.25 * changes);
+      }
+      continue;
+    }
 
     let sdHigh = false;
     if (Array.isArray(q.options) && q.options.length) {
@@ -530,6 +571,18 @@ export function hesitationIndex(state, questions) {
   const value = n ? clamp((100 / n) * acc, 0, 100) : null;
   return { value, baseline, samples: n };
 }
+
+const MIRROR_TARGET_DIMS = {
+  pride_humility: ['sin_pride', 'virtue_humility'],
+  wrath_patience: ['sin_wrath', 'virtue_patience'],
+  greed_charity: ['sin_greed', 'virtue_charity'],
+  lust_chastity: ['sin_lust', 'virtue_chastity'],
+  envy_kindness: ['sin_envy', 'virtue_kindness'],
+  gluttony_temperance: ['sin_gluttony', 'virtue_temperance'],
+  sloth_diligence: ['sin_sloth', 'virtue_diligence'],
+  alignment_order: ['dd_order'],
+  alignment_good: ['dd_good'],
+};
 
 /** 3) 跨卷镜像撕裂度 G_mirror */
 export function mirrorTear(state, DATA) {
@@ -551,8 +604,13 @@ export function mirrorTear(state, DATA) {
     // 关闭证据收缩：比的是两侧差值，收缩会把差值一起压平
     const a = scorePool(state, explicitQs, { validDimSet: valid, priorW: 0 }).scores;
     const b = scorePool(state, stealthQs, { validDimSet: valid, priorW: 0 }).scores;
-    const dims = Object.keys(a).filter((d) => Number.isFinite(b[d]));
-    if (!dims.length) continue;
+    const shared = Object.keys(a).filter((d) => Number.isFinite(b[d]));
+    if (!shared.length) continue;
+
+    // 只对照该 mirror_key 靶向的核心维度，避免把同题附带的 8–10 个无关副维度算进撕裂度
+    const targetList = MIRROR_TARGET_DIMS[key] || (valid.has(key) ? [key] : []);
+    const targeted = shared.filter((d) => targetList.includes(d));
+    const dims = targeted.length ? targeted : shared;
 
     const diff = mean(dims.map((d) => Math.abs(a[d] - b[d])));
     pairs.push({ mirrorKey: key, diff, dims });
@@ -640,9 +698,9 @@ export function extractTopValues(state, DATA) {
       const keys = (q.values || []).map((v) => v.key);
       if (!keys.some((k) => CORE_VALUE_KEYS.includes(k))) continue;
 
-      const ans = state.answersByVolume?.[volId]?.[q.id]?.value;
-      if (!Array.isArray(ans)) continue;
-      ans.forEach((k) => {
+      const ansRec = state.answersByVolume?.[volId]?.[q.id];
+      if (!ansRec || ansRec.draft || !Array.isArray(ansRec.value)) continue;
+      ansRec.value.forEach((k) => {
         if (CORE_VALUE_KEYS.includes(k) && !out.includes(k)) out.push(k);
       });
     }
@@ -656,8 +714,9 @@ export function pressureStyle(state, DATA) {
   const styles = {};
   for (const q of vol.questions || []) {
     if (q.kind !== 'pressure') continue;
-    const ans = state.answersByVolume?.vol8?.[q.id]?.value;
-    if (!ans) continue;
+    const ansRec = state.answersByVolume?.vol8?.[q.id];
+    if (!ansRec || ansRec.draft || !ansRec.value) continue;
+    const ans = ansRec.value;
     const opt = (q.options || []).find((o) => o.key === ans);
     if (!opt || !opt.style) continue;
     styles[opt.style] = (styles[opt.style] || 0) + (Number(q.weight) || 1);
@@ -679,9 +738,12 @@ export function pressureStyle(state, DATA) {
 export function computeAll(state, DATA) {
   const dimOrder = DATA.dimensions.dims.map((d) => d.id);
   const valid = new Set(dimOrder);
+  const dimHomeMap = Object.fromEntries(
+    (DATA.dimensions?.dims || []).filter((d) => d.volume).map((d) => [d.id, d.volume]),
+  );
 
-  // 全局池（修复 BUG-04：不再逐卷求平均再平均）
-  const pool = scorePool(state, allQuestions(DATA), { validDimSet: valid });
+  // 全局池（主卷证据保护 + 按振幅加权，避免跨卷附带维度淹没主测维度）
+  const pool = scorePool(state, allQuestions(DATA), { validDimSet: valid, dimHomeMap });
 
   const scores = {};
   for (const d of dimOrder) {

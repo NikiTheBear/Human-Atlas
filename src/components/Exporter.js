@@ -7,6 +7,7 @@
    ============================================================ */
 
 import { downloadBlob, downloadText, copyText, toast, round, formatDate } from '../core/utils.js';
+import { buildStructuredPrompt } from '../core/dossierCore.js';
 
 /* ------------------------------------------------------------
    中文字体与文本排版
@@ -881,12 +882,10 @@ export async function copyMarkdown(report, opts = {}) {
 }
 
 /* ------------------------------------------------------------
-   AI 深度精读密文（v4.2）
+   AI 深度精读密文（由 dossierCore.js 共享编译）
    把全维得分、Z 尖峰、面具三分量、以及「耗时最久 / 改选最多」的
-   三道犹豫题原文与选项，拼成一段可直接粘给任意大模型的分析师 Prompt。
+   犹豫题原文与选项，拼成一段可直接粘给任意大模型的分析师 Prompt。
    ------------------------------------------------------------ */
-
-const TIER_WORD = (s) => (s >= 80 ? '极显锋芒' : s >= 60 ? '清晰倾向' : s >= 40 ? '弹性灰度' : '反向深潜');
 
 /**
  * @param {Object} report   buildHolographicReport() 的产物（可带 dimRows）
@@ -894,128 +893,7 @@ const TIER_WORD = (s) => (s >= 80 ? '极显锋芒' : s >= 60 ? '清晰倾向' : 
  * @returns {string}
  */
 export function buildAIPrompt(report, opt = {}) {
-  const {
-    nickname = '', telemetry = {}, answersByVolume = {},
-    volumes = {}, mask = null, topValues = [],
-  } = opt;
-
-  const scores = report.scores || {};
-  const zs = report.zScores || {};
-  const nameOf = Object.fromEntries((report.dimRows || []).map((d) => [d.id, d.name]));
-
-  const L = [];
-
-  L.push('你是我的私人心理分析师。下面是我在一个分卷式潜行测评里的完整作答结果。');
-  L.push('请不要复述这些数字，也不要给我泛泛的鼓励。我要的是一次 30 分钟的深谈。');
-  L.push('');
-  L.push('## 我的档案');
-  L.push(`- 署名：${nickname || '（未署名）'}`);
-  L.push(`- 已完成：${(report.completed || []).length} 卷`);
-  if (Number.isFinite(report.mask?.value)) {
-    L.push(`- 社会面具厚度 M：${Math.round(report.mask.value)} / 100（${report.mask.tier?.name || TIER_WORD(report.mask.value)}）`);
-    const d = mask?.dsd; const h = mask?.hlat; const g = mask?.mirror;
-    const bits = [];
-    if (Number.isFinite(d)) bits.push(`社会期许偏移 D_sd=${Math.round(d)}`);
-    if (Number.isFinite(h)) bits.push(`犹豫修饰 H_lat=${Math.round(h)}`);
-    if (Number.isFinite(g)) bits.push(`跨卷镜像撕裂 G_mirror=${Math.round(g)}`);
-    if (bits.length) L.push(`  - ${bits.join(' · ')}`);
-  }
-  if (topValues.length) {
-    L.push(`- 核心价值金字塔：${topValues.map((v) => v.name || v).join(' > ')}`);
-  }
-
-  const gifts = (report.gifts || []).slice(0, 4);
-  const shadows = (report.shadows || []).slice(0, 3);
-  if (gifts.length) {
-    L.push(`- 王牌天赋：${gifts.map((g) => g.gift_title).join(' / ')}`);
-  }
-  if (shadows.length) {
-    L.push(`- 阴影预警：${shadows.map((s) => s.shadow_title).join(' / ')}`);
-  }
-  if (report.archetype?.best?.name) {
-    L.push(`- 原型匹配：${report.archetype.best.name}（拟合度 ${report.archetype.best.fit}）`);
-  }
-
-  L.push('');
-  L.push('## 全维得分（0–100，50 为中性；Z 是我个人内部的相对尖峰）');
-  const rows = Object.entries(scores)
-    .filter(([, v]) => Number.isFinite(v))
-    .sort((a, b) => (zs[b[0]] ?? 0) - (zs[a[0]] ?? 0));
-  rows.forEach(([id, v]) => {
-    const z = zs[id];
-    const zPart = Number.isFinite(z) ? `  Z=${z > 0 ? '+' : ''}${z}` : '';
-    L.push(`- ${nameOf[id] || id}：${v} （${TIER_WORD(v)}）${zPart}`);
-  });
-
-  /* ---------- 犹豫题：耗时最久 / 改选最多 ---------- */
-  const qIndex = {};
-  for (const [vid, vol] of Object.entries(volumes)) {
-    const ans = answersByVolume[vid] || {};
-    for (const q of vol.questions || []) {
-      if (ans[q.id]?.value === undefined) continue;
-      const tel = telemetry[q.id] || ans[q.id] || {};
-      qIndex[q.id] = { q, vid, vol, tel, value: ans[q.id].value };
-    }
-  }
-
-  const scored = Object.values(qIndex)
-    .map((r) => ({
-      ...r,
-      ms: Number(r.tel.ms) || 0,
-      changes: Number(r.tel.changes) || 0,
-      dirty: !!r.tel.dirty,
-    }))
-    .filter((r) => !r.dirty);
-
-  const fmtOption = (q, value) => {
-    if (q.type === 'stealth_scale') {
-      return `在 7 点量表上选了第 ${value} 档（左端：${q.scale?.left || ''} ／ 右端：${q.scale?.right || ''}）`;
-    }
-    if (q.type === 'budget_100') {
-      const map = typeof value === 'object' ? value : {};
-      return (q.items || []).map((it) => `${it.label} ${map[it.key] ?? 0} 点`).join('、');
-    }
-    if (q.type === 'pyramid_top3') {
-      const arr = Array.isArray(value) ? value : [];
-      return arr.map((k, i) => `第${i + 1}顺位「${(q.values || []).find((v) => v.key === k)?.label || k}」`).join(' → ');
-    }
-    const o = (q.options || []).find((x) => x.key === value);
-    return o ? `${value}. ${o.text}` : String(value);
-  };
-
-  const slowest = [...scored].sort((a, b) => b.ms - a.ms).slice(0, 3);
-  const mostChanged = [...scored].sort((a, b) => b.changes - a.changes).filter((r) => r.changes > 0).slice(0, 3);
-
-  if (slowest.length) {
-    L.push('');
-    L.push('## 我停留最久的三道题（可能是真正的痛点）');
-    slowest.forEach((r, i) => {
-      L.push(`${i + 1}. [${r.vol.title}] ${r.q.context ? `${r.q.context}` : ''}`);
-      L.push(`   问：${r.q.prompt}`);
-      L.push(`   我选：${fmtOption(r.q, r.value)}`);
-      L.push(`   耗时：${(r.ms / 1000).toFixed(1)} 秒`);
-    });
-  }
-
-  if (mostChanged.length) {
-    L.push('');
-    L.push('## 我改选最多的题（可能是被压下去的那个答案）');
-    mostChanged.forEach((r, i) => {
-      L.push(`${i + 1}. ${r.q.prompt}`);
-      L.push(`   最终选：${fmtOption(r.q, r.value)}`);
-      L.push(`   改选次数：${r.changes}`);
-    });
-  }
-
-  L.push('');
-  L.push('## 我要你做的事');
-  L.push('1. 先指出三个我在自我叙述里最可能在回避的东西，并给出支撑它的具体分数组合（不要空谈）。');
-  L.push('2. 找出我得分里最矛盾的一组：哪两个高分放在同一个人身上会互相拉扯？它在我生活里可能长什么样？');
-  L.push('3. 结合「停留最久」和「改选最多」的题，说出那个我没选、但其实很想选的答案是什么。');
-  L.push('4. 给我三条未来 30 天可验证的小实验，每条都要能被我自己判定成功或失败。');
-  L.push('5. 最后用不超过 80 字，写一句只说给我听的话。不要鼓励，要准确。');
-
-  return L.join('\n');
+  return buildStructuredPrompt(report, opt);
 }
 
 export async function copyAIPrompt(report, opt = {}) {

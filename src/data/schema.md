@@ -183,12 +183,12 @@
 }
 ```
 
-**校验**：60 个维度必须齐全，且 `high`/`low` 四组文案（gift / shadow / tip）均非空。
+**校验**：127 个维度必须齐全，且 `high`/`low` 四组文案（gift / shadow / tip）均非空。
 `tests/verify-engine.js` 的 TC6 会自动检查。
 
 ---
 
-## 4. `archetypes.json` — 24 原型
+## 4. `archetypes.json` — 36 原型
 
 ```jsonc
 {
@@ -232,7 +232,7 @@
 
 **特殊维度**：`"dim": "mask"` 会取 `maskIndex.value` 而非普通维度分。
 
-`op` 支持 `>=` `>` `<=` `<`。规则数量必须 ≥ 30（当前 35 条）。
+`op` 支持 `>=` `>` `<=` `<`。规则数量必须 ≥ 60（当前 65 条）。
 
 ---
 

@@ -6204,3 +6204,463 @@ html[data-theme='dark'] {
 @media (prefers-reduced-motion: reduce) {
   .rfold__inner { transition: none; }
 }
+
+/* ============================================================
+   行为遥测聚光灯 & 浏览器 BYOK AI 深谈面板
+   ============================================================ */
+
+.telemetry-spotlight {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  text-align: left;
+}
+
+.telemetry-spotlight--muted {
+  padding: 12px 16px;
+  opacity: 0.85;
+}
+
+.telemetry-spotlight__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+}
+
+.telemetry-spotlight__kicker {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.telemetry-spotlight__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.telemetry-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.telemetry-spotlight__list {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.telemetry-spotlight__item {
+  padding: 10px 12px;
+  border-left: 2px solid var(--gold);
+  background: var(--bg-page);
+  border-radius: 0 6px 6px 0;
+}
+
+.telemetry-spotlight__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.telemetry-badge {
+  font-size: 10.5px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--gold-wash);
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.telemetry-vol {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.telemetry-spotlight__q {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.telemetry-spotlight__a {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.telemetry-spotlight__empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-tertiary);
+}
+
+.byok-panel {
+  margin-top: 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+}
+
+.byok-panel__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.byok-panel__note {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--text-tertiary);
+}
+
+.byok-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.byok-presets__label {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.byok-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.byok-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.byok-field--wide {
+  grid-column: 1 / -1;
+}
+
+.byok-input,
+.byok-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12.5px;
+}
+
+.byok-check {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.byok-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.byok-status {
+  margin-top: 8px;
+  min-height: 16px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.byok-output {
+  margin-top: 10px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.hub-pack-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hub-pack-pills__label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.hub-pack-pill,
+.express-pack-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  transition: border-color 180ms var(--ease), color 180ms var(--ease), background 180ms var(--ease);
+}
+
+.hub-pack-pill:hover,
+.express-pack-pill:hover {
+  border-color: var(--gold);
+  color: var(--text-primary);
+}
+
+.express-packs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.express-pack-pill.is-on {
+  border-color: var(--gold);
+  background: var(--gold-wash);
+  color: var(--gold);
+  font-weight: 500;
+}
+
+/* 直觉题已锁状态 & 手滑解锁 */
+.impulse-halo.is-locked .impulse-meter {
+  opacity: 0.32;
+}
+
+.impulse-halo.is-locked .opt:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.impulse-halo.is-locked .opt.is-sel:disabled {
+  opacity: 1;
+  border-color: var(--vc, var(--gold));
+}
+
+.impulse-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* 双人对比：我以为的 TA 投射抽屉 & 投射偏差面板 */
+.cmp-proj {
+  margin: 0 0 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+}
+
+.cmp-proj__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.cmp-proj__summary::-webkit-details-marker {
+  display: none;
+}
+
+.cmp-proj__badge {
+  font-size: 10.5px;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  background: var(--gold-wash);
+}
+
+.cmp-proj__body {
+  padding: 4px 16px 16px;
+  border-top: 1px solid var(--border-hair);
+}
+
+.cmp-proj__intro {
+  margin: 10px 0 12px;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.cmp-proj__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.cmp-proj__input {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12.5px;
+}
+
+.cmp-proj__list {
+  display: grid;
+  gap: 10px;
+}
+
+.cmp-proj__q {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.cmp-proj__qhead {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+.cmp-proj__prompt {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.cmp-proj__opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cmp-proj__opt {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-page);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms var(--ease), background 160ms var(--ease), color 160ms var(--ease);
+}
+
+.cmp-proj__opt.is-on {
+  border-color: var(--gold);
+  background: var(--gold-wash);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.cmp-proj__scale {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.cmp-proj__dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-page);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.cmp-proj__dot.is-on {
+  border-color: var(--gold);
+  background: var(--gold-wash);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.cmp-proj__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.cmp-proj__insight {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+.cmp-proj__rows {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cmp-proj__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--bg-inset);
+  font-size: 12px;
+}

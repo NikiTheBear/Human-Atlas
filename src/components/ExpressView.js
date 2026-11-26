@@ -8,8 +8,8 @@ import { tierOf } from '../core/scoring.js';
 import { mirrorFor, topGifts, topShadows, resolveEffectiveComputed } from '../core/synthesizer.js';
 import { emblemSvg } from '../viz/emblemsSvg.js';
 import {
-  EXPRESS_BUCKET, buildExpressVolume, seedFromVolumes, commitExpress,
-  expressProgress, expressDimCoverage,
+  EXPRESS_BUCKET, THEMATIC_PACKS, buildExpressVolume, seedFromVolumes, commitExpress,
+  resetExpress, expressProgress, expressDimCoverage,
 } from '../core/express.js';
 
 /* ------------------------------------------------------------
@@ -17,9 +17,9 @@ import {
    ------------------------------------------------------------ */
 
 export function renderExpressIntro(root, ctx) {
-  const { App, DATA, go: nav } = ctx;
+  const { App, DATA, go: nav, packId = null } = ctx;
   const state = App.state;
-  const vol = buildExpressVolume(DATA, DATA.express);
+  const vol = buildExpressVolume(DATA, DATA.express, packId);
   const { answered, total } = expressProgress(state, vol);
   const { count: dimCount } = expressDimCoverage(vol);
 
@@ -28,17 +28,35 @@ export function renderExpressIntro(root, ctx) {
   root.appendChild(wrap);
 
   const hero = el('div', { class: 'express-hero' });
-  hero.appendChild(el('div', { class: 'express-hero__kicker', text: 'Express · 初见微光' }));
+  hero.appendChild(el('div', {
+    class: 'express-hero__kicker',
+    text: vol.packId ? 'Micro-Diagnostic · 主题切面 10 题快诊' : 'Express · 初见微光',
+  }));
   hero.appendChild(el('h1', { text: vol.title }));
   hero.appendChild(el('p', { text: vol.intro }));
   wrap.appendChild(hero);
+
+  // 主题切面切换栏
+  const packBar = el('div', { class: 'express-packs' }, [
+    el('a', {
+      class: `express-pack-pill${!vol.packId ? ' is-on' : ''}`,
+      href: '#/express',
+      text: '全维速写 · 28 题',
+    }),
+    ...THEMATIC_PACKS.map((p) => el('a', {
+      class: `express-pack-pill${vol.packId === p.id ? ' is-on' : ''}`,
+      href: `#/express/pack/${p.id}`,
+      text: p.badge,
+    })),
+  ]);
+  wrap.appendChild(packBar);
 
   const stats = el('dl', { class: 'express-stats' });
   [
     ['题目', `${total}`],
     ['预计', `约 ${vol.estimated_minutes} 分钟`],
     ['覆盖维度', `${dimCount}`],
-    ['来源卷宗', '16 卷'],
+    ['互通机制', '写回十六正卷'],
   ].forEach(([k, v]) => {
     stats.appendChild(el('div', { class: 'express-stat' }, [
       el('dt', { text: k }),
@@ -51,11 +69,11 @@ export function renderExpressIntro(root, ctx) {
     el('button', {
       class: 'btn btn--solid',
       type: 'button',
-      text: answered > 0 ? `继续（已答 ${answered}/${total}）` : '开始 28 题',
+      text: answered > 0 ? `继续（已答 ${answered}/${total}）` : `开始 ${total} 题`,
       onclick: () => {
         seedFromVolumes(state, vol);
         save(state, { immediate: true });
-        nav(`#/express/quiz`);
+        nav(vol.quizRoute || '#/express/quiz');
       },
     }),
     el('a', { class: 'btn btn--ghost', href: '#/', text: '返回大厅' }),
@@ -65,7 +83,7 @@ export function renderExpressIntro(root, ctx) {
   wrap.appendChild(el('p', {
     class: 'notice',
     style: { marginTop: '22px' },
-    html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M12 11v5"/></svg><span>这 28 题是从十六卷里挑出来的高区分度题，不重复造题。做过的题会自动同步到原卷，之后做完整卷时不会再让你答第二遍。</span>`,
+    html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M12 11v5"/></svg><span>这 ${total} 题是从十六卷里挑出来的高区分度原题，不重复造题。做过的题会自动同步到原卷，之后做完整卷时不会再让你答第二遍。</span>`,
   }));
 }
 
@@ -74,11 +92,11 @@ export function renderExpressIntro(root, ctx) {
    ------------------------------------------------------------ */
 
 export function renderExpressResult(root, ctx) {
-  const { App, DATA, recompute, soulCode, go: nav } = ctx;
+  const { App, DATA, recompute, soulCode, go: nav, packId = null } = ctx;
   const state = App.state;
-  const vol = buildExpressVolume(DATA, DATA.express);
+  const vol = buildExpressVolume(DATA, DATA.express, packId);
 
-  /* ---------- 出码时序（P0 · 28 题存档码） ----------
+  /* ---------- 出码时序（P0 · 28 题/主题微诊存档码） ----------
      commitExpress（虚拟桶 → 原卷）
        → recompute（内部走 resolveEffectiveComputed：computeAll + 双源融合）
        → state.computedScores / zScores / maskIndex / topValues 落盘
@@ -96,7 +114,7 @@ export function renderExpressResult(root, ctx) {
   const answers = state.answersByVolume || {};
   const answeredCount = vol.questions.filter((q) => {
     const src = answers[q._srcVol]?.[q.id];
-    return src && src.value !== undefined;
+    return src && !src.draft && src.value !== undefined;
   }).length;
 
   root.classList.add('view');
@@ -104,12 +122,15 @@ export function renderExpressResult(root, ctx) {
   root.appendChild(wrap);
 
   const hero = el('div', { class: 'express-hero' });
-  hero.appendChild(el('div', { class: 'express-hero__kicker', text: 'Express · 初见微光简报' }));
-  hero.appendChild(el('h1', { text: '这就是刚才那 28 题的你' }));
+  hero.appendChild(el('div', {
+    class: 'express-hero__kicker',
+    text: vol.packId ? `Micro-Diagnostic · ${vol.title}` : 'Express · 初见微光简报',
+  }));
+  hero.appendChild(el('h1', { text: `这就是刚才那 ${vol.questions.length} 题的你` }));
   hero.appendChild(el('p', {
     text: answeredCount < vol.questions.length
       ? `已完成 ${answeredCount}/${vol.questions.length} 题。以下是基于目前作答的速写，不是完整档案。`
-      : '这是速写，不是判决书。28 题只能勾出轮廓，完整的十六卷才能画出细节。',
+      : `这是速写，不是判决书。${vol.questions.length} 题只能勾出这一侧的轮廓，完整的十六卷才能画出全部细节。`,
   }));
   wrap.appendChild(hero);
 
@@ -118,14 +139,19 @@ export function renderExpressResult(root, ctx) {
     .map((d) => ({ id: d, score: eff.scores?.[d] ?? state.computedScores?.[d] }))
     .filter((d) => Number.isFinite(d.score));
 
-  const gifts = topGifts(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
-  const shadows = topShadows(Object.fromEntries(dims.map((d) => [d.id, d.score])), DATA.mirrors, 3);
+  const scoreMap = Object.fromEntries(dims.map((d) => [d.id, d.score]));
+  const zMap = eff.zScores
+    ? Object.fromEntries(dims.map((d) => [d.id, eff.zScores[d.id]]).filter(([, z]) => Number.isFinite(z)))
+    : null;
+  const gifts = topGifts(scoreMap, DATA.mirrors, 3, zMap);
+  const shadows = topShadows(scoreMap, DATA.mirrors, 3, zMap);
+  const maskVal = Number.isFinite(eff.mask) ? eff.mask : state.maskIndex;
 
   const stats = el('dl', { class: 'express-stats' });
   [
     ['已作答', `${answeredCount} / ${vol.questions.length}`],
     ['已测维度', `${dims.length}`],
-    ['社会面具', Number.isFinite(state.maskIndex) ? `${round(state.maskIndex, 0)}` : '—'],
+    ['社会面具', Number.isFinite(maskVal) ? `${round(maskVal, 0)}` : '—'],
     ['完成卷宗', `${(state.completedVolumes || []).length} / 16`],
   ].forEach(([k, v]) => {
     stats.appendChild(el('div', { class: 'express-stat' }, [
@@ -286,12 +312,12 @@ export function renderExpressResult(root, ctx) {
     el('button', {
       class: 'btn btn--ghost',
       type: 'button',
-      text: '重做这 28 题',
+      text: `重做这 ${vol.questions.length} 题`,
       onclick: () => {
-        delete state.answersByVolume[EXPRESS_BUCKET];
-        delete state.inProgress[EXPRESS_BUCKET];
+        resetExpress(state, vol, DATA);
+        recompute({ silent: true });
         save(state, { immediate: true });
-        nav('#/express');
+        nav(vol.introRoute || '#/express');
       },
     }),
   ]));
@@ -299,6 +325,6 @@ export function renderExpressResult(root, ctx) {
   wrap.appendChild(el('p', {
     class: 'colophon',
     style: { marginTop: '26px' },
-    text: 'EXPRESS · 28 题速写 · 全部计算在本地完成，无任何数据上传',
+    text: `${vol.packId ? 'MICRO-DIAGNOSTIC' : 'EXPRESS'} · ${vol.questions.length} 题速写 · 全部计算在本地完成，无任何数据上传`,
   }));
 }

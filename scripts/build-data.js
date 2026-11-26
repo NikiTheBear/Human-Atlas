@@ -24,24 +24,28 @@ for (const f of volFiles) {
   volumes[v.volume_id] = v;
 }
 
-/* ---------- mirrors: 支持拆分碎片后合并 ---------- */
+/* ---------- mirrors: 统一由 mirrors/*.json 作为唯一可编辑源码 ---------- */
 const mirrorDir = path.join(DATA_DIR, 'mirrors');
-let mirrors = {};
+const mirrors = {};
 const fragments = fs.existsSync(mirrorDir)
   ? fs.readdirSync(mirrorDir).filter((f) => f.endsWith('.json')).sort()
   : [];
 
 for (const f of fragments) {
   const frag = read(path.join(mirrorDir, f));
-  mirrors = { ...mirrors, ...frag };
+  for (const [k, v] of Object.entries(frag)) {
+    if (mirrors[k]) {
+      console.warn(`[data] ⚠ mirrors 重复键：${k}（${f} 覆盖了之前分卷定义）`);
+    }
+    mirrors[k] = v;
+  }
 }
 const singleMirror = path.join(DATA_DIR, 'mirrors.json');
-if (fs.existsSync(singleMirror)) {
-  mirrors = { ...mirrors, ...read(singleMirror) };
+if (!fragments.length && fs.existsSync(singleMirror)) {
+  Object.assign(mirrors, read(singleMirror));
 }
 
-// 同时输出一份合并后的 mirrors.json，使目录结构与规范一致
-// （fragments 仍是可编辑的唯一来源，此文件为自动生成产物）
+// 输出合并后的 mirrors.json（完全由 mirrors/*.json 单向生成，不再反向覆盖源码碎片）
 fs.writeFileSync(
   singleMirror,
   `${JSON.stringify(mirrors, null, 2)}\n`,
@@ -109,6 +113,7 @@ fs.writeFileSync(path.join(DATA_DIR, 'bundle.compact.js'), compact, 'utf8');
 const BLACKLIST = [
   '林舟', '沈明', '陆言',
   '留一层备份', '把牌摊开', '在心里划掉', '把桥烧掉', '后背是温的', '接住情绪',
+  '吉TA', '利TA', '其TA', '听TA把话说完人',
 ];
 const banned = [];
 for (const [vid, vol] of Object.entries(volumes)) {
@@ -117,12 +122,18 @@ for (const [vid, vol] of Object.entries(volumes)) {
     if (blob.includes(w)) banned.push(`${vid} → ${w}`);
   }
 }
+for (const r of crossRules) {
+  const blob = JSON.stringify(r);
+  for (const w of ['吉TA', '利TA', '其TA', '听TA把话说完人']) {
+    if (blob.includes(w)) banned.push(`crossRules/${r.id} → ${w}`);
+  }
+}
 if (banned.length) {
-  console.error('[data] ✗ 题库出现黑名单词汇（要求去 AI 腔）：');
+  console.error('[data] ✗ 题库或规则出现黑名单词汇/错别字：');
   banned.forEach((b) => console.error('   ' + b));
   process.exitCode = 1;
 } else {
-  console.log('[data] ✓ 无黑名单词汇');
+  console.log('[data] ✓ 无黑名单词汇与 TA 误替换错字');
 }
 
 /* ---------- express 清单校验：id 必须存在、无重复 ---------- */
@@ -238,6 +249,44 @@ if (wildFields.length) {
   process.exitCode = 1;
 } else {
   console.log('[data] ✓ 维度键全部合法');
+}
+
+/* ---------- 跨卷规则 required_volumes 与敏感题 SD 门禁 ---------- */
+const dimHome = Object.fromEntries(dimensions.dims.map((d) => [d.id, d.volume]));
+const crIssues = [];
+for (const r of crossRules) {
+  const condVols = new Set((r.conditions || []).map((c) => (c.dim === 'mask' ? 'vol8' : dimHome[c.dim])).filter(Boolean));
+  const reqSet = new Set(r.required_volumes || []);
+  const extra = [...reqSet].filter((v) => !condVols.has(v));
+  const missing = [...condVols].filter((v) => !reqSet.has(v));
+  if (extra.length || missing.length) {
+    crIssues.push(`${r.id}: req=[${[...reqSet]}] condVols=[${[...condVols]}]`);
+  }
+}
+if (crIssues.length) {
+  console.error('[data] ✗ 跨卷规则 required_volumes 与条件维度主卷不一致：');
+  crIssues.forEach((x) => console.error('   ' + x));
+  process.exitCode = 1;
+} else {
+  console.log('[data] ✓ 65 条跨卷规则 required_volumes 一致');
+}
+
+const flatSdIssues = [];
+for (const [vid, vol] of Object.entries(volumes)) {
+  for (const q of vol.questions || []) {
+    if ((q.type === 'forced_choice' || q.type === 'impulse_3s') && q.is_sensitive) {
+      const sds = (q.options || []).map((o) => Number(o.social_desirability)).filter(Number.isFinite);
+      if (sds.length >= 2 && Math.max(...sds) <= Math.min(...sds)) {
+        flatSdIssues.push(`${vid}/${q.id}`);
+      }
+    }
+  }
+}
+if (flatSdIssues.length) {
+  console.error('[data] ✗ 敏感选择/直觉题 social_desirability 无区分度：' + flatSdIssues.join(', '));
+  process.exitCode = 1;
+} else {
+  console.log('[data] ✓ 敏感题社会赞许权重区分度有效');
 }
 
 const qTotal = Object.values(volumes).reduce((a, v) => a + (v.questions?.length || 0), 0);

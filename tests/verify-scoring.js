@@ -8,8 +8,9 @@
 import { VOLUMES, DIMENSIONS, DIM_ORDER } from '../src/data/bundle.js';
 import {
   questionRange, getQuestionDims, scoreBudgetItem, scorePool, computeAll,
-  answerContributions, TYPE_WEIGHT,
+  answerContributions, mirrorTear, TYPE_WEIGHT,
 } from '../src/core/scoring.js';
+import { answeredCount } from '../src/core/storage.js';
 import { DIRTY_MS, readingBaseline, dirtyLimitOf as limitOf } from '../src/core/telemetry.js';
 
 const DATA = {
@@ -475,6 +476,50 @@ function testProfiles() {
   }
 }
 
+function testRegressions() {
+  console.log('\n[REG] 草稿屏蔽 / 主卷抗稀释 / 镜像靶向去噪');
+
+  // 1) budget_100 未满 100 草稿不得进入计分或已答计数
+  const stDraft = mkState();
+  const qB = allQuestions().find((x) => x.type === 'budget_100');
+  const draftMap = {};
+  qB.items.forEach((it, idx) => { draftMap[it.key] = idx === 0 ? 20 : 0; });
+  stDraft.answersByVolume[qB.volumeId] = { [qB.id]: { value: draftMap, draft: true, ms: 3000 } };
+  check('draft 筹码草稿不计入 answeredCount', answeredCount(stDraft, qB.volumeId) === 0);
+  const resDraft = scorePool(stDraft, [qB], { validDimSet: VALID });
+  check('draft 筹码草稿不污染 scorePool', Object.keys(resDraft.scores).length === 0);
+
+  // 2) big5_rumination 主卷满高 + 其余 15 卷逆向满低：主卷仍占主导（> 60）
+  const stHome = mkState();
+  for (const q of allQuestions()) {
+    const dims = getQuestionDims(q, VALID);
+    if (!dims.includes('big5_rumination')) continue;
+    const isHome = q.volume_id === 'vol2';
+    let val;
+    if (q.type === 'forced_choice' || q.type === 'impulse_3s') {
+      const opt = [...q.options].sort((a, b) => Number(b.effects?.big5_rumination ?? 0) - Number(a.effects?.big5_rumination ?? 0));
+      val = (isHome ? opt[0] : opt[opt.length - 1]).key;
+    } else if (q.type === 'stealth_scale') {
+      const r = q.effects.big5_rumination;
+      const arr = Array.isArray(r) ? r : [r.low, r.high];
+      const hiRight = arr[1] > arr[0];
+      val = isHome ? (hiRight ? 7 : 1) : (hiRight ? 1 : 7);
+    } else continue;
+    (stHome.answersByVolume[q.volume_id] ||= {})[q.id] = { value: val };
+  }
+  const rumScore = computeAll(stHome, DATA).scores.big5_rumination;
+  check('big5_rumination 主卷拉满、15 卷全反压时仍 > 60（不被淹没）',
+    Number.isFinite(rumScore) && rumScore > 60, `big5_rumination=${rumScore}`);
+
+  // 3) mirrorTear 对 def_detach 只对比靶向维度（不再塞入 10 个副维度）
+  const stMir = buildProfile('max');
+  const tear = mirrorTear(stMir, DATA);
+  const detachPair = tear.pairs.find((p) => p.mirrorKey === 'def_detach');
+  check('mirrorTear(def_detach) 仅对比靶向核心维（1 维而非 10 维）',
+    Boolean(detachPair) && detachPair.dims.length === 1 && detachPair.dims[0] === 'def_detach',
+    detachPair ? detachPair.dims.join(',') : 'missing');
+}
+
 /* ------------------------------------------------------------
    主流程
    ------------------------------------------------------------ */
@@ -490,6 +535,7 @@ testBug04();
 testBug05();
 testBug06to08();
 testProfiles();
+testRegressions();
 
 console.log('\n' + '─'.repeat(66));
 console.log(`  通过 ${pass} · 失败 ${fail}`);

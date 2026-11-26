@@ -34,7 +34,7 @@
       "prompt": "一桌人已经第三次绕回同一个话题，谁也说服不了谁，而你早就看清分歧卡在哪里。此刻你更像——",
       "scale": {
         "left": "把话讲透，哪怕要重复三遍",
-        "right": "礼貌点头，把力气留给别处",
+        "right": "礼貌点头，在心里懒得再跟这桌人多费口舌",
         "sdHigh": "right"
       },
       "effects": {
@@ -137,7 +137,7 @@
         },
         {
           "key": "D",
-          "text": "想先把吉TA放下，去阳台站一会儿，等这阵劲儿过去再回来看",
+          "text": "想先把吉他放下，去阳台站一会儿，等这阵劲儿过去再回来看",
           "effects": {
             "sin_wrath": -1.8,
             "virtue_patience": 1.8,
@@ -535,7 +535,7 @@
       "id": "v1_q12",
       "type": "stealth_scale",
       "stealth_mode": "projection",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "envy_kindness",
       "is_sensitive": true,
       "weight": 0.85,
@@ -568,7 +568,7 @@
       "id": "v1_q13",
       "type": "impulse_3s",
       "stealth_mode": "impulse",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "lust_chastity",
       "is_sensitive": true,
       "weight": 1.25,
@@ -849,7 +849,7 @@
       "id": "v1_q19",
       "type": "impulse_3s",
       "stealth_mode": "impulse",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "envy_kindness",
       "is_sensitive": true,
       "weight": 1.2,
@@ -989,6 +989,10 @@
         "mot_autonomy": [
           -0.8,
           1.4
+        ],
+        "virtue_chastity": [
+          0.7,
+          -0.7
         ]
       }
     },

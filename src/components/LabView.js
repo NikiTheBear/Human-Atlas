@@ -287,7 +287,7 @@ export function parliamentSection({ scores }) {
    3 · 时间胶囊
    ============================================================ */
 
-export function timelineSection({ state, scores, colors, dimMap }) {
+export function timelineSection({ state, scores, colors, dimMap, dimOrder = [] }) {
   const sec = el('section', { class: 'rsec', id: 'r-timeline' });
 
   sec.appendChild(labHead('07', '时间胶囊', '把过去的自己调出来，放在同一张图上'));
@@ -324,7 +324,8 @@ export function timelineSection({ state, scores, colors, dimMap }) {
     onclick: () => {
       const raw = ta.value.trim();
       if (!raw) { toast('先粘贴一份存档码'); return; }
-      const res = decodeSoulCode(raw, state.__dimOrder || []);
+      const order = dimOrder.length ? dimOrder : (state.__dimOrder || []);
+      const res = decodeSoulCode(raw, order);
       if (!res.ok) { toast(res.error || '解码失败'); return; }
       renderDiff(res.state.computedScores, res.state.stamp || '历史存档');
     },

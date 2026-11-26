@@ -85,7 +85,7 @@ export function load() {
 /* ------------------------------------------------------------
    存档写入
    每次作答都会调用 save()。全量 JSON.stringify + localStorage.setItem
-   在 152 题全部答完后约 2.1MB 的字符串处理，是长会话里主要的抖动源。
+   在 298 题全部答完后是长会话里主要的序列化开销与抖动源。
    这里做两件事：
      1. 串行化结果缓存 —— 内容没变就不重复 stringify
      2. 合并写入 —— 用 requestIdleCallback 把写盘推到空闲帧
@@ -440,6 +440,46 @@ export function importJSON(text) {
   return { ok: true, state: merged };
 }
 
+/** 将导入的 JSON 备份按题级精度合并到当前状态，保留本机优先及遥测/初印象快照 */
+export function mergeImportedState(currentState, importedState) {
+  const base = currentState || emptyState();
+  const incoming = importedState || {};
+  const merged = { ...base };
+
+  merged.completedVolumes = Array.from(new Set([
+    ...(base.completedVolumes || []),
+    ...(incoming.completedVolumes || []),
+  ]));
+
+  const nextAnswers = {};
+  for (const vid of new Set([
+    ...Object.keys(incoming.answersByVolume || {}),
+    ...Object.keys(base.answersByVolume || {}),
+  ])) {
+    const incMap = incoming.answersByVolume?.[vid] || {};
+    const curMap = base.answersByVolume?.[vid] || {};
+    const combined = { ...incMap };
+    for (const [qid, rec] of Object.entries(curMap)) {
+      // 本机非草稿优先；若本机只是草稿而导入的是完整作答，保留导入的完整作答
+      if (!rec?.draft || !combined[qid] || combined[qid].draft) {
+        combined[qid] = rec;
+      }
+    }
+    nextAnswers[vid] = combined;
+  }
+  merged.answersByVolume = nextAnswers;
+
+  merged.inProgress = { ...(incoming.inProgress || {}), ...(base.inProgress || {}) };
+  merged.telemetry = { ...(incoming.telemetry || {}), ...(base.telemetry || {}) };
+  merged.initialSnapshot = { ...(incoming.initialSnapshot || {}), ...(base.initialSnapshot || {}) };
+  merged.computedScores = { ...(incoming.computedScores || {}), ...(base.computedScores || {}) };
+  merged.zScores = { ...(incoming.zScores || {}), ...(base.zScores || {}) };
+  merged.nickname = base.nickname || incoming.nickname || '';
+  merged.maskIndex = Number.isFinite(base.maskIndex) ? base.maskIndex : incoming.maskIndex;
+  if (!base.topValues?.length && incoming.topValues?.length) merged.topValues = incoming.topValues;
+  return merged;
+}
+
 /* ------------------------------------------------------------
    统计辅助
    ------------------------------------------------------------ */
@@ -450,7 +490,8 @@ export function completion(state) {
 
 export function answeredCount(state, volumeId) {
   const ans = state.answersByVolume?.[volumeId];
-  return ans ? Object.keys(ans).length : 0;
+  if (!ans || typeof ans !== 'object') return 0;
+  return Object.values(ans).filter((rec) => rec && !rec.draft && rec.value !== undefined && rec.value !== null).length;
 }
 
 export function hasProgress(state, volumeId) {

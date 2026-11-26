@@ -541,6 +541,28 @@ async function runChecks(browser, base) {
       `innerText=${r.len} nodes=${r.nodes}`);
   }
 
+  /* ============ 4.3b 双人对比真 DOM 渲染全部 7 个生态位（含同行挚友） ============ */
+  await open('#/compare');
+  await evalJson(`(() => {
+    const tas = document.querySelectorAll('.cmp-form textarea');
+    if (tas.length >= 2) {
+      tas[0].value = ${JSON.stringify(CODE8)};
+      tas[0].dispatchEvent(new Event('input', { bubbles: true }));
+      tas[1].value = ${JSON.stringify(CODE8)};
+      tas[1].dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    return tas.length;
+  })()`);
+  await sleep(500);
+  const cmp7 = await evalJson(`{
+    cards: document.querySelectorAll('.eco-card').length,
+    hasCompanion: document.body.innerText.includes('同行挚友'),
+    radarAxes: document.querySelectorAll('.chart-card svg polygon').length
+  }`);
+  check('双人对比页真 DOM 渲染全部 7 个生态位卡片（含同行挚友）',
+    cmp7.cards === 7 && cmp7.hasCompanion,
+    JSON.stringify(cmp7));
+
   /* ============ 4.4 单卷报告 ============ */
   await open('#/report/vol1');
   const vol1 = await evalJson(`{
@@ -578,10 +600,103 @@ async function runChecks(browser, base) {
       `height ${beforeH} → ${after.h}`);
   }
 
+  /* ============ 4.7 新能力真实 DOM 端到端交互验证 ============ */
+  const byokDom = await evalJson(`(() => {
+    const panel = document.querySelector('#byok-panel');
+    const ollama = [...document.querySelectorAll('.byok-preset')].find((b) => b.textContent.includes('Ollama'));
+    if (ollama) ollama.click();
+    const url = panel?.querySelector('input[type="url"]')?.value || '';
+    return { hasPanel: !!panel, ollamaUrl: url };
+  })()`);
+  check('报告页含 BYOK AI 面板且预设切换正常',
+    byokDom.hasPanel && byokDom.ollamaUrl.includes('11434'),
+    JSON.stringify(byokDom));
+
+  // 主题 10 题切面微诊断 + budget < 100 草稿拦截 + impulse_3s 直觉锁定
+  await open('#/express/pack/rel');
+  const packIntro = await evalJson(`{
+    len: document.body.innerText.length,
+    hasRel: document.body.innerText.includes('亲密与依恋剧本'),
+    hasStart: !!document.querySelector('.express-actions button')
+  }`);
+  check('主题切面微诊断 #/express/pack/rel 可打开',
+    packIntro.hasRel && packIntro.hasStart && packIntro.len > 120,
+    JSON.stringify(packIntro));
+
+  // 筹码题只填 10 点（<100）时只能存草稿，不计入正式已答数
+  await open('#/quiz/vol6');
+  await evalJson(`(() => {
+    const slider = document.querySelector('.budget input[type="range"]');
+    if (slider) {
+      slider.value = '10';
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  })()`);
+  await sleep(150);
+  const vol6Draft = await evalJson(`(() => {
+    const st = window.HumanAtlas.App.state;
+    const rec = st.answersByVolume?.vol6?.v6_q01;
+    return {
+      isDraft: !!rec?.draft,
+      doneCount: Object.values(st.answersByVolume?.vol6 || {}).filter((x) => x && !x.draft).length
+    };
+  })()`);
+  check('budget_100 未满 100 时只写 draft 不计入已答数',
+    vol6Draft.isDraft && vol6Draft.doneCount === 0,
+    JSON.stringify(vol6Draft));
+
+  // impulse_3s：首次选中即进入直觉锁定，点击手滑改选解锁后可改写
+  await evalJson(`(() => {
+    window.HumanAtlas.App.state.inProgress.vol3 = { currentIdx: 2, updatedAt: Date.now() };
+    localStorage.setItem('human-atlas::state::v4', JSON.stringify(window.HumanAtlas.App.state));
+  })()`);
+  await open('#/quiz/vol3');
+  const impFlow = await evalJson(`(() => {
+    const autoBtn = document.querySelector('.auto-toggle');
+    if (autoBtn && autoBtn.getAttribute('aria-pressed') === 'true') autoBtn.click();
+    const opts = document.querySelectorAll('.opt');
+    if (!opts.length) return { ok: false, reason: 'no opts' };
+    opts[0].click();
+    const lockedAfterPick = !!document.querySelector('.impulse-halo.is-locked');
+    const optDisabled = !!document.querySelector('.opt')?.disabled;
+    const unlockBtn = document.querySelector('.impulse-unlock');
+    if (unlockBtn) unlockBtn.click();
+    const lockedAfterUnlock = !!document.querySelector('.impulse-halo.is-locked');
+    return { ok: true, lockedAfterPick, optDisabled, lockedAfterUnlock };
+  })()`);
+  check('impulse_3s 选中后锁定直觉、显式解锁可改选',
+    impFlow.ok && impFlow.lockedAfterPick && impFlow.optDisabled && !impFlow.lockedAfterUnlock,
+    JSON.stringify(impFlow));
+
+  // 双人对比页「我以为的 TA」投射对照抽屉
+  await open('#/compare');
+  const projFlow = await evalJson(`(() => {
+    const det = document.querySelector('#cmp-projection');
+    if (det) det.open = true;
+    const qs = [...document.querySelectorAll('.cmp-proj__q')];
+    qs.slice(0, 6).forEach((q) => {
+      const btn = q.querySelector('.cmp-proj__dot, .cmp-proj__opt');
+      if (btn) btn.click();
+    });
+    const applyBtn = [...document.querySelectorAll('.cmp-proj__foot button')].find((b) => b.textContent.includes('填入左侧'));
+    if (applyBtn) applyBtn.click();
+    const tas = document.querySelectorAll('.cmp-form textarea');
+    if (tas[1]) {
+      tas[1].value = ${JSON.stringify(CODE8)};
+      tas[1].dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    return { qCount: qs.length, hasApply: !!applyBtn && !applyBtn.disabled };
+  })()`);
+  await sleep(400);
+  const projInsight = await evalJson(`!!document.querySelector('.cmp-proj__insight')`);
+  check('双人对比「我以为的 TA」投射抽屉可算出投射偏差透视',
+    projFlow.qCount === 10 && projFlow.hasApply && projInsight,
+    JSON.stringify({ ...projFlow, projInsight }));
+
   /* ============ 4.5 页面无未捕获异常 ============ */
   const errs = (browser.cdp.events || [])
     .filter((e) => e.method === 'Runtime.exceptionThrown')
-    .map((e) => e.params?.exceptionDetails?.text || '');
+    .map((e) => e.params?.exceptionDetails?.exception?.description || e.params?.exceptionDetails?.text || '');
   check('全程无未捕获 JS 异常', errs.length === 0, errs.slice(0, 3).join(' | '));
 }
 

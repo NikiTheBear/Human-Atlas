@@ -219,7 +219,7 @@
       "id": "v5_q06",
       "type": "impulse_3s",
       "stealth_mode": "impulse",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "cog_speed",
       "is_sensitive": false,
       "weight": 1.2,
@@ -276,7 +276,7 @@
       "id": "v5_q07",
       "type": "forced_choice",
       "stealth_mode": "projection",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "cog_global",
       "is_sensitive": false,
       "weight": 1.4,
@@ -366,7 +366,7 @@
             "big5_compassion": -1,
             "light_humanism": -0.4
           },
-          "social_desirability": 1
+          "social_desirability": 2
         },
         {
           "key": "B",
@@ -414,7 +414,7 @@
       "id": "v5_q11",
       "type": "forced_choice",
       "stealth_mode": "projection",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "cog_independent",
       "is_sensitive": true,
       "weight": 1.35,
@@ -561,7 +561,7 @@
       "id": "v5_q14",
       "type": "stealth_scale",
       "stealth_mode": "projection",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "cog_diverge",
       "is_sensitive": false,
       "weight": 0.85,
@@ -590,7 +590,7 @@
       "id": "v5_q15",
       "type": "impulse_3s",
       "stealth_mode": "impulse",
-      "layer": "explicit",
+      "layer": "stealth",
       "mirror_key": "cog_logic",
       "is_sensitive": false,
       "weight": 1.2,

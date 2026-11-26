@@ -7,8 +7,9 @@
    ============================================================ */
 
 import { el, go, clamp, round, toast } from '../core/utils.js';
-import { save, hasProgress, answeredCount, importJSON, reset } from '../core/storage.js';
+import { save, hasProgress, answeredCount, importJSON, mergeImportedState, reset } from '../core/storage.js';
 import { emblemSvg } from '../viz/emblemsSvg.js';
+import { THEMATIC_PACKS } from '../core/express.js';
 import {
   openNicknameDialog, openImportDialog, openSoulDialog, confirmDialog,
 } from './Dialogs.js';
@@ -252,7 +253,7 @@ export function renderHub(root, ctx) {
 
   left.appendChild(el('div', { class: 'hub-hero__kicker' }, [
     el('span', { class: 'line' }),
-    el('span', { class: 'eyebrow', text: 'THE HUMAN ATLAS · V4.4' }),
+    el('span', { class: 'eyebrow', text: 'THE HUMAN ATLAS · V5.2' }),
   ]));
 
   left.appendChild(el('h1', {
@@ -300,6 +301,15 @@ export function renderHub(root, ctx) {
       ? el('a', { class: 'btn', href: '#/report', text: '查看已有的报告' })
       : el('a', { class: 'btn btn--ghost', href: '#/quiz/vol1', text: '直接开始答题' }),
     el('a', { class: 'btn btn--ghost', href: '#/express', text: '28 题极速版' }),
+  ]));
+
+  left.appendChild(el('div', { class: 'hub-pack-pills' }, [
+    el('span', { class: 'hub-pack-pills__label', text: '10 题切面快诊：' }),
+    ...THEMATIC_PACKS.map((p) => el('a', {
+      class: 'hub-pack-pill',
+      href: `#/express/pack/${p.id}`,
+      text: p.title,
+    })),
   ]));
 
   hero.appendChild(left);
@@ -420,20 +430,7 @@ export function renderHub(root, ctx) {
       importJSONText: (text) => {
         const r = importJSON(text);
         if (r.ok) {
-          const merged = { ...App.state };
-          merged.completedVolumes = Array.from(new Set([
-            ...(App.state.completedVolumes || []),
-            ...(r.state.completedVolumes || []),
-          ]));
-          merged.answersByVolume = { ...(r.state.answersByVolume || {}), ...(App.state.answersByVolume || {}) };
-          merged.inProgress = { ...(r.state.inProgress || {}), ...(App.state.inProgress || {}) };
-          /* 本地分优先于导入分（与 importSoulCode 的合并口径一致） */
-          merged.computedScores = { ...(r.state.computedScores || {}), ...(App.state.computedScores || {}) };
-          merged.zScores = { ...(r.state.zScores || {}), ...(App.state.zScores || {}) };
-          merged.nickname = App.state.nickname || r.state.nickname || '';
-          merged.maskIndex = Number.isFinite(App.state.maskIndex) ? App.state.maskIndex : r.state.maskIndex;
-          if (!App.state.topValues?.length && r.state.topValues?.length) merged.topValues = r.state.topValues;
-          App.state = merged;
+          App.state = mergeImportedState(App.state, r.state);
           save(App.state, { immediate: true });
           recompute({ silent: true });
         }
@@ -463,7 +460,7 @@ export function renderHub(root, ctx) {
   tools.appendChild(tool(
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8.5" cy="12" r="4.5"/><circle cx="15.5" cy="12" r="4.5"/></svg>',
     '双人对比室',
-    '两人共同完成卷宗的交集，六大关系生态位合盘。',
+    '两人共同完成卷宗的交集，七大关系生态位合盘。',
     () => go('#/compare'),
   ));
 

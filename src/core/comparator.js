@@ -58,8 +58,7 @@ export const MIN_COMPARABLE_DIMS = 10;
 
 /** 底层共振度 R_sync = 100 − 平均绝对差 */
 export function resonance(a, b, dims, DATA) {
-  const core = dims.filter((d) => (DATA.pairRules.coreDims || []).includes(d));
-  const list = core.length ? core : dims;
+  const list = dims.filter((d) => (DATA.pairRules.coreDims || []).includes(d));
   if (!list.length) return null;
   const diffs = list.map((d) => Math.abs(a.computedScores[d] - b.computedScores[d]));
   return {
